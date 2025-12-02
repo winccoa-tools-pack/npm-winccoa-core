@@ -1,14 +1,18 @@
-# PR labeler configuration
+# PR labeler configuration (actions/labeler v6)
 # Adjust patterns to match your repository structure
 frontend:
-  - 'src/**'
+  paths:
+    - 'src/**'
 
 ci:
-  - '.github/workflows/**'
+  paths:
+    - '.github/workflows/**'
 
 docs:
-  - 'README.md'
-  - 'docs/**'
+  paths:
+    - 'README.md'
+    - 'docs/**'
 
 tests:
-  - 'test/**'
+  paths:
+    - 'test/**'
