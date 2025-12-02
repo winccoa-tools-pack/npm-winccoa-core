@@ -71,6 +71,50 @@ The `setup-gitflow.ps1` script applies protection rules:
 - **main**: Requires PR reviews, status checks, no force pushes
 - **develop**: Requires PR reviews, status checks, allows force pushes (for rebasing)
 
+## 🔐 NPM Publishing Setup
+
+To enable automatic publishing to the NPM registry when creating releases, you need to configure an NPM access token:
+
+### Why NPM_TOKEN is Required
+
+The `release.yml` workflow automatically publishes your package to NPM when you merge a release PR to `main`. This requires authentication with the NPM registry.
+
+### How to Get an NPM Access Token
+
+1. **Log in to NPM**
+   - Go to [npmjs.com](https://www.npmjs.com/) and sign in (or create an account)
+
+2. **Generate Access Token**
+   - Navigate to **Access Tokens** in your account settings: https://www.npmjs.com/settings/~/tokens
+   - Click **"Generate New Token"** → Select **"Automation"** type
+   - Copy the generated token (you won't see it again!)
+
+3. **Add Token to Repository**
+   - Go to your GitHub repository settings
+   - Navigate to **Settings** → **Secrets and variables** → **Actions**
+   - Click **"New repository secret"**
+   - Name: `NPM_TOKEN`
+   - Value: Paste your NPM access token
+   - Click **"Add secret"**
+
+### Token Permissions
+
+- **Automation tokens** are recommended for CI/CD (they don't expire but can be revoked)
+- The token needs **publish** permission for your package scope
+- For scoped packages (`@winccoa-tools-pack/...`), ensure your NPM organization allows publishing
+
+### Testing Without NPM_TOKEN
+
+If `NPM_TOKEN` is not configured, the workflow will:
+- ✅ Still run tests and build the package
+- ✅ Create GitHub releases with artifacts
+- ⚠️ Skip NPM publishing with a warning message
+
+You can always publish manually later:
+```bash
+npm publish --access public
+```
+
 ## 📦 Development
 
 ```bash
