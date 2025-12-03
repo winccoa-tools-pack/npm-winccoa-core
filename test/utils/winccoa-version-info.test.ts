@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { parseVersionString } from '../../src/utils/winccoa-version-info';
+import { parseVersionString } from '../../dist/utils/winccoa-version-info.js';
 
 describe('winccoa-version-info', () => {
     describe('parseVersionString', () => {
@@ -32,8 +32,8 @@ describe('winccoa-version-info', () => {
 
         it('should handle edge cases', () => {
             assert.strictEqual(parseVersionString('0.0'), 0);
-            assert.strictEqual(parseVersionString('1.0'), 101000);
-            assert.strictEqual(parseVersionString('99.99.999'), 99099999);
+            assert.strictEqual(parseVersionString('1.0'), 100000);
+            assert.strictEqual(parseVersionString('99.99.99'), 9999099);
         });
 
         it('should sort versions correctly', () => {
