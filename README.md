@@ -19,10 +19,7 @@ Minimal starter template for creating shared npm libraries with Git Flow workflo
    git clone https://github.com/winccoa-tools-pack/<your-library-name>
    cd <your-library-name>
    
-   # Run the setup script (PowerShell)
-   .\setup-gitflow.ps1
-   
-   # Or manually
+   # Initialize Git Flow locally (if you use the git-flow tool)
    git flow init -d
    git push -u origin develop
    ```
@@ -67,9 +64,13 @@ git flow hotfix finish 1.0.1
 
 ### Branch Protection
 
-The `setup-gitflow.ps1` script applies protection rules:
+This template includes a GitHub Actions workflow `setup-gitflow` that can apply branch protection rules and validate the Git Flow branch structure. The recommended default protections are:
 - **main**: Requires PR reviews, status checks, no force pushes
 - **develop**: Requires PR reviews, status checks, allows force pushes (for rebasing)
+
+To apply or validate branch protection in your new repository, run the `Setup Git Flow Branch Protection` workflow from the Actions tab or via `workflow_dispatch`.
+
+For a short guide on the Git Flow process and branch naming, see `docs/GITFLOW_WORKFLOW.md`.
 
 ## 🔐 NPM Publishing Setup
 
