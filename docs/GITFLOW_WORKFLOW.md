@@ -3,6 +3,7 @@
 This repository template uses the Git Flow branching model. The repository includes GitHub Actions workflows that help enforce branch protection and automate parts of the release process.
 
 Summary
+
 - main: Production-ready code (stable releases)
 - develop: Integration branch for ongoing development
 - feature/*: New features (branch off `develop`)
@@ -40,5 +41,21 @@ Applying branch protection
 There is a workflow `Setup Git Flow Branch Protection` in `.github/workflows/setup-gitflow.yml` which can apply recommended protection settings to `main` and `develop`. Run it from the Actions tab or via `workflow_dispatch` if you have repository admin rights.
 
 Notes
+
 - If you don't want to install the `git-flow` CLI, you can use standard git commands and follow the same branch naming conventions.
 - The template's release workflows (e.g. `release.yml`) will operate on `main` and require repository secrets (e.g. `NPM_TOKEN`) for publishing.
+
+---
+
+## 🎉 Thank You
+
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey. **Happy Coding! 🚀**
+
+---
+
+## Quick Links
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+<center>Made with ❤️ for and by the WinCC OA community</center>

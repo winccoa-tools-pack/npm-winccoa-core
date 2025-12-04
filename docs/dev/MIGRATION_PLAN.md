@@ -1,10 +1,12 @@
 # WinCC OA Core Library - Migration Plan
 
 ## Overview
+
 This document outlines the step-by-step plan to migrate reusable WinCC OA functionality from `vs-code-projects-viewer` extension into the `npm-shared-library-core` package.
 
 ## Repository Structure
-```
+
+```txt
 npm-shared-library-core/
 ├── src/
 │   ├── utils/          # Utility functions (paths, version parsing)
@@ -25,9 +27,11 @@ npm-shared-library-core/
 ## Migration Phases
 
 ### ✅ Phase 1: Repository Structure Setup (COMPLETED)
+
 **Status**: Merged to `develop`
 
 **Completed Steps**:
+
 - Created directory structure (`/src`, `/test`, `/docs`)
 - Added README.md files with standard footers
 - Established Git Flow workflow with CI/CD
@@ -35,9 +39,11 @@ npm-shared-library-core/
 ---
 
 ### ✅ Phase 2: Core Utilities Migration (COMPLETED)
+
 **Status**: Merged to `develop`
 
 **Step 2.1**: WinCC OA Path Discovery Utilities ✅
+
 - **Files Migrated**:
   - `src/utils/winccoa-paths.ts` - Platform-specific installation path discovery
   - `src/utils/winccoa-version-info.ts` - Version parsing and comparison
@@ -57,6 +63,7 @@ npm-shared-library-core/
 ### 🔄 Phase 3: Type Definitions Migration (IN PROGRESS)
 
 **Step 3.1**: Version Information Types
+
 - **Source**: `vs-code-projects-viewer/src/types/version/DetailedVersionInfo.ts`
 - **Target**: `src/types/version/DetailedVersionInfo.ts`
 - **Description**: Migrate version metadata types
@@ -70,6 +77,7 @@ npm-shared-library-core/
 - **Commit**: `feat(types): add version information types`
 
 **Step 3.2**: WinCC OA Component Types
+
 - **Source**: `vs-code-projects-viewer/src/types/components/`
 - **Target**: `src/types/components/`
 - **Description**: Migrate component type system (base class + implementations)
@@ -94,6 +102,7 @@ npm-shared-library-core/
 ### 📋 Phase 4: Core Business Logic Migration (PLANNED)
 
 **Step 4.1**: Project Detection and Parsing
+
 - **Description**: Logic to detect and parse WinCC OA projects
 - **Source Files**:
   - Project configuration parsing
@@ -107,6 +116,7 @@ npm-shared-library-core/
 - **Commit**: `feat(core): add project detection and parsing`
 
 **Step 4.2**: Component Analysis
+
 - **Description**: Component validation, dependency tracking, health checks
 - **Tasks**:
   - [ ] Create `src/core/analysis/` directory
@@ -116,6 +126,7 @@ npm-shared-library-core/
 - **Commit**: `feat(core): add component analysis logic`
 
 **Step 4.3**: Health and Status Utilities
+
 - **Description**: Project health checks, version compatibility validation
 - **Tasks**:
   - [ ] Create `src/core/health/` directory
@@ -129,6 +140,7 @@ npm-shared-library-core/
 ### 📚 Phase 5: Testing & Documentation (ONGOING)
 
 **Step 5.1**: Integration Tests
+
 - **Description**: End-to-end tests for complete workflows
 - **Tasks**:
   - [ ] Create `test/integration/` directory
@@ -138,6 +150,7 @@ npm-shared-library-core/
 - **Commit**: `test: add integration tests`
 
 **Step 5.2**: API Documentation
+
 - **Description**: Generate comprehensive API documentation
 - **Tasks**:
   - [ ] Add TSDoc comments to all public APIs
@@ -147,6 +160,7 @@ npm-shared-library-core/
 - **Commit**: `docs: add API documentation and examples`
 
 **Step 5.3**: Performance Optimization
+
 - **Description**: Optimize caching and performance-critical paths
 - **Tasks**:
   - [ ] Review and optimize caching strategies
@@ -160,12 +174,14 @@ npm-shared-library-core/
 ## Git Flow Workflow
 
 ### Branch Strategy
+
 - **main**: Production releases only
 - **develop**: Integration branch for ongoing work
 - **feature/**: Feature branches (e.g., `feature/component-types`)
 - **hotfix/**: Emergency fixes for production
 
 ### Commit Process
+
 1. Create feature branch from `develop`
 2. Implement changes with focused commits
 3. Push branch and create PR to `develop`
@@ -174,7 +190,8 @@ npm-shared-library-core/
 6. Release: Merge `develop` → `main` → auto-publish to npm
 
 ### Commit Message Format
-```
+
+```txt
 <type>(<scope>): <description>
 
 [optional body]
@@ -185,6 +202,7 @@ npm-shared-library-core/
 **Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`
 
 **Examples**:
+
 - `feat(utils): add WinCC OA path discovery utilities`
 - `feat(types): add version information types`
 - `fix(utils): handle missing registry keys on Windows`
@@ -196,17 +214,20 @@ npm-shared-library-core/
 ## Testing Strategy
 
 ### Unit Tests
+
 - **Location**: `test/utils/`, `test/types/`, `test/core/`
 - **Framework**: `node:test` (native Node.js test runner)
 - **Coverage Target**: >80%
 - **Run**: `npm test`
 
 ### Integration Tests
+
 - **Location**: `test/integration/`
 - **Purpose**: Test complete workflows
 - **Run**: `npm run test:integration`
 
 ### Platform-Specific Tests
+
 - **Windows**: Registry queries, path detection
 - **Linux**: `/opt` path scanning, version detection
 - **Mock Strategy**: Mock file system and registry operations
@@ -216,6 +237,7 @@ npm-shared-library-core/
 ## CI/CD Pipeline
 
 ### Pull Request Checks (Automated)
+
 - ✅ Build on Node.js 18.x, 20.x, 22.x
 - ✅ Run all tests
 - ✅ Lint code
@@ -223,6 +245,7 @@ npm-shared-library-core/
 - ✅ Generate coverage report
 
 ### Release Process (Automated)
+
 1. Merge PR to `develop`
 2. Merge `develop` → `main` for release
 3. CI/CD triggers:
@@ -237,14 +260,17 @@ npm-shared-library-core/
 ## Dependencies Strategy
 
 ### Keep Minimal
+
 - Avoid VS Code-specific dependencies (`vscode` module)
 - Use Node.js built-ins where possible (`fs`, `path`, `os`)
 - Platform-agnostic logic only
 
 ### Peer Dependencies
+
 - None required (standalone utility library)
 
 ### Dev Dependencies
+
 - TypeScript
 - Node.js test framework
 - Linting tools (ESLint)
@@ -255,16 +281,19 @@ npm-shared-library-core/
 ## Version Strategy
 
 ### Semantic Versioning (SemVer)
+
 - **Major (X.0.0)**: Breaking changes
 - **Minor (0.X.0)**: New features, backward compatible
 - **Patch (0.0.X)**: Bug fixes, backward compatible
 
 ### Pre-release Versions
+
 - **Alpha**: `0.1.0-alpha.1` - Early development
 - **Beta**: `0.1.0-beta.1` - Feature complete, testing
 - **RC**: `0.1.0-rc.1` - Release candidate
 
 ### Current Version
+
 - `0.1.0` - Initial development phase
 
 ---
@@ -293,6 +322,7 @@ npm-shared-library-core/
 ## Success Criteria
 
 ### Phase Completion Checklist
+
 - [ ] All source files migrated
 - [ ] All tests passing
 - [ ] Code coverage >80%
@@ -302,6 +332,7 @@ npm-shared-library-core/
 - [ ] Merged to `develop`
 
 ### Final Release Criteria
+
 - [ ] All phases completed
 - [ ] Integration tests passing
 - [ ] API documentation published
@@ -322,3 +353,18 @@ npm-shared-library-core/
 **Last Updated**: December 3, 2025  
 **Current Phase**: Phase 3 - Type Definitions Migration  
 **Next Milestone**: Complete component type system migration
+
+---
+
+## 🎉 Thank You
+
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey. **Happy Coding! 🚀**
+
+---
+
+## Quick Links
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+<center>Made with ❤️ for and by the WinCC OA community</center>

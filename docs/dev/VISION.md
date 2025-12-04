@@ -9,23 +9,27 @@ Create a **comprehensive, platform-agnostic, reusable TypeScript/Node.js library
 ## 🌟 Core Objectives
 
 ### 1. **Separation of Concerns**
+
 - Extract reusable WinCC OA logic from VS Code extension
 - Create platform-agnostic utilities usable in any Node.js environment
 - Enable code reuse across multiple tools and platforms
 
 ### 2. **High-Quality Foundation**
+
 - Comprehensive test coverage (>80%)
 - Type-safe TypeScript implementation
 - Cross-platform compatibility (Windows, Linux, macOS)
 - Performance-optimized with intelligent caching
 
 ### 3. **Developer Experience**
+
 - Clear, well-documented APIs
 - Intuitive function naming and structure
 - Rich TypeScript type definitions
 - Helpful error messages
 
 ### 4. **Ecosystem Growth**
+
 - Enable community contributions
 - Support multiple WinCC OA use cases
 - Foundation for future tools and extensions
@@ -35,7 +39,8 @@ Create a **comprehensive, platform-agnostic, reusable TypeScript/Node.js library
 ## 🏗️ Architecture Principles
 
 ### Layered Architecture
-```
+
+```txt
 ┌─────────────────────────────────────┐
 │   Applications & Extensions         │  ← VS Code Extension, CLI tools, etc.
 ├─────────────────────────────────────┤
@@ -50,29 +55,34 @@ Create a **comprehensive, platform-agnostic, reusable TypeScript/Node.js library
 ### Design Principles
 
 #### 1. **Platform Agnostic**
+
 - No VS Code dependencies
 - Abstract platform-specific operations
 - Support Windows (registry), Linux (/opt), macOS
 
 #### 2. **Functional & Composable**
+
 - Pure functions where possible
 - Composable utilities
 - Minimal side effects
 - Explicit dependency injection
 
 #### 3. **Performance First**
+
 - Intelligent caching strategies
 - Lazy evaluation
 - Efficient file system operations
 - Avoid unnecessary computations
 
 #### 4. **Type Safety**
+
 - Strong TypeScript types
 - No `any` types in public APIs
 - Comprehensive type exports
 - Runtime validation where needed
 
 #### 5. **Testability**
+
 - Unit tests for all functions
 - Integration tests for workflows
 - Mock-friendly architecture
@@ -111,6 +121,7 @@ import {
 ### Module Organization
 
 #### `/src/utils/` - Utility Functions
+
 - **Purpose**: Low-level helper functions
 - **Examples**:
   - Path discovery and resolution
@@ -123,6 +134,7 @@ import {
   - Highly reusable
 
 #### `/src/types/` - Type Definitions
+
 - **Purpose**: TypeScript interfaces and types
 - **Examples**:
   - Version information structures
@@ -134,6 +146,7 @@ import {
   - Comprehensive coverage
 
 #### `/src/core/` - Business Logic
+
 - **Purpose**: WinCC OA-specific logic
 - **Examples**:
   - Project detection and parsing
@@ -150,29 +163,34 @@ import {
 ## 🔧 Technology Stack
 
 ### Core Technologies
+
 - **Language**: TypeScript 5.x
 - **Runtime**: Node.js 18+ (LTS)
 - **Package Manager**: npm
 - **Build Tool**: TypeScript Compiler (tsc)
 
 ### Testing
+
 - **Framework**: node:test (native Node.js)
 - **Assertion**: node:assert
 - **Coverage**: c8 or nyc
 - **Mocking**: Manual mocks / test doubles
 
 ### Code Quality
+
 - **Linter**: ESLint with TypeScript rules
 - **Formatter**: Prettier (optional)
 - **Type Checking**: TypeScript strict mode
 - **Pre-commit**: Husky + lint-staged (optional)
 
 ### Documentation
+
 - **API Docs**: TSDoc + TypeDoc
 - **Guides**: Markdown in `/docs`
 - **Examples**: Code samples in docs
 
 ### CI/CD
+
 - **Platform**: GitHub Actions
 - **Triggers**: PR checks, release automation
 - **Deployment**: npm registry (public)
@@ -184,22 +202,26 @@ import {
 ### Naming Conventions
 
 #### Functions
+
 - **Verbs first**: `getWinCCOAVersion()`, `parseVersionString()`, `detectProject()`
 - **Clear intent**: `analyzeComponents()` not `analyze()`
 - **Boolean predicates**: `isValidVersion()`, `hasComponent()`
 
 #### Types/Interfaces
+
 - **PascalCase**: `DetailedVersionInfo`, `WinCCOAComponent`
 - **Descriptive names**: `ComponentType`, `ProjectConfiguration`
 - **Avoid abbreviations**: `VersionInfo` not `VerInfo`
 
 #### Constants
+
 - **UPPER_SNAKE_CASE**: `DEFAULT_CACHE_TTL`, `MAX_RETRIES`
 - **Group by domain**: `Version.DEFAULT_FORMAT`, `Path.SEPARATOR`
 
 ### Error Handling
 
 #### Explicit Errors
+
 ```typescript
 // Throw descriptive errors
 throw new Error('WinCC OA version 3.19 not found in registry');
@@ -214,11 +236,13 @@ class WinCCOANotFoundError extends Error {
 ```
 
 #### Error Recovery
+
 - Return `null` or `undefined` for "not found" cases
 - Throw errors for unexpected failures
 - Provide fallback values where appropriate
 
 ### Async Operations
+
 - Use `async/await` for clarity
 - Return Promises for async operations
 - Avoid callback-based APIs
@@ -291,18 +315,21 @@ class WinCCOANotFoundError extends Error {
 ## 📊 Quality Metrics
 
 ### Code Quality
+
 - **Test Coverage**: ≥80% lines, branches, functions
 - **Type Coverage**: 100% (no implicit `any`)
 - **Linting**: Zero errors, minimal warnings
 - **Complexity**: Keep cyclomatic complexity <10
 
 ### Performance
+
 - **Cold Start**: <100ms for simple operations
 - **Cached Operations**: <10ms
 - **Memory**: Efficient caching, no memory leaks
 - **File I/O**: Batch operations, minimize reads
 
 ### Documentation
+
 - **API Coverage**: 100% of public APIs documented
 - **Examples**: At least one example per major feature
 - **Guides**: Setup, usage, troubleshooting
@@ -348,12 +375,14 @@ class WinCCOANotFoundError extends Error {
 ## 🌍 Cross-Platform Considerations
 
 ### Windows
+
 - **Registry Access**: Use `child_process.execSync('reg query ...')`
 - **Path Format**: Handle `C:\` and backslashes
 - **Line Endings**: CRLF (`\r\n`)
 - **Case Sensitivity**: Case-insensitive paths
 
 ### Linux
+
 - **Installation Path**: `/opt/WinCC_OA/`
 - **Path Format**: Forward slashes
 - **Line Endings**: LF (`\n`)
@@ -361,12 +390,14 @@ class WinCCOANotFoundError extends Error {
 - **Permissions**: Check read/execute permissions
 
 ### macOS
+
 - **Installation Path**: TBD (likely `/Applications/` or `/opt/`)
 - **Path Format**: Forward slashes
 - **Line Endings**: LF (`\n`)
 - **Case Sensitivity**: Configurable (usually case-insensitive)
 
 ### Abstraction Strategy
+
 ```typescript
 // Platform detection
 const isWindows = process.platform === 'win32';
@@ -387,27 +418,32 @@ function getInstallPath(): string | null {
 ## 🎯 Future Roadmap
 
 ### v0.1.0 - Initial Release (Current)
+
 - ✅ Utilities: Path discovery, version parsing
 - 🔄 Types: Version info, components
 - 📋 Core: Project detection (planned)
 
 ### v0.2.0 - Core Logic Expansion
+
 - Component analysis
 - Health checks
 - Dependency resolution
 
 ### v0.3.0 - Advanced Features
+
 - Configuration management
 - Template generation
 - Build automation helpers
 
 ### v1.0.0 - Stable Release
+
 - Complete API coverage
 - Full documentation
 - Performance optimized
 - Used in production (vs-code-projects-viewer)
 
 ### v1.x - Enhancements
+
 - Additional platforms (macOS)
 - Advanced caching strategies
 - Performance benchmarks
@@ -418,17 +454,20 @@ function getInstallPath(): string | null {
 ## 🤝 Contribution Guidelines
 
 ### Code Standards
+
 - Follow TypeScript best practices
 - Write tests for all new code
 - Document public APIs with TSDoc
 - Keep functions small and focused
 
 ### Commit Messages
+
 - Use conventional commits format
 - Be descriptive but concise
 - Reference issues/PRs when applicable
 
 ### Pull Requests
+
 - One feature/fix per PR
 - Include tests and documentation
 - Ensure CI/CD passes
@@ -439,14 +478,17 @@ function getInstallPath(): string | null {
 ## 📚 Learning Resources
 
 ### TypeScript
+
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
 
 ### Node.js Testing
+
 - [Node.js Test Runner](https://nodejs.org/api/test.html)
 - [Testing Best Practices](https://github.com/goldbergyoni/nodebestpractices#testing)
 
 ### WinCC OA
+
 - Internal WinCC OA documentation
 - Component structure reference
 - Version compatibility matrix
@@ -456,3 +498,18 @@ function getInstallPath(): string | null {
 **Last Updated**: December 3, 2025  
 **Vision Status**: Active Development  
 **Target Release**: v1.0.0 (Q1 2026)
+
+---
+
+## 🎉 Thank You
+
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey. **Happy Coding! 🚀**
+
+---
+
+## Quick Links
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+<center>Made with ❤️ for and by the WinCC OA community</center>

@@ -7,6 +7,7 @@ Minimal starter template for creating shared npm libraries with Git Flow workflo
 ### Initial Setup
 
 1. **Create repository from this template**
+
    ```bash
    # Via GitHub CLI
    gh repo create winccoa-tools-pack/<your-library-name> \
@@ -15,6 +16,7 @@ Minimal starter template for creating shared npm libraries with Git Flow workflo
    ```
 
 2. **Clone and initialize Git Flow**
+
    ```bash
    git clone https://github.com/winccoa-tools-pack/<your-library-name>
    cd <your-library-name>
@@ -25,6 +27,7 @@ Minimal starter template for creating shared npm libraries with Git Flow workflo
    ```
 
 3. **Install dependencies and build**
+
    ```bash
    npm install
    npm run build
@@ -36,6 +39,7 @@ Minimal starter template for creating shared npm libraries with Git Flow workflo
 This template uses [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for branch management:
 
 ### Branch Structure
+
 - **`main`** - Production-ready code (stable releases)
 - **`develop`** - Integration branch (pre-release features)
 - **`feature/*`** - New features
@@ -65,6 +69,7 @@ git flow hotfix finish 1.0.1
 ### Branch Protection
 
 This template includes a GitHub Actions workflow `setup-gitflow` that can apply branch protection rules and validate the Git Flow branch structure. The recommended default protections are:
+
 - **main**: Requires PR reviews, status checks, no force pushes
 - **develop**: Requires PR reviews, status checks, allows force pushes (for rebasing)
 
@@ -86,7 +91,7 @@ The `release.yml` workflow automatically publishes your package to NPM when you 
    - Go to [npmjs.com](https://www.npmjs.com/) and sign in (or create an account)
 
 2. **Generate Access Token**
-   - Navigate to **Access Tokens** in your account settings: https://www.npmjs.com/settings/~/tokens
+   - Navigate to **Access Tokens** in your account settings: <https://www.npmjs.com/settings/~/tokens>
    - Click **"Generate New Token"** → Select **"Automation"** type
    - Copy the generated token (you won't see it again!)
 
@@ -107,11 +112,13 @@ The `release.yml` workflow automatically publishes your package to NPM when you 
 ### Testing Without NPM_TOKEN
 
 If `NPM_TOKEN` is not configured, the workflow will:
+
 - ✅ Still run tests and build the package
 - ✅ Create GitHub releases with artifacts
 - ⚠️ Skip NPM publishing with a warning message
 
 You can always publish manually later:
+
 ```bash
 npm publish --access public
 ```
@@ -137,6 +144,7 @@ npm run lint
 Special thanks to all our [contributors](https://github.com/orgs/winccoa-tools-pack/people) who make this project possible!
 
 ### Key Contributors
+
 - **Martin Pokorny** ([@mPokornyETM](https://github.com/mPokornyETM)) - Creator & Lead Developer
 - And many more amazing contributors!
 
@@ -156,19 +164,16 @@ It might happens, that the partial repositories contains third party SW which ar
 
 ---
 
-## 🎉 Thank You!
+## 🎉 Thank You
 
-Thank you for using WinCC OA tools package! We're excited to be part of your development journey.
-
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey.
 **Happy Coding! 🚀**
 
 ---
 
-<div align="center">
-
-**Quick Links**
+## Quick Links
 
 • [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
 
-*Made with ❤️ for and by the WinCC OA community*
-</div>
+<center>Made with ❤️ for and by the WinCC OA community</center>
