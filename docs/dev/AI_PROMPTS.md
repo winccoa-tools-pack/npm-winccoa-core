@@ -479,3 +479,18 @@ Replace placeholders:
 
 **Last Updated**: December 3, 2025  
 **Usage**: Copy and customize these prompts for your development workflow
+
+---
+
+**Happy Coding! 🚀**
+
+---
+
+<div align="center">
+
+**Quick Links**
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+*Made with ❤️ for and by the WinCC OA community*
+</div>

@@ -322,3 +322,18 @@ npm-shared-library-core/
 **Last Updated**: December 3, 2025  
 **Current Phase**: Phase 3 - Type Definitions Migration  
 **Next Milestone**: Complete component type system migration
+
+---
+
+**Happy Coding! 🚀**
+
+---
+
+<div align="center">
+
+**Quick Links**
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+*Made with ❤️ for and by the WinCC OA community*
+</div>

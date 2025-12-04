@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { test } from 'node:test';
 import { PmonComponent } from '../dist/types/components/implementations/PmonComponent.js';
-import type { WinCCOAManager } from '../dist/types/status/WinCCOAManager.js';
+
 
 // We'll stub execAndCollectLines on PmonComponent instances to return sample outputs
 
@@ -17,7 +17,7 @@ test('PmonComponent STATI parsing - parse MGRLIST:STATI output into managers and
     // mock execAndCollectLines to return the sample output as lines
     (pmon as any).execAndCollectLines = async () => sampleStati.split('\n');
 
-    const result = await pmon.getManagerStatusList('MyProject');
+    const result = await pmon.getProjectStatus('MyProject');
 
     assert.ok(result);
     assert.ok(Array.isArray(result.managers));
@@ -39,11 +39,11 @@ test('PmonComponent STATI parsing - parse MGRLIST:STATI output into managers and
     assert.strictEqual(m2.runningState, 'init');
 
     // project state
-    assert.ok(result.projectState);
-    assert.strictEqual(result.projectState?.statusCode, 0);
-    assert.strictEqual(result.projectState?.text, 'WAIT_MODE');
+    assert.ok(result.project);
+    assert.strictEqual(result.project?.statusCode, 0);
+    assert.strictEqual(result.project?.text, 'WAIT_MODE');
     // also test getManagerStatusAt
-    const single = await pmon.getManagerStatusAt(2);
+    const single = await pmon.getManagerStatusAt(2, 'MyProject');
     assert.ok(single);
     assert.strictEqual(single?.managerNumber, 3);
 });

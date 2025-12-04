@@ -16,7 +16,7 @@ WCCOAui;1;60;5;1;--opt
 
     assert.ok(Array.isArray(managers));
     assert.strictEqual(managers.length, 3);
-    const opt = await pmon.getManagerOptionsAt(1);
+    const opt = await pmon.getManagerOptionsAt(1, 'MyProject');
     assert.ok(opt);
 
     const m0 = managers[0];

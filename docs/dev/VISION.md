@@ -456,3 +456,18 @@ function getInstallPath(): string | null {
 **Last Updated**: December 3, 2025  
 **Vision Status**: Active Development  
 **Target Release**: v1.0.0 (Q1 2026)
+
+---
+
+**Happy Coding! 🚀**
+
+---
+
+<div align="center">
+
+**Quick Links**
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+*Made with ❤️ for and by the WinCC OA community*
+</div>

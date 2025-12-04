@@ -2,10 +2,11 @@ import { WinCCOAComponent } from '../WinCCOAComponent.js';
 import { spawn } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ProjEnvPmonStatus } from '../../project/PmonProjectRunningStatus.js';
+import { ProjEnvPmonStatus } from '../../project/ProjEnvPmonStatus.js';
 import type { ProjEnvManagerOptions } from '../../project/ProjEnv.js';
 import { ProjEnvManagerStartMode, ProjEnvManagerState } from '../../project/ProjEnv.js';
 import type { ProjEnvManagerInfo } from '../../project/ProjEnv.js';
+import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus.js';
 
 export class PmonComponent extends WinCCOAComponent {
     public getName(): string {
@@ -197,7 +198,7 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
-    public async checkProjectStatus(projectName: string, outputCallback?: (message: string) => void): Promise<{ project: string; status: import('../../project/PmonProjectRunningStatus.js').ProjEnvPmonStatus; error?: string }>
+    public async checkProjectStatus(projectName: string, outputCallback?: (message: string) => void): Promise<{ project: string; status: ProjEnvPmonStatus; error?: string }>
     {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -486,9 +487,6 @@ export class PmonComponent extends WinCCOAComponent {
         const args = ['-proj', projectName, '-command', 'MGRLIST:LIST', '-log', '+stdout'];
         const lines = await this.execAndCollectLines(pmonPath, args, outputCallback);
         const parsed = this.parseManagerList(lines.join('\n'));
-        // cache options list for convenience accessors
-        this._lastManagers = parsed;
-        this._lastProjectName = projectName;
         return parsed;
     }
 
@@ -505,24 +503,17 @@ export class PmonComponent extends WinCCOAComponent {
             return list[index];
         }
 
-        if (this._lastManagers) {
-            return this._lastManagers[index] as ProjEnvManagerOptions | undefined;
-        }
-
         return undefined;
     }
 
     /**
-     * Gets detailed manager status (MGRLIST:STATI) and returns typed managers and optional project state
+     * Gets detailed project and manager status (MGRLIST:STATI) and returns typed managers and optional project state
      */
-    private _lastManagers: (ProjEnvManagerOptions | ProjEnvManagerInfo)[] | undefined;
-    private _lastProjectState: { status: string; statusCode: number; text: string; emergency: boolean; demo: boolean } | undefined;
-    private _lastProjectName: string | undefined;
 
-    public async getManagerStatusList(
+    public async getProjectStatus(
         projectName: string,
         outputCallback?: (message: string) => void
-    ): Promise<{ managers: ProjEnvManagerInfo[]; projectState?: { status: string; statusCode: number; text: string; emergency: boolean; demo: boolean } }> {
+    ): Promise<ProjEnvPmonProjectStatus> {
         const pmonPath = await this.getPath();
         if (!pmonPath) {
             const errorMsg = 'Could not locate WCCILpmon executable';
@@ -534,10 +525,6 @@ export class PmonComponent extends WinCCOAComponent {
         const lines = await this.execAndCollectLines(pmonPath, args, outputCallback);
         const raw = lines.join('\n');
         const parsed = this.parseManagerStatus(raw);
-        // cache results
-        this._lastManagers = parsed.managers;
-        this._lastProjectState = parsed.projectState;
-        this._lastProjectName = projectName;
         return parsed;
     }
 
@@ -553,13 +540,10 @@ export class PmonComponent extends WinCCOAComponent {
     ): Promise<ProjEnvManagerInfo | undefined> {
         if (typeof index !== 'number' || index < 0) return undefined;
 
-        if (projectName) {
-            const res = await this.getManagerStatusList(projectName, outputCallback);
-            return res.managers[index];
-        }
 
-        if (this._lastManagers) {
-            return this._lastManagers[index] as ProjEnvManagerInfo | undefined;
+        if (projectName) {
+            const res = await this.getProjectStatus(projectName, outputCallback);
+            return res.managers[index];
         }
 
         // No cached data and no project specified
@@ -646,7 +630,9 @@ export class PmonComponent extends WinCCOAComponent {
     }
 
     // Parse STATI output into typed managers and project state
-    private parseManagerStatus(output: string): { managers: ProjEnvManagerInfo[]; projectState?: { status: string; statusCode: number; text: string; emergency: boolean; demo: boolean } } {
+    private parseManagerStatus(output: string): ProjEnvPmonProjectStatus  
+    // {   managers: ProjEnvManagerState[]; project?: { status: string; statusCode: number; text: string; emergency: boolean; demo: boolean } } 
+    {
         const managers: ProjEnvManagerInfo[] = [];
         const lines = output.split('\n');
 
@@ -750,12 +736,18 @@ export class PmonComponent extends WinCCOAComponent {
                     : (startModeEnum === ProjEnvManagerStartMode.Manual) ? 'manual'
                     : 'unknown';
 
-                managers.push(managerObj as ProjEnvManagerInfo);
+                managers.push(managerObj);
 
                 managerIndex++;
             }
         }
 
-        return { managers, projectState };
+    
+        const state: ProjEnvPmonProjectStatus = {
+            managers: managers,
+            project: projectState
+        };
+
+        return state;
     }
 }

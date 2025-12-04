@@ -42,3 +42,18 @@ There is a workflow `Setup Git Flow Branch Protection` in `.github/workflows/set
 Notes
 - If you don't want to install the `git-flow` CLI, you can use standard git commands and follow the same branch naming conventions.
 - The template's release workflows (e.g. `release.yml`) will operate on `main` and require repository secrets (e.g. `NPM_TOKEN`) for publishing.
+
+---
+
+**Happy Coding! 🚀**
+
+---
+
+<div align="center">
+
+**Quick Links**
+
+• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+
+*Made with ❤️ for and by the WinCC OA community*
+</div>
