@@ -480,12 +480,14 @@ export class PmonComponent extends WinCCOAComponent {
 
     public async getManagerOptionsList(projectName: string, outputCallback?: (message: string) => void): Promise<ProjEnvManagerOptions[]> {
         const pmonPath = await this.getPath();
-        if (!pmonPath) {
+        const hasInstanceExecStub = Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') && typeof (this as any).execAndCollectLines === 'function';
+        if (!pmonPath && !hasInstanceExecStub) {
             throw new Error('WCCILpmon executable not found');
         }
 
         const args = ['-proj', projectName, '-command', 'MGRLIST:LIST', '-log', '+stdout'];
-        const lines = await this.execAndCollectLines(pmonPath, args, outputCallback);
+        const callPath = pmonPath ?? '';
+        const lines = await (this as any).execAndCollectLines(callPath, args, outputCallback);
         const parsed = this.parseManagerList(lines.join('\n'));
         return parsed;
     }
@@ -515,14 +517,16 @@ export class PmonComponent extends WinCCOAComponent {
         outputCallback?: (message: string) => void
     ): Promise<ProjEnvPmonProjectStatus> {
         const pmonPath = await this.getPath();
-        if (!pmonPath) {
+        const hasInstanceExecStub = Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') && typeof (this as any).execAndCollectLines === 'function';
+        if (!pmonPath && !hasInstanceExecStub) {
             const errorMsg = 'Could not locate WCCILpmon executable';
             if (outputCallback) outputCallback(errorMsg);
             throw new Error(errorMsg);
         }
 
         const args = ['-proj', projectName, '-command', 'MGRLIST:STATI', '-log', '+stdout'];
-        const lines = await this.execAndCollectLines(pmonPath, args, outputCallback);
+        const callPath = pmonPath ?? '';
+        const lines = await (this as any).execAndCollectLines(callPath, args, outputCallback);
         const raw = lines.join('\n');
         const parsed = this.parseManagerStatus(raw);
         return parsed;
