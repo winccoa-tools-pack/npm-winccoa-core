@@ -9,15 +9,15 @@ This directory contains documentation for the WinCC OA Core Library.
 
 ---
 
-**Happy Coding! 🚀**
+## 🎉 Thank You
+
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey. **Happy Coding! 🚀**
 
 ---
 
-<div align="center">
-
-**Quick Links**
+## Quick Links
 
 • [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
 
-*Made with ❤️ for and by the WinCC OA community*
-</div>
+<center>Made with ❤️ for and by the WinCC OA community</center>
