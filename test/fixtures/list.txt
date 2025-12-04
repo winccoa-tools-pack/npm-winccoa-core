@@ -1,0 +1,11 @@
+LIST:9
+WCCILpmon;0;30;3;1;
+WCCILdataSQLite;0;30;3;1;
+WCCOAnextgenarch;0;30;2;2;
+WCCILevent;0;30;3;1;
+WCCILproxy;0;30;2;2;
+WCCOActrl;0;30;3;1;-num 1 -f pvss_scripts.lst
+WCCILsim;0;-30;3;1;
+WCCOActrl;2;30;2;2;webclient_http.ctl -num 2
+WCCOAui;1;30;3;1;-m gedi -n -num 4
+;

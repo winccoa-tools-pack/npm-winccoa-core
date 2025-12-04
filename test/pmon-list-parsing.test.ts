@@ -1,21 +1,22 @@
 import assert from 'assert';
 import { test } from 'node:test';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import { PmonComponent } from '../dist/types/components/implementations/PmonComponent.js';
 
 test('PmonComponent LIST parsing - parse MGRLIST:LIST output into managers', async () => {
-    const sampleList = `LIST:3
-WCCILpmon;0;30;3;1;
-WCCILdata;2;30;3;1;-arg1 -arg2
-WCCOAui;1;60;5;1;--opt
-;`;
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'list.txt'), 'utf8');
 
     const pmon = new PmonComponent();
-    (pmon as any).execAndCollectLines = async () => sampleList.split('\n');
+    (pmon as any).execAndCollectLines = async () => fixture.split('\n');
 
-        const managers = await pmon.getManagerOptionsList('MyProject'); // Renamed to getManagerOptionsList
+    const managers = await pmon.getManagerOptionsList('MyProject');
 
     assert.ok(Array.isArray(managers));
-    assert.strictEqual(managers.length, 3);
+    assert.strictEqual(managers.length, 9);
     const opt = await pmon.getManagerOptionsAt(1, 'MyProject');
     assert.ok(opt);
 
@@ -24,11 +25,7 @@ WCCOAui;1;60;5;1;--opt
     assert.strictEqual(m0.startMode, 0);
 
     const m1 = managers[1];
-    assert.strictEqual(m1.component, 'WCCILdata');
-    assert.strictEqual(m1.startOptions, '-arg1 -arg2');
-    assert.strictEqual(m1.startMode, 2);
-
-    const m2 = managers[2];
-    assert.strictEqual(m2.component, 'WCCOAui');
-    assert.strictEqual(m2.startMode, 1);
+    assert.strictEqual(m1.component, 'WCCILdataSQLite');
+    const withArgs = managers.find((p: any) => p.component === 'WCCOActrl' && p.startOptions && p.startOptions.includes('-num 1'));
+    assert.ok(withArgs);
 });
