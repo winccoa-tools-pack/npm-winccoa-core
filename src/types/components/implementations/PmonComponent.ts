@@ -46,19 +46,17 @@ export class PmonComponent extends WinCCOAComponent {
                 stdio: ['pipe', 'pipe', 'pipe'],
             });
 
-            let stdout = '';
-            let stderr = '';
+            this.stdOut = '';
+            this.stdErr = '';
 
             process.stdout?.on('data', (data) => {
                 const output = data.toString();
-                stdout += output;
                 this.stdOut += output;
                 if (outputCallback) outputCallback(output);
             });
 
             process.stderr?.on('data', (data) => {
                 const output = data.toString();
-                stderr += output;
                 this.stdErr += output;
                 if (outputCallback) outputCallback(output);
             });
@@ -76,7 +74,7 @@ export class PmonComponent extends WinCCOAComponent {
                     const errorMsg = `Sub-project registration failed with exit code ${code}`;
                     if (outputCallback) {
                         outputCallback(errorMsg);
-                        if (stderr) outputCallback(`Error details: ${stderr}`);
+                        if (this.stdErr) outputCallback(`Error details: ${this.stdErr}`);
                     }
                     reject(new Error(errorMsg));
                 }
@@ -120,19 +118,17 @@ export class PmonComponent extends WinCCOAComponent {
                 stdio: ['pipe', 'pipe', 'pipe'],
             });
 
-            let stdout = '';
-            let stderr = '';
+            this.stdOut = '';
+            this.stdErr = '';
 
             process.stdout?.on('data', (data) => {
                 const output = data.toString();
-                stdout += output;
                 this.stdOut += output;
                 if (outputCallback) outputCallback(output);
             });
 
             process.stderr?.on('data', (data) => {
                 const output = data.toString();
-                stderr += output;
                 this.stdErr += output;
                 if (outputCallback) outputCallback(output);
             });
@@ -150,7 +146,7 @@ export class PmonComponent extends WinCCOAComponent {
                     const errorMsg = `Project unregistration failed with exit code ${code}`;
                     if (outputCallback) {
                         outputCallback(errorMsg);
-                        if (stderr) outputCallback(`Error details: ${stderr}`);
+                        if (this.stdErr) outputCallback(`Error details: ${this.stdErr}`);
                     }
                     reject(new Error(errorMsg));
                 }
@@ -194,19 +190,17 @@ export class PmonComponent extends WinCCOAComponent {
                 stdio: ['pipe', 'pipe', 'pipe'],
             });
 
-            let stdout = '';
-            let stderr = '';
+            this.stdOut = '';
+            this.stdErr = '';
 
             process.stdout?.on('data', (data) => {
                 const output = data.toString();
-                stdout += output;
                 this.stdOut += output;
                 if (outputCallback) outputCallback(output);
             });
 
             process.stderr?.on('data', (data) => {
                 const output = data.toString();
-                stderr += output;
                 this.stdErr += output;
                 if (outputCallback) outputCallback(`[STDERR] ${output}`);
             });
@@ -222,8 +216,8 @@ export class PmonComponent extends WinCCOAComponent {
                     const errorMsg = `Project registration failed with exit code ${code}`;
                     if (outputCallback) {
                         outputCallback(errorMsg);
-                        if (stderr) outputCallback(`STDERR: ${stderr}`);
-                        if (stdout) outputCallback(`STDOUT: ${stdout}`);
+                        if (this.stdErr) outputCallback(`STDERR: ${this.stdErr}`);
+                        if (this.stdOut) outputCallback(`STDOUT: ${this.stdOut}`);
                     }
                     reject(new Error(errorMsg));
                 }
@@ -266,7 +260,9 @@ export class PmonComponent extends WinCCOAComponent {
                 stdout += data.toString();
             });
             process.stderr.on('data', (data) => {
-                stderr += data.toString();
+                const output = data.toString();
+                    if (outputCallback) outputCallback(output);
+                stderr += output;
             });
 
             process.on('close', (code) => {
@@ -283,11 +279,7 @@ export class PmonComponent extends WinCCOAComponent {
             process.on('error', (error) => {
                 const errorMsg = `Failed to check project status: ${error.message}`;
                 if (outputCallback) outputCallback(errorMsg);
-                resolve({
-                    project: projectName,
-                    status: ProjEnvPmonStatus.Unknown,
-                    error: error.message,
-                });
+                reject(new Error(errorMsg));
             });
         });
     }
@@ -898,7 +890,6 @@ export class PmonComponent extends WinCCOAComponent {
         const lines = output.split('\n');
 
         let listStarted = false;
-        let managerIndex = 0;
         let projectState:
             | {
                   status: string;
@@ -907,7 +898,7 @@ export class PmonComponent extends WinCCOAComponent {
                   emergency: boolean;
                   demo: boolean;
               }
-            | undefined;
+            | undefined = undefined;
         let projectStateLineFound = false;
 
         for (let i = 0; i < lines.length; i++) {
@@ -1043,8 +1034,6 @@ export class PmonComponent extends WinCCOAComponent {
                             : 'unknown';
 
                 managers.push(managerObj);
-
-                managerIndex++;
             }
         }
 

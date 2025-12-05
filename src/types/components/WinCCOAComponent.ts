@@ -156,7 +156,6 @@ export abstract class WinCCOAComponent {
         return new Promise((resolve, reject) => {
             const proc = spawn(cmdPath, args, { shell: false });
             let stdout = '';
-            let stderr = '';
 
             proc.stdout?.on('data', (d) => {
                 const s = d.toString();
@@ -167,12 +166,11 @@ export abstract class WinCCOAComponent {
 
             proc.stderr?.on('data', (d) => {
                 const s = d.toString();
-                stderr += s;
                 this.stdErr += s;
                 if (outputCallback) outputCallback(s);
             });
 
-            proc.on('close', (code) => {
+            proc.on('close', (_code) => {
                 const lines = stdout
                     .split(/\r?\n/)
                     .map((l) => l.trim())

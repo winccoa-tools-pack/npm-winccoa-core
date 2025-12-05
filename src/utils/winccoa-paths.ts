@@ -84,6 +84,7 @@ function getWindowsInstallationPath(version: string): string | null {
                 return installPath;
             }
         }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         // Registry key not found or command failed
         // Fall back to default paths
@@ -167,6 +168,7 @@ export function getWindowsAvailableVersions(): string[] {
                 versions.push(match[1]);
             }
         }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         // Registry query failed, try common paths
     }
@@ -197,6 +199,7 @@ function getUnixAvailableVersions(): string[] {
         return versions.sort(
             (a: string, b: string) => parseVersionString(b) - parseVersionString(a),
         );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         return [];
     }

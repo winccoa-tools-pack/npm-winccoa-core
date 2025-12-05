@@ -1,4 +1,3 @@
-import { ProjEnvManagerState } from './ProjEnv';
 import type { ProjEnvManagerInfo } from './ProjEnv';
 
 /**
