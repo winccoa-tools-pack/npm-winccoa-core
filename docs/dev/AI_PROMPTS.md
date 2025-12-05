@@ -61,7 +61,7 @@ Use node:test framework with describe/it structure and node:assert for assertion
 
 ### Implement Core Business Logic
 
-```txt
+````txt
 Implement [FEATURE_NAME] business logic for the WinCC OA core library.
 
 Feature description: [DETAILED_DESCRIPTION]
@@ -80,9 +80,9 @@ Expected API:
 export function [functionName]([params]): [ReturnType] {
   // Implementation
 }
-```
+````
 
-```
+````
 
 ---
 
@@ -104,7 +104,7 @@ Please:
 4. Verify all tests pass
 5. Explain what was wrong and how it was fixed
 
-```
+````
 
 ### Fix Platform-Specific Issue
 
@@ -587,11 +587,8 @@ Replace placeholders:
 
 ---
 
-
-
 ## Quick Links
 
 • [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
 
 <center>Made with ❤️ for and by the WinCC OA community</center>
-

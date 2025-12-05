@@ -33,7 +33,7 @@ import { parseVersionString } from './winccoa-version-info.js';
  * Note: Cache persists for extension lifetime. Extension reload required
  * if WinCC OA installations change.
  */
-var cachedWinCCOAInstallationPathByVersion: { [version: string]: string | null } = {};
+const cachedWinCCOAInstallationPathByVersion: { [version: string]: string | null } = {};
 
 /**
  * Finds the WinCC OA installation path for a given version
@@ -118,7 +118,7 @@ function getUnixInstallationPath(version: string): string | null {
  * Note: Set to null initially, populated on first call. Cache persists for
  * extension lifetime. Extension reload required if WinCC OA versions change.
  */
-var cachedAvailableWinCCOAVersions: string[] | null = null;
+let cachedAvailableWinCCOAVersions: string[] | null = null;
 
 /**
  * Gets available WinCC OA versions installed on the system
@@ -194,7 +194,9 @@ function getUnixAvailableVersions(): string[] {
         });
 
         // Sort versions descending
-        return versions.sort((a: string, b: string) => parseVersionString(b) - parseVersionString(a));
+        return versions.sort(
+            (a: string, b: string) => parseVersionString(b) - parseVersionString(a),
+        );
     } catch (error) {
         return [];
     }

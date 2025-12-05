@@ -15,10 +15,16 @@ export class UIComponent extends WinCCOAComponent {
      * @param args - Additional arguments
      * @returns Process exit code
      */
-    public async startWithPanel(panelPath: string, args: string[] = [], outputCallback?: (msg: string) => void): Promise<number> {
+    public async startWithPanel(
+        panelPath: string,
+        args: string[] = [],
+        outputCallback?: (msg: string) => void,
+    ): Promise<number> {
         const cmdArgs = ['-p', panelPath, ...args];
 
-        const hasExecStub = Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') && typeof (this as any).execAndCollectLines === 'function';
+        const hasExecStub =
+            Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') &&
+            typeof (this as any).execAndCollectLines === 'function';
         const exePath = this.getPath();
         if (!exePath && hasExecStub) {
             try {

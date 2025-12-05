@@ -6,16 +6,16 @@ Summary
 
 - main: Production-ready code (stable releases)
 - develop: Integration branch for ongoing development
-- feature/*: New features (branch off `develop`)
-- release/*: Prepare and test release candidates (branch off `develop`)
-- hotfix/*: Emergency fixes for `main`
+- feature/\*: New features (branch off `develop`)
+- release/\*: Prepare and test release candidates (branch off `develop`)
+- hotfix/\*: Emergency fixes for `main`
 
 Recommended local setup
 
 1. Install the `git-flow` tooling for your platform (optional).
-   - Windows: use Scoop/Chocolatey or WSL
-   - macOS: `brew install git-flow-avh`
-   - Linux: `apt install git-flow` (Debian/Ubuntu)
+    - Windows: use Scoop/Chocolatey or WSL
+    - macOS: `brew install git-flow-avh`
+    - Linux: `apt install git-flow` (Debian/Ubuntu)
 
 2. Initialize git-flow locally (if using the tool):
 

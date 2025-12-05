@@ -12,7 +12,7 @@
  * @returns Numeric representation for comparison (e.g., "3.19" -> 30190, "3.19.1" -> 319001)
  */
 export function parseVersionString(version: string): number {
-    const parts = version.split('.').map(part => parseInt(part, 10) || 0);
+    const parts = version.split('.').map((part) => parseInt(part, 10) || 0);
     const major = parts[0] || 0;
     const minor = parts[1] || 0;
     const patch = parts[2] || 0;
