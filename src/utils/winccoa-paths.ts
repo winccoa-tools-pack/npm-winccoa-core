@@ -33,7 +33,7 @@ import { parseVersionString } from './winccoa-version-info.js';
  * Note: Cache persists for extension lifetime. Extension reload required
  * if WinCC OA installations change.
  */
-var cachedWinCCOAInstallationPathByVersion: { [version: string]: string | null } = {};
+const cachedWinCCOAInstallationPathByVersion: { [version: string]: string | null } = {};
 
 /**
  * Finds the WinCC OA installation path for a given version
@@ -84,6 +84,7 @@ function getWindowsInstallationPath(version: string): string | null {
                 return installPath;
             }
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         // Registry key not found or command failed
         // Fall back to default paths
@@ -118,7 +119,7 @@ function getUnixInstallationPath(version: string): string | null {
  * Note: Set to null initially, populated on first call. Cache persists for
  * extension lifetime. Extension reload required if WinCC OA versions change.
  */
-var cachedAvailableWinCCOAVersions: string[] | null = null;
+let cachedAvailableWinCCOAVersions: string[] | null = null;
 
 /**
  * Gets available WinCC OA versions installed on the system
@@ -167,6 +168,7 @@ export function getWindowsAvailableVersions(): string[] {
                 versions.push(match[1]);
             }
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         // Registry query failed, try common paths
     }
@@ -194,7 +196,10 @@ function getUnixAvailableVersions(): string[] {
         });
 
         // Sort versions descending
-        return versions.sort((a: string, b: string) => parseVersionString(b) - parseVersionString(a));
+        return versions.sort(
+            (a: string, b: string) => parseVersionString(b) - parseVersionString(a),
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         return [];
     }

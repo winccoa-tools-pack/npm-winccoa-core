@@ -1,3 +1,7 @@
 {
-    "MD033": { "allowed_elements": ["center"]}
+    "default": true,
+    "MD013": false,
+    "MD032": true,
+    "MD033": { "allowed_elements": ["center"]},
+    "MD024" : false
 }

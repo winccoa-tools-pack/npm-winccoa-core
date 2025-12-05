@@ -6,7 +6,10 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { spawn } from 'child_process';
-import { getWinCCOAInstallationPathByVersion, getAvailableWinCCOAVersions } from '../../utils/winccoa-paths.js';
+import {
+    getWinCCOAInstallationPathByVersion,
+    getAvailableWinCCOAVersions,
+} from '../../utils/winccoa-paths.js';
 
 export abstract class WinCCOAComponent {
     /**
@@ -133,11 +136,11 @@ export abstract class WinCCOAComponent {
         return new Promise((resolve, reject) => {
             const proc = spawn(p, args, { detached: !!options.detached });
 
-            proc.stdout?.on('data', d => this.stdOut += d.toString());
-            proc.stderr?.on('data', d => this.stdErr += d.toString());
+            proc.stdout?.on('data', (d) => (this.stdOut += d.toString()));
+            proc.stderr?.on('data', (d) => (this.stdErr += d.toString()));
 
-            proc.on('close', code => resolve(code ?? 0));
-            proc.on('error', err => reject(err));
+            proc.on('close', (code) => resolve(code ?? 0));
+            proc.on('error', (err) => reject(err));
         });
     }
 
@@ -145,32 +148,37 @@ export abstract class WinCCOAComponent {
      * Execute a command and collect stdout lines as an array of strings.
      * Returns trimmed lines (excluding empty lines and terminating ';').
      */
-    protected async execAndCollectLines(cmdPath: string, args: string[], outputCallback?: (msg: string) => void): Promise<string[]> {
+    protected async execAndCollectLines(
+        cmdPath: string,
+        args: string[],
+        outputCallback?: (msg: string) => void,
+    ): Promise<string[]> {
         return new Promise((resolve, reject) => {
             const proc = spawn(cmdPath, args, { shell: false });
             let stdout = '';
-            let stderr = '';
 
-            proc.stdout?.on('data', d => {
+            proc.stdout?.on('data', (d) => {
                 const s = d.toString();
                 stdout += s;
                 this.stdOut += s;
                 if (outputCallback) outputCallback(s);
             });
 
-            proc.stderr?.on('data', d => {
+            proc.stderr?.on('data', (d) => {
                 const s = d.toString();
-                stderr += s;
                 this.stdErr += s;
                 if (outputCallback) outputCallback(s);
             });
 
-            proc.on('close', code => {
-                const lines = stdout.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0 && l !== ';');
+            proc.on('close', (_code) => {
+                const lines = stdout
+                    .split(/\r?\n/)
+                    .map((l) => l.trim())
+                    .filter((l) => l.length > 0 && l !== ';');
                 resolve(lines);
             });
 
-            proc.on('error', err => reject(err));
+            proc.on('error', (err) => reject(err));
         });
     }
 }

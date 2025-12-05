@@ -61,7 +61,7 @@ Use node:test framework with describe/it structure and node:assert for assertion
 
 ### Implement Core Business Logic
 
-```txt
+````txt
 Implement [FEATURE_NAME] business logic for the WinCC OA core library.
 
 Feature description: [DETAILED_DESCRIPTION]
@@ -80,15 +80,14 @@ Expected API:
 export function [functionName]([params]): [ReturnType] {
   // Implementation
 }
-```
-
-```
+````
 
 ---
 
 ## 🐛 Bug Fix Prompts
 
 ### Fix Failing Test
+
 ```txt
 
 The test [TEST_NAME] in [TEST_FILE] is failing.
@@ -583,15 +582,15 @@ Replace placeholders:
 
 ---
 
-**Happy Coding! 🚀**
+## 🎉 Thank You
+
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey. **Happy Coding! 🚀**
 
 ---
-
-
 
 ## Quick Links
 
 • [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
 
 <center>Made with ❤️ for and by the WinCC OA community</center>
-

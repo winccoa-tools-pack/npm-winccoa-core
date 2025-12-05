@@ -100,21 +100,21 @@ import {
   getWinCCOAInstallationPathByVersion,
   getAvailableWinCCOAVersions,
   parseVersionString,
-  compareVersions
+  compareVersions,
 } from '@winccoa-tools-pack/core-utils/utils';
 
 // Types
 import {
   DetailedVersionInfo,
   WinCCOAComponent,
-  ComponentType
+  ComponentType,
 } from '@winccoa-tools-pack/core-utils/types';
 
 // Core Logic
 import {
   detectProject,
   analyzeComponents,
-  validateHealth
+  validateHealth,
 } from '@winccoa-tools-pack/core-utils/core';
 ```
 

@@ -12,11 +12,17 @@ export class CtrlComponent extends WinCCOAComponent {
     /**
      * Starts the Control Manager with a specific script
      */
-    public async startWithScript(scriptName: string, additionalArgs: string[] = [], outputCallback?: (msg: string) => void): Promise<number> {
+    public async startWithScript(
+        scriptName: string,
+        additionalArgs: string[] = [],
+        outputCallback?: (msg: string) => void,
+    ): Promise<number> {
         const args = ['-f', scriptName, ...additionalArgs];
 
         // Allow tests to stub execAndCollectLines on the instance to simulate execution
-        const hasExecStub = Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') && typeof (this as any).execAndCollectLines === 'function';
+        const hasExecStub =
+            Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') &&
+            typeof (this as any).execAndCollectLines === 'function';
         const exePath = this.getPath();
         if (!exePath && hasExecStub) {
             try {
