@@ -12,10 +12,7 @@ Summary
 
 Recommended local setup
 
-1.Install the `git-flow` tooling for your platform (optional).
-    - Windows: use Scoop/Chocolatey or WSL
-    - macOS: `brew install git-flow-avh`
-    - Linux: `apt install git-flow` (Debian/Ubuntu)
+1.Install the `git-flow` tooling for your platform (optional). - Windows: use Scoop/Chocolatey or WSL - macOS: `brew install git-flow-avh` - Linux: `apt install git-flow` (Debian/Ubuntu)
 
 2.Initialize git-flow locally (if using the tool):
 

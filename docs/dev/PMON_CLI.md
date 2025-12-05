@@ -266,23 +266,23 @@ When building parsers, treat any line starting with `ERROR` as a command failure
 Below are suggested Node/TypeScript test snippets you can add to unit tests for the parser in `npm-shared-library-core`. The examples use the real outputs above as fixtures — copy the exact blocks into test fixtures (do not alter them).
 
 - Test: parse `MGRLIST:LIST` into manager option objects
-  - Input: the `MGRLIST:LIST` example block above
-  - Expected samples:
-    - First manager: component `WCCILpmon`, `startMode` = `Manual` (0), `secondToKill` = 30, `restart` = 3, `resetStartCounter` = 1
-    - Manager with `-num 1 -f pvss_scripts.lst` included in `startOptions`
+    - Input: the `MGRLIST:LIST` example block above
+    - Expected samples:
+        - First manager: component `WCCILpmon`, `startMode` = `Manual` (0), `secondToKill` = 30, `restart` = 3, `resetStartCounter` = 1
+        - Manager with `-num 1 -f pvss_scripts.lst` included in `startOptions`
 
 - Test: parse `MGRLIST:STATI` (stopped example)
-  - Input: the `MGRLIST:STATI` stopped sample block above
-  - Expectations:
-    - Manager 1: state = `Running`, pid = 33540, startMode = `Manual`, startTime parsed to a Date
-    - Managers with pid `-1` should yield `pid = undefined` in parsed output
-    - Project state line `0 WAIT_MODE 0 0` should map to project state `Down`/`Wait` (depending on your mapping)
+    - Input: the `MGRLIST:STATI` stopped sample block above
+    - Expectations:
+        - Manager 1: state = `Running`, pid = 33540, startMode = `Manual`, startTime parsed to a Date
+        - Managers with pid `-1` should yield `pid = undefined` in parsed output
+        - Project state line `0 WAIT_MODE 0 0` should map to project state `Down`/`Wait` (depending on your mapping)
 
 - Test: parse `MGRLIST:STATI` (monitoring example)
-  - Input: the `MGRLIST:STATI` monitoring sample block above
-  - Expectations:
-    - Manager lines with real timestamps should be parsed into `Date` objects
-    - The final project state line `2 MONITOR_MODE 0 0` maps to `Monitoring` / `Started`
+    - Input: the `MGRLIST:STATI` monitoring sample block above
+    - Expectations:
+        - Manager lines with real timestamps should be parsed into `Date` objects
+        - The final project state line `2 MONITOR_MODE 0 0` maps to `Monitoring` / `Started`
 
 Suggested test pseudocode (Node / assert style)
 

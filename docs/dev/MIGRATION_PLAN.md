@@ -45,17 +45,17 @@ npm-shared-library-core/
 **Step 2.1**: WinCC OA Path Discovery Utilities ✅
 
 - **Files Migrated**:
-  - `src/utils/winccoa-paths.ts` - Platform-specific installation path discovery
-  - `src/utils/winccoa-version-info.ts` - Version parsing and comparison
-  - `src/utils/index.ts` - Module exports
+    - `src/utils/winccoa-paths.ts` - Platform-specific installation path discovery
+    - `src/utils/winccoa-version-info.ts` - Version parsing and comparison
+    - `src/utils/index.ts` - Module exports
 - **Tests Created**:
-  - `test/utils/winccoa-paths.test.ts` - Platform detection, caching, version sorting
-  - `test/utils/winccoa-version-info.test.ts` - Version parsing edge cases
+    - `test/utils/winccoa-paths.test.ts` - Platform detection, caching, version sorting
+    - `test/utils/winccoa-version-info.test.ts` - Version parsing edge cases
 - **Key Functions**:
-  - `getWinCCOAInstallationPathByVersion()` - Get install path for specific version
-  - `getAvailableWinCCOAVersions()` - List all installed versions
-  - `parseVersionString()` - Convert version string to comparable number (format: `major.minor.patch`)
-  - `compareVersions()` - Semver-compatible comparison
+    - `getWinCCOAInstallationPathByVersion()` - Get install path for specific version
+    - `getAvailableWinCCOAVersions()` - List all installed versions
+    - `parseVersionString()` - Convert version string to comparable number (format: `major.minor.patch`)
+    - `compareVersions()` - Semver-compatible comparison
 - **Commit**: `feat(utils): add WinCC OA path discovery utilities`
 
 ---
@@ -69,11 +69,11 @@ npm-shared-library-core/
 - **Description**: Migrate version metadata types
 - **Dependencies**: `winccoa-version-info` utilities
 - **Tasks**:
-  - [ ] Create `src/types/version/` directory
-  - [ ] Copy `DetailedVersionInfo.ts` interface
-  - [ ] Update imports to use local utilities
-  - [ ] Create corresponding tests
-  - [ ] Export from `src/types/index.ts`
+    - [ ] Create `src/types/version/` directory
+    - [ ] Copy `DetailedVersionInfo.ts` interface
+    - [ ] Update imports to use local utilities
+    - [ ] Create corresponding tests
+    - [ ] Export from `src/types/index.ts`
 - **Commit**: `feat(types): add version information types`
 
 **Step 3.2**: WinCC OA Component Types
@@ -82,19 +82,19 @@ npm-shared-library-core/
 - **Target**: `src/types/components/`
 - **Description**: Migrate component type system (base class + implementations)
 - **Files to Migrate**:
-  - `WinCCOAComponent.ts` - Base component interface/class
-  - `ComponentImplementations.ts` - Concrete implementations (Manager, Panel, Script, etc.)
+    - `WinCCOAComponent.ts` - Base component interface/class
+    - `ComponentImplementations.ts` - Concrete implementations (Manager, Panel, Script, etc.)
 - **Considerations**:
-  - Remove VS Code-specific dependencies
-  - Keep only core component logic
-  - Ensure platform-agnostic
+    - Remove VS Code-specific dependencies
+    - Keep only core component logic
+    - Ensure platform-agnostic
 - **Tasks**:
-  - [ ] Create `src/types/components/` directory
-  - [ ] Copy `WinCCOAComponent.ts` (base class)
-  - [ ] Copy component implementations
-  - [ ] Remove VS Code tree item logic
-  - [ ] Create component tests
-  - [ ] Export from `src/types/index.ts`
+    - [ ] Create `src/types/components/` directory
+    - [ ] Copy `WinCCOAComponent.ts` (base class)
+    - [ ] Copy component implementations
+    - [ ] Remove VS Code tree item logic
+    - [ ] Create component tests
+    - [ ] Export from `src/types/index.ts`
 - **Commit**: `feat(types): add WinCC OA component type system`
 
 ---
@@ -105,34 +105,34 @@ npm-shared-library-core/
 
 - **Description**: Logic to detect and parse WinCC OA projects
 - **Source Files**:
-  - Project configuration parsing
-  - Component discovery logic
-  - Dependency resolution
+    - Project configuration parsing
+    - Component discovery logic
+    - Dependency resolution
 - **Tasks**:
-  - [ ] Create `src/core/project/` directory
-  - [ ] Migrate project detection logic
-  - [ ] Migrate configuration parsing
-  - [ ] Create comprehensive tests
+    - [ ] Create `src/core/project/` directory
+    - [ ] Migrate project detection logic
+    - [ ] Migrate configuration parsing
+    - [ ] Create comprehensive tests
 - **Commit**: `feat(core): add project detection and parsing`
 
 **Step 4.2**: Component Analysis
 
 - **Description**: Component validation, dependency tracking, health checks
 - **Tasks**:
-  - [ ] Create `src/core/analysis/` directory
-  - [ ] Migrate component validation logic
-  - [ ] Migrate dependency analyzer
-  - [ ] Create analysis tests
+    - [ ] Create `src/core/analysis/` directory
+    - [ ] Migrate component validation logic
+    - [ ] Migrate dependency analyzer
+    - [ ] Create analysis tests
 - **Commit**: `feat(core): add component analysis logic`
 
 **Step 4.3**: Health and Status Utilities
 
 - **Description**: Project health checks, version compatibility validation
 - **Tasks**:
-  - [ ] Create `src/core/health/` directory
-  - [ ] Migrate health check logic
-  - [ ] Migrate status reporting
-  - [ ] Create health check tests
+    - [ ] Create `src/core/health/` directory
+    - [ ] Migrate health check logic
+    - [ ] Migrate status reporting
+    - [ ] Create health check tests
 - **Commit**: `feat(core): add health and status utilities`
 
 ---
@@ -143,30 +143,30 @@ npm-shared-library-core/
 
 - **Description**: End-to-end tests for complete workflows
 - **Tasks**:
-  - [ ] Create `test/integration/` directory
-  - [ ] Add project discovery integration tests
-  - [ ] Add version detection integration tests
-  - [ ] Add component analysis integration tests
+    - [ ] Create `test/integration/` directory
+    - [ ] Add project discovery integration tests
+    - [ ] Add version detection integration tests
+    - [ ] Add component analysis integration tests
 - **Commit**: `test: add integration tests`
 
 **Step 5.2**: API Documentation
 
 - **Description**: Generate comprehensive API documentation
 - **Tasks**:
-  - [ ] Add TSDoc comments to all public APIs
-  - [ ] Generate API documentation with TypeDoc
-  - [ ] Create usage examples
-  - [ ] Add troubleshooting guide
+    - [ ] Add TSDoc comments to all public APIs
+    - [ ] Generate API documentation with TypeDoc
+    - [ ] Create usage examples
+    - [ ] Add troubleshooting guide
 - **Commit**: `docs: add API documentation and examples`
 
 **Step 5.3**: Performance Optimization
 
 - **Description**: Optimize caching and performance-critical paths
 - **Tasks**:
-  - [ ] Review and optimize caching strategies
-  - [ ] Add performance benchmarks
-  - [ ] Optimize file system operations
-  - [ ] Document performance characteristics
+    - [ ] Review and optimize caching strategies
+    - [ ] Add performance benchmarks
+    - [ ] Optimize file system operations
+    - [ ] Document performance characteristics
 - **Commit**: `perf: optimize caching and file operations`
 
 ---

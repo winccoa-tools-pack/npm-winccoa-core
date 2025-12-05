@@ -103,7 +103,7 @@ Please:
 4. Verify all tests pass
 5. Explain what was wrong and how it was fixed
 
-````
+```
 
 ### Fix Platform-Specific Issue
 

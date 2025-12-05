@@ -124,39 +124,39 @@ import {
 
 - **Purpose**: Low-level helper functions
 - **Examples**:
-  - Path discovery and resolution
-  - Version parsing and comparison
-  - File system operations
-  - Platform detection
+    - Path discovery and resolution
+    - Version parsing and comparison
+    - File system operations
+    - Platform detection
 - **Characteristics**:
-  - Pure functions
-  - No business logic
-  - Highly reusable
+    - Pure functions
+    - No business logic
+    - Highly reusable
 
 #### `/src/types/` - Type Definitions
 
 - **Purpose**: TypeScript interfaces and types
 - **Examples**:
-  - Version information structures
-  - Component type definitions
-  - Configuration schemas
+    - Version information structures
+    - Component type definitions
+    - Configuration schemas
 - **Characteristics**:
-  - Type-only exports
-  - Well-documented
-  - Comprehensive coverage
+    - Type-only exports
+    - Well-documented
+    - Comprehensive coverage
 
 #### `/src/core/` - Business Logic
 
 - **Purpose**: WinCC OA-specific logic
 - **Examples**:
-  - Project detection and parsing
-  - Component analysis
-  - Health checks
-  - Dependency resolution
+    - Project detection and parsing
+    - Component analysis
+    - Health checks
+    - Dependency resolution
 - **Characteristics**:
-  - Uses utilities
-  - Domain-specific
-  - Stateful operations
+    - Uses utilities
+    - Domain-specific
+    - Stateful operations
 
 ---
 

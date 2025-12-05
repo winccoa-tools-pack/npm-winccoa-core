@@ -13,8 +13,8 @@
     "build": "tsc --build",
     "test": "npm run style-check && npm run build && node --experimental-specifier-resolution=node --test",
     "prepublishOnly": "npm run build",
-    "lint": "eslint 'src/**/*.ts'",
-    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
     "lint:md:fix": "markdownlint \"**/*.md\" --ignore node_modules --fix",
     
