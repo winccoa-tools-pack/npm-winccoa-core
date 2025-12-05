@@ -17,6 +17,13 @@ export class PmonComponent extends WinCCOAComponent {
         return 'Process Monitor';
     }
 
+
+    /**
+     * Registers a sub-project using pmon's -regsubf option
+     * @param projectPath - Path to the sub-project directory
+     * @param outputCallback - Optional callback for output logging
+     * @returns Promise that resolves when registration is complete
+     */
     public async registerSubProject(projectPath: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) throw new Error('pmon executable not found');
@@ -77,6 +84,13 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+
+    /**
+     * Unregisters a project using pmon's -unreg option
+     * @param projectName - Name of the project to unregister
+     * @param outputCallback - Optional callback for output logging
+     * @returns Promise that resolves when unregistration is complete
+     */
     public async unregisterProject(projectName: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) throw new Error('pmon executable not found');
@@ -87,9 +101,8 @@ export class PmonComponent extends WinCCOAComponent {
             outputCallback(`pmon path: ${pmonPath}`);
         }
 
+        // Use -unreg option to unregister project
         const args = ['-unreg', projectName, '-log', '+stderr'];
-
-
 
         if (outputCallback) outputCallback(`Executing: ${pmonPath} ${args.join(' ')}`);
 
@@ -139,6 +152,12 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Registers a runnable project using pmon's -config -autofreg -status options
+     * @param configPath - Path to the project config file
+     * @param outputCallback - Optional callback for output logging
+     * @returns Promise that resolves when registration is complete with exit code
+     */
     public async registerProject(configPath: string, outputCallback?: (message: string) => void): Promise<number> {
         const pmonPath = this.getPath();
         if (!pmonPath) throw new Error('pmon executable not found');
@@ -149,6 +168,7 @@ export class PmonComponent extends WinCCOAComponent {
             outputCallback(`pmon path: ${pmonPath}`);
         }
 
+        // Use -config -autofreg -status options to register runnable project
         const args = ['-config', configPath, '-log', '+stderr', '-autofreg', '-status'];
 
         if (outputCallback) outputCallback(`Executing: ${pmonPath} ${args.join(' ')}`);
@@ -198,7 +218,10 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
-    public async checkProjectStatus(projectName: string, outputCallback?: (message: string) => void): Promise<{ project: string; status: ProjEnvPmonStatus; error?: string }>
+    /**
+     * Get pmon status. It check if the pmon is running or not
+     */
+    public async getStatus(projectName: string, outputCallback?: (message: string) => void): Promise<{ project: string; status: ProjEnvPmonStatus; error?: string }>
     {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -239,6 +262,10 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+
+    /**
+     * Starts pmon only (without auto-starting managers)
+     */
     public async startPmonOnly(projectName: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -263,6 +290,10 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+
+    /**
+     * Starts a project with all managers
+     */
     public async startProject(projectName: string, startAll: boolean = true, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -278,6 +309,8 @@ export class PmonComponent extends WinCCOAComponent {
             if (startAll) {
                 args = args.concat(['-command', 'START_ALL:']);
             } else {
+                // starting pmon only without extra arguments means, it will start the project too.
+                // that means the pmon process will never end (hopefully, otherwise it crashed), so we need to detach
                 detached = true;
             }
 
@@ -294,6 +327,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Stops all managers in a project
+     */
     public async stopProject(projectName: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -317,6 +353,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Stops all managers and exits pmon
+     */
     public async stopProjectAndPmon(projectName: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -340,6 +379,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Restarts all managers in a project
+     */
     public async restartProject(projectName: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -363,6 +405,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Sets pmon wait mode
+     */
     public async setWaitMode(projectName: string, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -386,6 +431,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Starts a specific manager by index
+     */
     public async startManager(projectName: string, managerIndex: number, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -409,6 +457,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Stops a specific manager by index
+     */
     public async stopManager(projectName: string, managerIndex: number, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -432,6 +483,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Kills a specific manager by index
+     */
     public async killManager(projectName: string, managerIndex: number, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -455,6 +509,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Removes a specific manager by index
+     */
     public async removeManager(projectName: string, managerIndex: number, outputCallback?: (message: string) => void): Promise<void> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
@@ -478,6 +535,9 @@ export class PmonComponent extends WinCCOAComponent {
         });
     }
 
+    /**
+     * Gets the list of managers in a project
+     */
     public async getManagerOptionsList(projectName: string, outputCallback?: (message: string) => void): Promise<ProjEnvManagerOptions[]> {
         const pmonPath = await this.getPath();
         const hasInstanceExecStub = Object.prototype.hasOwnProperty.call(this, 'execAndCollectLines') && typeof (this as any).execAndCollectLines === 'function';
