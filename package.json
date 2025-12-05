@@ -13,28 +13,28 @@
     "build": "tsc --build",
     "test": "npm run style-check && npm run build && node --experimental-specifier-resolution=node --test",
     "prepublishOnly": "npm run build",
-
     "lint": "eslint 'src/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' --fix",
     "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
     "lint:md:fix": "markdownlint \"**/*.md\" --ignore node_modules --fix",
-
+    
     "format": "prettier --write 'src/**/*.ts'",
     "format:check": "prettier --check 'src/**/*.ts'",
     "format:md": "prettier --write \"**/*.md\"",
     "format:md:check": "prettier --check \"**/*.md\"",
-
     "style-check": "npm run lint && npm run format:check && npm run lint:md && npm run format:md:check",
     "style-fix": "npm run lint:fix && npm run format && npm run lint:md:fix && npm run format:md"
   },
   "devDependencies": {
     "@types/node": "^20.19.25",
-    "typescript": "^5.2.0",
-    "eslint": "^8.60.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.1",
+    "@typescript-eslint/parser": "^8.48.1",
+    "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.29.1",
-    "prettier": "^3.0.0",
     "markdownlint": "^0.28.0",
-    "markdownlint-cli": "^0.33.0"
+    "markdownlint-cli": "^0.33.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.2.0"
   }
 }
