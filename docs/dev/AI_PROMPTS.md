@@ -82,13 +82,12 @@ export function [functionName]([params]): [ReturnType] {
 }
 ````
 
-````
-
 ---
 
 ## 🐛 Bug Fix Prompts
 
 ### Fix Failing Test
+
 ```txt
 
 The test [TEST_NAME] in [TEST_FILE] is failing.
@@ -583,7 +582,10 @@ Replace placeholders:
 
 ---
 
-**Happy Coding! 🚀**
+## 🎉 Thank You
+
+Thank you for using WinCC OA tools package!
+We're excited to be part of your development journey. **Happy Coding! 🚀**
 
 ---
 
