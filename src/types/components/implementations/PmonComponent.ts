@@ -261,7 +261,7 @@ export class PmonComponent extends WinCCOAComponent {
             });
             process.stderr.on('data', (data) => {
                 const output = data.toString();
-                    if (outputCallback) outputCallback(output);
+                if (outputCallback) outputCallback(output);
                 stderr += output;
             });
 
