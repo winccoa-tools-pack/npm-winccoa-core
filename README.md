@@ -139,6 +139,26 @@ npm test
 npm run lint
 ```
 
+## Windows EOL (CRLF) note
+
+On Windows you may see Git report that some config files (like `.prettierrc.json`) will have CRLF replaced by LF. This repository enforces LF for tooling/config files via `.gitattributes` to avoid spurious diffs.
+
+If you see such warnings, run the following once in your local clone to apply the normalization:
+
+```powershell
+cd C:\path\to\repo
+git fetch origin
+git checkout <your-branch>
+git pull
+git add --renormalize .
+git status --porcelain
+# If there are normalization changes to commit:
+git commit -m "chore: apply eol normalization per .gitattributes" || Write-Host "Nothing to commit"
+```
+
+After this the config files will be normalized and you should no longer see CRLF→LF warnings for those files.
+
+
 ## 🏆 Recognition
 
 Special thanks to all our [contributors](https://github.com/orgs/winccoa-tools-pack/people) who make this project possible!
