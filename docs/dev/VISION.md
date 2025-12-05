@@ -97,24 +97,24 @@ Create a **comprehensive, platform-agnostic, reusable TypeScript/Node.js library
 ```typescript
 // Utilities
 import {
-    getWinCCOAInstallationPathByVersion,
-    getAvailableWinCCOAVersions,
-    parseVersionString,
-    compareVersions,
+  getWinCCOAInstallationPathByVersion,
+  getAvailableWinCCOAVersions,
+  parseVersionString,
+  compareVersions,
 } from '@winccoa-tools-pack/core-utils/utils';
 
 // Types
 import {
-    DetailedVersionInfo,
-    WinCCOAComponent,
-    ComponentType,
+  DetailedVersionInfo,
+  WinCCOAComponent,
+  ComponentType,
 } from '@winccoa-tools-pack/core-utils/types';
 
 // Core Logic
 import {
-    detectProject,
-    analyzeComponents,
-    validateHealth,
+  detectProject,
+  analyzeComponents,
+  validateHealth,
 } from '@winccoa-tools-pack/core-utils/core';
 ```
 
@@ -228,10 +228,10 @@ throw new Error('WinCC OA version 3.19 not found in registry');
 
 // Use custom error classes
 class WinCCOANotFoundError extends Error {
-    constructor(version?: string) {
-        super(`WinCC OA ${version || ''} installation not found`);
-        this.name = 'WinCCOANotFoundError';
-    }
+  constructor(version?: string) {
+    super(`WinCC OA ${version || ''} installation not found`);
+    this.name = 'WinCCOANotFoundError';
+  }
 }
 ```
 
@@ -254,61 +254,61 @@ class WinCCOANotFoundError extends Error {
 ### Feature Development Cycle
 
 1. **Plan**
-    - Review migration plan
-    - Identify source files
-    - Define scope and tasks
+   - Review migration plan
+   - Identify source files
+   - Define scope and tasks
 
 2. **Branch**
-    - Create feature branch from `develop`
-    - Name: `feature/component-types`, `feat/project-detection`
+   - Create feature branch from `develop`
+   - Name: `feature/component-types`, `feat/project-detection`
 
 3. **Implement**
-    - Write implementation
-    - Add comprehensive tests
-    - Update types and exports
+   - Write implementation
+   - Add comprehensive tests
+   - Update types and exports
 
 4. **Test**
-    - Run unit tests locally
-    - Verify cross-platform compatibility
-    - Check coverage
+   - Run unit tests locally
+   - Verify cross-platform compatibility
+   - Check coverage
 
 5. **Document**
-    - Add TSDoc comments
-    - Update migration plan
-    - Add usage examples
+   - Add TSDoc comments
+   - Update migration plan
+   - Add usage examples
 
 6. **Review**
-    - Create PR to `develop`
-    - CI/CD runs checks
-    - Address review feedback
+   - Create PR to `develop`
+   - CI/CD runs checks
+   - Address review feedback
 
 7. **Merge**
-    - Squash or merge commit
-    - Delete feature branch
-    - Update tracking documents
+   - Squash or merge commit
+   - Delete feature branch
+   - Update tracking documents
 
 ### Release Workflow
 
 1. **Prepare Release**
-    - Merge all features to `develop`
-    - Update version in `package.json`
-    - Update CHANGELOG.md
+   - Merge all features to `develop`
+   - Update version in `package.json`
+   - Update CHANGELOG.md
 
 2. **Create Release PR**
-    - Open PR from `develop` → `main`
-    - Label as `release`
-    - Review changes
+   - Open PR from `develop` → `main`
+   - Label as `release`
+   - Review changes
 
 3. **Merge & Deploy**
-    - Merge to `main`
-    - CI/CD publishes to npm
-    - Creates GitHub release
-    - Tags version
+   - Merge to `main`
+   - CI/CD publishes to npm
+   - Creates GitHub release
+   - Tags version
 
 4. **Post-Release**
-    - Merge `main` → `develop`
-    - Announce release
-    - Update dependent projects
+   - Merge `main` → `develop`
+   - Announce release
+   - Update dependent projects
 
 ---
 
@@ -343,17 +343,17 @@ class WinCCOANotFoundError extends Error {
 
 ```json
 {
-    "scripts": {
-        "build": "tsc --build",
-        "test": "npm run build && node --test",
-        "test:watch": "node --test --watch",
-        "test:coverage": "c8 node --test",
-        "lint": "eslint src/ test/",
-        "lint:fix": "eslint src/ test/ --fix",
-        "docs": "typedoc src/index.ts",
-        "clean": "rm -rf dist/",
-        "prepublishOnly": "npm run clean && npm run build && npm test"
-    }
+  "scripts": {
+    "build": "tsc --build",
+    "test": "npm run build && node --test",
+    "test:watch": "node --test --watch",
+    "test:coverage": "c8 node --test",
+    "lint": "eslint src/ test/",
+    "lint:fix": "eslint src/ test/ --fix",
+    "docs": "typedoc src/index.ts",
+    "clean": "rm -rf dist/",
+    "prepublishOnly": "npm run clean && npm run build && npm test"
+  }
 }
 ```
 
@@ -362,11 +362,11 @@ class WinCCOANotFoundError extends Error {
 ```json
 // .vscode/settings.json
 {
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    }
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
 ```
 
@@ -406,10 +406,10 @@ const isMacOS = process.platform === 'darwin';
 
 // Platform-specific implementations
 function getInstallPath(): string | null {
-    if (isWindows) return getWindowsInstallPath();
-    if (isLinux) return getUnixInstallPath();
-    if (isMacOS) return getMacOSInstallPath();
-    return null;
+  if (isWindows) return getWindowsInstallPath();
+  if (isLinux) return getUnixInstallPath();
+  if (isMacOS) return getMacOSInstallPath();
+  return null;
 }
 ```
 

@@ -8,31 +8,31 @@ Minimal starter template for creating shared npm libraries with Git Flow workflo
 
 1. **Create repository from this template**
 
-    ```bash
-    # Via GitHub CLI
-    gh repo create winccoa-tools-pack/<your-library-name> \
-      --template winccoa-tools-pack/template-npm-shared-library \
-      --public
-    ```
+   ```bash
+   # Via GitHub CLI
+   gh repo create winccoa-tools-pack/<your-library-name> \
+     --template winccoa-tools-pack/template-npm-shared-library \
+     --public
+   ```
 
 2. **Clone and initialize Git Flow**
 
-    ```bash
-    git clone https://github.com/winccoa-tools-pack/<your-library-name>
-    cd <your-library-name>
+   ```bash
+   git clone https://github.com/winccoa-tools-pack/<your-library-name>
+   cd <your-library-name>
 
-    # Initialize Git Flow locally (if you use the git-flow tool)
-    git flow init -d
-    git push -u origin develop
-    ```
+   # Initialize Git Flow locally (if you use the git-flow tool)
+   git flow init -d
+   git push -u origin develop
+   ```
 
 3. **Install dependencies and build**
 
-    ```bash
-    npm install
-    npm run build
-    npm test
-    ```
+   ```bash
+   npm install
+   npm run build
+   npm test
+   ```
 
 ## 🌳 Git Flow Workflow
 
@@ -88,20 +88,20 @@ The `release.yml` workflow automatically publishes your package to NPM when you 
 ### How to Get an NPM Access Token
 
 1. **Log in to NPM**
-    - Go to [npmjs.com](https://www.npmjs.com/) and sign in (or create an account)
+   - Go to [npmjs.com](https://www.npmjs.com/) and sign in (or create an account)
 
 2. **Generate Access Token**
-    - Navigate to **Access Tokens** in your account settings: <https://www.npmjs.com/settings/~/tokens>
-    - Click **"Generate New Token"** → Select **"Automation"** type
-    - Copy the generated token (you won't see it again!)
+   - Navigate to **Access Tokens** in your account settings: <https://www.npmjs.com/settings/~/tokens>
+   - Click **"Generate New Token"** → Select **"Automation"** type
+   - Copy the generated token (you won't see it again!)
 
 3. **Add Token to Repository**
-    - Go to your GitHub repository settings
-    - Navigate to **Settings** → **Secrets and variables** → **Actions**
-    - Click **"New repository secret"**
-    - Name: `NPM_TOKEN`
-    - Value: Paste your NPM access token
-    - Click **"Add secret"**
+   - Go to your GitHub repository settings
+   - Navigate to **Settings** → **Secrets and variables** → **Actions**
+   - Click **"New repository secret"**
+   - Name: `NPM_TOKEN`
+   - Value: Paste your NPM access token
+   - Click **"Add secret"**
 
 ### Token Permissions
 
