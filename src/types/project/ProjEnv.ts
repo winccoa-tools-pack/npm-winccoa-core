@@ -2,6 +2,7 @@
  * WinCC OA project and manager enums and helper functions
  */
 
+
 export enum ProjEnvProjectState {
     Unknown = -1,
     Down = 0,
@@ -90,4 +91,10 @@ export function startModeToString(mode: ProjEnvManagerStartMode): string {
         default:
             return '';
     }
+}
+
+export enum ProjEnvProjectRunnable{
+    Unknown = -1,
+    Runnable = 0,
+    NotRunnable = 1
 }

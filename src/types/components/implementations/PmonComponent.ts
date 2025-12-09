@@ -552,7 +552,7 @@ export class PmonComponent extends WinCCOAComponent {
         }
 
         return new Promise((resolve, reject) => {
-            const args = ['-proj', projectName, '-command', `START_MANAGER:${managerIndex}`];
+            const args = ['-proj', projectName, '-command', 'SINGLE_MGR:START', managerIndex];
             const command = `"${pmonPath}" ${args.join(' ')}`;
             if (outputCallback) outputCallback(`Executing:\n${command}`);
 
@@ -593,7 +593,7 @@ export class PmonComponent extends WinCCOAComponent {
         }
 
         return new Promise((resolve, reject) => {
-            const args = ['-proj', projectName, '-command', `STOP_MANAGER:${managerIndex}`];
+            const args = ['-proj', projectName, '-command', 'SINGLE_MGR:STOP', managerIndex];
             const command = `"${pmonPath}" ${args.join(' ')}`;
             if (outputCallback) outputCallback(`Executing:\n${command}`);
 
@@ -634,7 +634,7 @@ export class PmonComponent extends WinCCOAComponent {
         }
 
         return new Promise((resolve, reject) => {
-            const args = ['-proj', projectName, '-command', `KILL_MANAGER:${managerIndex}`];
+            const args = ['-proj', projectName, '-command', 'SINGLE_MGR:KILL', managerIndex];
             const command = `"${pmonPath}" ${args.join(' ')}`;
             if (outputCallback) outputCallback(`Executing:\n${command}`);
 
@@ -675,7 +675,7 @@ export class PmonComponent extends WinCCOAComponent {
         }
 
         return new Promise((resolve, reject) => {
-            const args = ['-proj', projectName, '-command', `REMOVE_MANAGER:${managerIndex}`];
+            const args = ['-proj', projectName, '-command', 'SINGLE_MGR:DEL', managerIndex];
             const command = `"${pmonPath}" ${args.join(' ')}`;
             if (outputCallback) outputCallback(`Executing:\n${command}`);
 
@@ -726,6 +726,9 @@ export class PmonComponent extends WinCCOAComponent {
      * Convenience accessor for manager option (from MGRLIST:LIST) by index.
      * If `projectName` is provided, it will refresh the options list first.
      * If omitted, it returns the manager from last fetched list if available.
+     * 
+     * TODO use command `>WCCILpmon.exe -proj Bla -log +stderr -command SINGLE_MGR:PROP_GET 2
+once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster, then query the whole list
      */
     public async getManagerOptionsAt(
         index: number,
@@ -740,6 +743,138 @@ export class PmonComponent extends WinCCOAComponent {
         }
 
         return undefined;
+    }
+
+    
+    public async setManagerOptionsAt(
+        options: ProjEnvManagerOptions,
+        projectName: string,
+        managerIndex: number,
+        outputCallback?: (message: string) => void,
+    ): Promise<void> {
+        const pmonPath = this.getPath();
+        if (!pmonPath) {
+            const errorMsg = 'Could not locate WCCILpmon executable';
+            if (outputCallback) outputCallback(errorMsg);
+            throw new Error(errorMsg);
+        }
+
+        return new Promise((resolve, reject) => {
+            const args = [
+                '-proj', projectName,
+                '-command', 'SINGLE_MGR:PROP_PUT',
+                managerIndex,
+                options.startMode, options.secondToKill, options.resetStartCounter, options.restart, options.startOptions];
+            const command = `"${pmonPath}" ${args.join(' ')}`;
+            if (outputCallback) outputCallback(`Executing:\n${command}`);
+
+            const process = spawn(pmonPath, args, { shell: false });
+
+            process.stdout.on('data', (data) => {
+                if (outputCallback) outputCallback(data.toString());
+            });
+            process.stderr.on('data', (data) => {
+                if (outputCallback) outputCallback(data.toString());
+            });
+
+            process.on('close', (code) => {
+                if (code === 0) resolve();
+                else reject(new Error(`Set manager options failed with code ${code}`));
+            });
+            process.on('error', (error) => {
+                const errorMsg = `Failed to set manager options: ${error.message}`;
+                if (outputCallback) outputCallback(errorMsg);
+                reject(new Error(errorMsg));
+            });
+        });
+    }
+
+    
+    public async insertManagerAt(
+        options: ProjEnvManagerOptions,
+        projectName: string,
+        managerIndex: number,
+        outputCallback?: (message: string) => void,
+    ): Promise<void> {
+        const pmonPath = this.getPath();
+        if (!pmonPath) {
+            const errorMsg = 'Could not locate WCCILpmon executable';
+            if (outputCallback) outputCallback(errorMsg);
+            throw new Error(errorMsg);
+        }
+
+        return new Promise((resolve, reject) => {
+            const args = [
+                '-proj', projectName,
+                '-command', 'SINGLE_MGR:PROP_PUT',
+                managerIndex,
+                options.startMode, options.component, options.secondToKill, options.resetStartCounter, options.restart, options.startOptions];
+            const command = `"${pmonPath}" ${args.join(' ')}`;
+            if (outputCallback) outputCallback(`Executing:\n${command}`);
+
+            const process = spawn(pmonPath, args, { shell: false });
+
+            process.stdout.on('data', (data) => {
+                if (outputCallback) outputCallback(data.toString());
+            });
+            process.stderr.on('data', (data) => {
+                if (outputCallback) outputCallback(data.toString());
+            });
+
+            process.on('close', (code) => {
+                if (code === 0) resolve();
+                else reject(new Error(`Insert manager failed with code ${code}`));
+            });
+            process.on('error', (error) => {
+                const errorMsg = `Failed to insert manager: ${error.message}`;
+                if (outputCallback) outputCallback(errorMsg);
+                reject(new Error(errorMsg));
+            });
+        });
+    }
+
+    
+    public async sendDebugFlag(
+        flag: string,
+        projectName: string,
+        managerIndex: number,
+        outputCallback?: (message: string) => void,
+    ): Promise<void> {
+        const pmonPath = this.getPath();
+        if (!pmonPath) {
+            const errorMsg = 'Could not locate WCCILpmon executable';
+            if (outputCallback) outputCallback(errorMsg);
+            throw new Error(errorMsg);
+        }
+
+        return new Promise((resolve, reject) => {
+            const args = [
+                '-proj', projectName,
+                '-command', 'SINGLE_MGR:DEBUG',
+                managerIndex,
+                flag];
+            const command = `"${pmonPath}" ${args.join(' ')}`;
+            if (outputCallback) outputCallback(`Executing:\n${command}`);
+
+            const process = spawn(pmonPath, args, { shell: false });
+
+            process.stdout.on('data', (data) => {
+                if (outputCallback) outputCallback(data.toString());
+            });
+            process.stderr.on('data', (data) => {
+                if (outputCallback) outputCallback(data.toString());
+            });
+
+            process.on('close', (code) => {
+                if (code === 0) resolve();
+                else reject(new Error(`Send manager debug flag failed with code ${code}`));
+            });
+            process.on('error', (error) => {
+                const errorMsg = `Failed to send manager debug flag: ${error.message}`;
+                if (outputCallback) outputCallback(errorMsg);
+                reject(new Error(errorMsg));
+            });
+        });
     }
 
     /**
