@@ -17,7 +17,7 @@ import {
     ProjEnvProjectFileSysStruct,
     ProjEnvProjectState,
 } from './ProjEnv';
-import ProjEnvErrorHandler from './ProjEnvErrorHandler';
+import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
 import path from 'path';
 
 /**
@@ -816,7 +816,7 @@ export class ProjEnvProject {
     // Languages
     protected _languages: OaLanguage[] = [];
 
-    protected _errorHandler!: ProjEnvErrorHandler;
+    protected _errorHandler!: WinCCOAErrorHandler;
 
     //--------------------------------------------------------------------------------
     //@private members
