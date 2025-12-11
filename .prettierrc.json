@@ -6,8 +6,7 @@
   "singleQuote": true,
   "trailingComma": "all",
   "bracketSpacing": true,
-  "arrowParens": "always"
-  ,
+  "arrowParens": "always",
   "overrides": [
     {
       "files": "**/*.md",

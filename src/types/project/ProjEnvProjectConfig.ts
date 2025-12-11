@@ -1,181 +1,229 @@
+/*
+ * TypeScript conversion of ProjEnvProjectConfig
+ *
+ * This is a best-effort translation of the original API into TypeScript.
+ * The implementation is intentionally minimal: the setters/getters work,
+ * but the config modification functions are placeholders that will throw
+ * when `throwErrors` is enabled or return -1 when disabled. You can
+ * implement real persistence/paCfg bindings later.
+ *
+ * TODO:
+ * + Make getEntryValue() return a default value when missing.
+ * + Add unit tests for these functions (recommended).
+ * + Improve to heanlde list-entries
+ */
 
+import * as path from 'path';
+import fs from 'fs';
 
-export interface ProjEnvProjectConfig
-{
-//--------------------------------------------------------------------------------
-//@public members
-//--------------------------------------------------------------------------------
-  public bool throwErrors = true;
+export class ProjEnvProjectConfig {
+    // public members
+    public throwErrors = true;
 
-  //------------------------------------------------------------------------------
-  /**
-   * @brief Default c-tor
-   *
-   * @return initialized object of class ProjEnvProjectConfig
-   */
-  public ProjEnvProjectConfig(const string configFilePath = "")
-  {
-    setConfigPath(configFilePath);
-  }
+    // protected/private member
+    protected _configFilePath = '';
 
-  //------------------------------------------------------------------------------
-  /** @brief Function return full native path to the config file.
-    @exception Empty string.
-    @return Full native path to the config file.
-  */
-  public string getConfigPath()
-  {
-    return _configFilePath;
-  }
-
-  //------------------------------------------------------------------------------
-  /** @brief Set config path.
-    @details This function does not create some config. only set the member to this class.
-    @param configFilePath Full path to config file.
-  */
-  public setConfigPath(const string &configFilePath)
-  {
-    _configFilePath = makeNativePath(configFilePath);
-  }
-
-  //------------------------------------------------------------------------------
-  /** @brief Function insert value to config file.
-   * @param value Value to be inserted.
-   * @param key Key.
-   * @param section Section.
-   * @return Error code. Returns 0 when successful. Otherwise -1.
-   */
-  public int insertValue(const anytype &value, const string &key, const string section = "general")
-  {
-    const string cfgPath = getConfigPath();
-
-    if (cfgPath == "")
-      return -1;
-
-    int err = paCfgInsertValue(cfgPath, section, key, value);
-    dyn_errClass lastErr = getLastError();
-
-    if (err < 0)
-    {
-      if (throwErrors)
-      {
-        throwError(lastErr);
-        errClass err = makeError("pa", PRIO_WARNING, ERR_SYSTEM, 17, __FUNCTION__,
-                                 key + "=" + value, cfgPath);
-        throwError(err);
-      }
-
-      return -1;
+    /**
+     * Default constructor
+     * @param configFilePath optional path to config file
+     */
+    constructor(configFilePath: string = '') {
+        this.setConfigPath(configFilePath);
     }
 
-    return 0;
-  }
-
-  //------------------------------------------------------------------------------
-  /** @brief Function set value in config file.
-   * @param value Value to be set.
-   * @param key Key.
-   * @param section Section.
-   * @return Error code. Returns 0 when successful. Otherwise -1.
-   */
-  public int setValue(const anytype &value, const string &key, const string section = "general")
-  {
-    const string cfgPath = getConfigPath();
-
-    if (cfgPath == "")
-      return -1;
-
-    int err = paCfgSetValue(cfgPath, section, key, value);
-    dyn_errClass lastErr = getLastError();
-
-    if (err < 0)
-    {
-      if (throwErrors)
-      {
-        throwError(lastErr);
-        errClass err = makeError("pa", PRIO_WARNING, ERR_SYSTEM, 17, __FUNCTION__,
-                                 key + "=" + value, cfgPath);
-        throwError(err);
-      }
-
-      return -1;
+    /**
+     * Return full native path to the config file. Returns empty string
+     * if not set.
+     */
+    public getConfigPath(): string {
+        return this._configFilePath;
     }
 
-    return 0;
-  }
+    /**
+     * Set config path. This only sets the member; it does not create files.
+     */
+    public setConfigPath(configFilePath: string): void {
+        if (!configFilePath) {
+            this._configFilePath = '';
+            return;
+        }
 
-  //------------------------------------------------------------------------------
-  /** @brief Function deletes value in config file - contrary to setValue()
-   * @param value Value to be deleted.
-   * @param key Key.
-   * @param section Section.
-   * @return Error code. Returns 0 when successful. Otherwise -1.
-   */
-  public int deleteValue(const anytype &value, const string &key, const string section = "general")
-  {
-    const string cfgPath = getConfigPath();
-
-    if (cfgPath == "")
-      return -1;
-
-    int err = paCfgDeleteValue(cfgPath, section, key, value);
-    dyn_errClass lastErr = getLastError();
-
-    if (err < 0)
-    {
-      if (throwErrors)
-      {
-        throwError(lastErr);
-        errClass err = makeError("pa", PRIO_WARNING, ERR_SYSTEM, 17, __FUNCTION__,
-                                 key + "=" + value, cfgPath);
-        throwError(err);
-      }
-
-      return -1;
+        // Normalize to native path style
+        this._configFilePath = path.resolve(configFilePath);
     }
 
-    return 0;
-  }
+    /**
+     * Insert a value into the config. Placeholder: returns -1 and optionally
+     * throws when not implemented.
+     */
+    public insertValue(value: unknown, key: string, _section = 'general'): number {
+        const cfgPath = this.getConfigPath();
+        if (!cfgPath) return -1;
 
-  //------------------------------------------------------------------------------
-  /** @brief Function deletes entry in config file, used when only the key is known - but not the value. Deletes only one entry, from top to bottom
-   * @param key Key.
-   * @param section Section.
-   * @return Error code. Returns 0 when successful. Otherwise -1.
-   */
-  public int deleteEntry(const string &key, const string section = "general")
-  {
-    const string cfgPath = getConfigPath();
-
-    if (cfgPath == "")
-      return -1;
-
-    int err = paCfgDeleteValue(cfgPath, section, key);
-    dyn_errClass lastErr = getLastError();
-
-    if (err < 0)
-    {
-      if (throwErrors)
-      {
-        throwError(lastErr);
-        errClass err = makeError("pa", PRIO_WARNING, ERR_SYSTEM, 17, __FUNCTION__,
-                                 key, cfgPath);
-        throwError(err);
-      }
-
-      return -1;
+        try {
+            const content = fs.existsSync(cfgPath) ? fs.readFileSync(cfgPath, 'utf-8') : '';
+            const sections = content ? this.parseConfigSections(content) : Object.create(null);
+            if (!sections[_section]) sections[_section] = Object.create(null);
+            // Insert only if key does not already exist
+            if (Object.prototype.hasOwnProperty.call(sections[_section], key)) return -1;
+            sections[_section][key] = String(value ?? '');
+            this.saveConfigSections(sections);
+            return 0;
+        } catch (err) {
+            if (this.throwErrors) throw err;
+            return -1;
+        }
     }
 
-    return 0;
-  }
+    /**
+     * Set a value in the config. Placeholder implementation.
+     */
+    public setValue(value: unknown, key: string, _section = 'general'): number {
+        const cfgPath = this.getConfigPath();
+        if (!cfgPath) return -1;
 
-//--------------------------------------------------------------------------------
-//@protected members
-//--------------------------------------------------------------------------------
-  protected string _configFilePath;
+        try {
+            const content = fs.existsSync(cfgPath) ? fs.readFileSync(cfgPath, 'utf-8') : '';
+            const sections = content ? this.parseConfigSections(content) : Object.create(null);
+            if (!sections[_section]) sections[_section] = Object.create(null);
+            // Set/overwrite the key
+            sections[_section][key] = String(value ?? '');
+            this.saveConfigSections(sections);
+            return 0;
+        } catch (err) {
+            if (this.throwErrors) throw err;
+            return -1;
+        }
+    }
 
+    /**
+     * Delete a value in the config. Placeholder implementation.
+     */
+    public deleteValue(value: unknown, key: string, _section = 'general'): number {
+        const cfgPath = this.getConfigPath();
+        if (!cfgPath) return -1;
 
-//--------------------------------------------------------------------------------
-//@private members
-//--------------------------------------------------------------------------------
+        try {
+            if (!fs.existsSync(cfgPath)) return -1;
+            const content = fs.readFileSync(cfgPath, 'utf-8');
+            const sections = this.parseConfigSections(content);
+            if (
+                !sections[_section] ||
+                !Object.prototype.hasOwnProperty.call(sections[_section], key)
+            )
+                return -1;
+            // Only delete if value matches
+            if (sections[_section][key] !== String(value ?? '')) return -1;
+            delete sections[_section][key];
+            this.saveConfigSections(sections);
+            return 0;
+        } catch (err) {
+            if (this.throwErrors) throw err;
+            return -1;
+        }
+    }
+
+    /**
+     * Delete an entry by key in the config. Placeholder implementation.
+     */
+    public deleteEntry(key: string, _section = 'general'): number {
+        const cfgPath = this.getConfigPath();
+        if (!cfgPath) return -1;
+
+        try {
+            if (!fs.existsSync(cfgPath)) return -1;
+            const content = fs.readFileSync(cfgPath, 'utf-8');
+            const sections = this.parseConfigSections(content);
+            if (
+                !sections[_section] ||
+                !Object.prototype.hasOwnProperty.call(sections[_section], key)
+            )
+                return -1;
+            delete sections[_section][key];
+            this.saveConfigSections(sections);
+            return 0;
+        } catch (err) {
+            if (this.throwErrors) throw err;
+            return -1;
+        }
+    }
+
+    public getEntryValue(key: string, _section = 'general'): string {
+        const sectionData: Record<string, string> = this.getSection(_section);
+        return sectionData[key];
+    }
+
+    private getSection(section: string): Record<string, string> {
+        const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
+        return this.parseConfigSections(content)[section];
+    }
+
+    /**
+     * Parses a configuration file into sections
+     * @param content File content to parse
+     * @returns Sections with key-value pairs
+     */
+    private parseConfigSections(content: string): Record<string, Record<string, string>> {
+        const lines = content.split('\n');
+        const sections: Record<string, Record<string, string>> = Object.create(null);
+        let currentSection = '';
+
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+
+            if (trimmedLine.startsWith('[') && trimmedLine.endsWith(']')) {
+                currentSection = trimmedLine.slice(1, -1);
+                sections[currentSection] = Object.create(null);
+            } else if (currentSection && trimmedLine.includes('=')) {
+                const [key, ...valueParts] = trimmedLine.split('=');
+                const value = valueParts.join('=').trim().replace(/['"]/g, '');
+                sections[currentSection][key.trim()] = value;
+            }
+        }
+
+        return sections;
+    }
+
+    /**
+     * Save sections back to the config file.
+     * Ensures `[general]` is always the first section. Other sections and keys
+     * are written alphanumerically.
+     */
+    private saveConfigSections(sections: Record<string, Record<string, string>>): void {
+        const cfgPath = this.getConfigPath();
+        if (!cfgPath) {
+            if (this.throwErrors) throw new Error('Config path is not set');
+            return;
+        }
+
+        // Ensure general section exists and is first
+        if (!sections['general']) sections['general'] = Object.create(null);
+
+        const otherSections = Object.keys(sections)
+            .filter((s) => s !== 'general')
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+        const sectionOrder = ['general', ...otherSections];
+
+        const outLines: string[] = [];
+
+        for (const sec of sectionOrder) {
+            outLines.push(`[${sec}]`);
+            const entries = sections[sec] || Object.create(null);
+            const keys = Object.keys(entries).sort((a, b) =>
+                a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }),
+            );
+            for (const key of keys) {
+                const value = entries[key] ?? '';
+                const escaped = String(value).replace(/"/g, '\\"');
+                outLines.push(`${key} = "${escaped}"`);
+            }
+            outLines.push('');
+        }
+
+        const content = outLines.join('\n');
+        fs.writeFileSync(cfgPath, content, 'utf-8');
+    }
 }
+
+export default ProjEnvProjectConfig;

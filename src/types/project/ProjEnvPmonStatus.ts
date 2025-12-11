@@ -1,4 +1,4 @@
-import type { ProjEnvManagerInfo } from './ProjEnv';
+import type { ProjEnvManagerInfo, ProjEnvProjectState } from './ProjEnv';
 
 /**
  * Enumeration of possible project running states as reported by PMON.
@@ -17,7 +17,7 @@ export enum ProjEnvPmonStatus {
 export class ProjEnvPmonProjectStatus {
     managers: ProjEnvManagerInfo[] = [];
     project?: {
-        status: string;
+        status: ProjEnvProjectState;
         statusCode: number;
         text: string;
         emergency: boolean;

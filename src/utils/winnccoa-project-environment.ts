@@ -1,5 +1,4 @@
-import { ProjEnvProject } from "../types/project/ProjEnvProject"
-
+import { ProjEnvProject } from '../types/project/ProjEnvProject';
 
 /**
  * Return a list of all registered projects.

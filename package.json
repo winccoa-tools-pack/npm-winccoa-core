@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "tsc --build",
-    "test": "npm run style-check && npm run build && node --experimental-specifier-resolution=node --test",
+    "compile": "tsc --build",
     "prepublishOnly": "npm run build",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
@@ -23,7 +23,10 @@
     "format:md": "prettier --write \"**/*.md\"",
     "format:md:check": "prettier --check \"**/*.md\"",
     "style-check": "npm run lint && npm run format:check && npm run lint:md && npm run format:md:check",
-    "style-fix": "npm run lint:fix && npm run format && npm run lint:md:fix && npm run format:md"
+    "style-fix": "npm run lint:fix && npm run format && npm run lint:md:fix && npm run format:md",
+    "test": "npm run style-check && npm run build && node test/core-utils.test.js",
+    "test:integration": "npm run build && node .test/runTest.js",
+    "ci:integration": "npm ci && npm run test:integration"
   },
   "devDependencies": {
     "@types/node": "^20.19.25",

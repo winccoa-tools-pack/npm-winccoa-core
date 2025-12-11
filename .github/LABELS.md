@@ -52,11 +52,13 @@ This document describes the label system used for organizing issues and pull req
 ### **Issue Labeling Workflow**
 
 1. **Automatic Labels** (via GitHub Actions):
+
    - Issue type labels added based on title prefix
    - `needs-triage` added to all new issues
    - Component labels added based on issue template selection
 
 2. **Manual Triage Process**:
+
    - Maintainers review `needs-triage` issues within 2-3 business days
    - Add priority and component labels
    - Add to appropriate milestone
