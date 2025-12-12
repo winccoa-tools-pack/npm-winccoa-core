@@ -29,3 +29,4 @@ coverage/
 *.tmp
 .cache/
 tsconfig.tsbuildinfo
+build/test/

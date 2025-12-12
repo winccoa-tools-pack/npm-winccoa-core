@@ -1,6 +1,11 @@
 import { WinCCOAComponent } from '../WinCCOAComponent.js';
 import { ProjEnvPmonStatus } from '../../project/ProjEnvPmonStatus.js';
-import { ProjEnvManagerOptions, ProjEnvManagerStartMode, ProjEnvManagerState, ProjEnvProjectState } from '../../project/ProjEnv.js';
+import {
+    ProjEnvManagerOptions,
+    ProjEnvManagerStartMode,
+    ProjEnvManagerState,
+    ProjEnvProjectState,
+} from '../../project/ProjEnv.js';
 import type { ProjEnvManagerInfo } from '../../project/ProjEnv.js';
 import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus.js';
 
@@ -58,13 +63,11 @@ export class PmonComponent extends WinCCOAComponent {
         const args = ['-status', '-proj', projectName, '-log', '+stdout'];
         const code = super.start(args);
 
-        let status : ProjEnvPmonStatus = ProjEnvPmonStatus.Unknown;
+        let status: ProjEnvPmonStatus = ProjEnvPmonStatus.Unknown;
 
-        if ( await code === 0)
-            status = ProjEnvPmonStatus.Running;
-        else if (await code === 3)
-            status = ProjEnvPmonStatus.NotRunning;
-        
+        if ((await code) === 0) status = ProjEnvPmonStatus.Running;
+        else if ((await code) === 3) status = ProjEnvPmonStatus.NotRunning;
+
         return status;
     }
 
@@ -74,7 +77,7 @@ export class PmonComponent extends WinCCOAComponent {
     public async startPmonOnly(projectName: string): Promise<number> {
         const args = ['-proj', projectName, '-noAutostart'];
 
-        return super.start(args, {detached: true, waitForLog : 'WAIT_MODE'});
+        return super.start(args, { detached: true, waitForLog: 'WAIT_MODE' });
     }
 
     /**
@@ -86,11 +89,11 @@ export class PmonComponent extends WinCCOAComponent {
         if (startAll) {
             args = args.concat(['-command', 'START_ALL:']);
             // INFO, 9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
-            return super.start(args, {waitForLog : '9/pmon'});    
+            return super.start(args, { waitForLog: '9/pmon' });
         } else {
             // starting pmon only without extra arguments means, it will start the project too.
             // that means the pmon process will never end (hopefully, otherwise it crashed), so we need to detach
-            return super.start(args, {detached: true, waitForLog : 'WAIT_MODE'});  
+            return super.start(args, { detached: true, waitForLog: 'WAIT_MODE' });
         }
     }
 
@@ -100,7 +103,7 @@ export class PmonComponent extends WinCCOAComponent {
     public async stopProject(projectName: string): Promise<number> {
         const args = ['-proj', projectName, '-command', 'STOP_ALL:'];
         // INFO, 13/pmon, Projekt wurde komplett gestoppt - warte auf Befehle
-        return super.start(args, {waitForLog : '13/pmon'});
+        return super.start(args, { waitForLog: '13/pmon' });
     }
 
     /**
@@ -131,7 +134,13 @@ export class PmonComponent extends WinCCOAComponent {
      * Starts a specific manager by index
      */
     public async startManager(projectName: string, managerIndex: number): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'SINGLE_MGR:START', managerIndex.toString()];
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            'SINGLE_MGR:START',
+            managerIndex.toString(),
+        ];
         return super.start(args);
     }
 
@@ -162,10 +171,7 @@ export class PmonComponent extends WinCCOAComponent {
     /**
      * Gets the list of managers in a project
      */
-    public async getManagerOptionsList(
-        projectName: string,
-        
-    ): Promise<ProjEnvManagerOptions[]> {
+    public async getManagerOptionsList(projectName: string): Promise<ProjEnvManagerOptions[]> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
             throw new Error('WCCILpmon executable not found');
@@ -189,7 +195,6 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
     public async getManagerOptionsAt(
         index: number,
         projectName?: string,
-        
     ): Promise<ProjEnvManagerOptions | undefined> {
         if (typeof index !== 'number' || index < 0) return undefined;
 
@@ -205,20 +210,19 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         options: ProjEnvManagerOptions,
         projectName: string,
         managerIndex: number,
-        
     ): Promise<number> {
         const args = [
-                '-proj',
-                projectName,
-                '-command',
-                'SINGLE_MGR:PROP_PUT',
-                managerIndex.toString(),
-                options.startMode.toString(),
-                options.secondToKill.toString(),
-                options.resetStartCounter.toString(),
-                options.restart.toString(),
-                options.startOptions,
-            ];
+            '-proj',
+            projectName,
+            '-command',
+            'SINGLE_MGR:PROP_PUT',
+            managerIndex.toString(),
+            options.startMode.toString(),
+            options.secondToKill.toString(),
+            options.resetStartCounter.toString(),
+            options.restart.toString(),
+            options.startOptions,
+        ];
         return super.start(args);
     }
 
@@ -226,21 +230,20 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         options: ProjEnvManagerOptions,
         projectName: string,
         managerIndex: number,
-        
     ): Promise<number> {
         const args = [
-                '-proj',
-                projectName,
-                '-command',
-                'SINGLE_MGR:INS',
-                managerIndex.toString(),
-                options.component,
-                options.startMode.toString(),
-                options.secondToKill.toString(),
-                options.resetStartCounter.toString(),
-                options.restart.toString(),
-                options.startOptions,
-            ];
+            '-proj',
+            projectName,
+            '-command',
+            'SINGLE_MGR:INS',
+            managerIndex.toString(),
+            options.component,
+            options.startMode.toString(),
+            options.secondToKill.toString(),
+            options.resetStartCounter.toString(),
+            options.restart.toString(),
+            options.startOptions,
+        ];
         return super.start(args);
     }
 
@@ -248,9 +251,15 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         flag: string,
         projectName: string,
         managerIndex: number,
-        
     ): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'SINGLE_MGR:DEBUG', managerIndex.toString(), flag];
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            'SINGLE_MGR:DEBUG',
+            managerIndex.toString(),
+            flag,
+        ];
         return super.start(args);
     }
 
@@ -258,10 +267,7 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
      * Gets detailed project and manager status (MGRLIST:STATI) and returns typed managers and optional project state
      */
 
-    public async getProjectStatus(
-        projectName: string,
-        
-    ): Promise<ProjEnvPmonProjectStatus> {
+    public async getProjectStatus(projectName: string): Promise<ProjEnvPmonProjectStatus> {
         const pmonPath = this.getPath();
         if (!pmonPath) {
             const errorMsg = 'Could not locate WCCILpmon executable';
@@ -284,7 +290,6 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
     public async getManagerStatusAt(
         index: number,
         projectName?: string,
-        
     ): Promise<ProjEnvManagerInfo | undefined> {
         if (typeof index !== 'number' || index < 0) return undefined;
 
@@ -311,7 +316,6 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             const parts = line.split(';');
             if (parts.length < 1) continue;
 
-            
             if (parts.length < 6) {
                 throw new Error(`The line '${line}' has incorrect format`);
             }
@@ -335,7 +339,9 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
                     startModeEnum = ProjEnvManagerStartMode.Always;
                     break;
                 default:
-                    throw new Error(`The line '${line}' contains invalid start mode. Expected 0,1,2 becames ${startModeNum}`);
+                    throw new Error(
+                        `The line '${line}' contains invalid start mode. Expected 0,1,2 becames ${startModeNum}`,
+                    );
             }
 
             result.push({

@@ -128,10 +128,13 @@ export abstract class WinCCOAComponent {
      * @param args - Array of arguments to pass to the executable
      * @param options.detached - Whether to spawn the process detached
      * @returns Promise resolving with process exit code
-     * 
+     *
      * TODO implement the option waitForLog. need to wait until the std-err coontains the specific string
      */
-    public async start(args: string[] = [], options: { detached?: boolean, waitForLog?: string} = {}): Promise<number> {
+    public async start(
+        args: string[] = [],
+        options: { detached?: boolean; waitForLog?: string } = {},
+    ): Promise<number> {
         const p = this.getPath();
         if (!p) throw new Error('Executable ' + this.getName() + ' not found');
 
@@ -144,17 +147,13 @@ export abstract class WinCCOAComponent {
             proc.on('close', (code) => resolve(code ?? 0));
             proc.on('error', (err) => reject(err));
         });
-
     }
 
     /**
      * Execute a command and collect stdout lines as an array of strings.
      * Returns trimmed lines (excluding empty lines and terminating ';').
      */
-    protected async execAndCollectLines(
-        cmdPath: string,
-        args: string[],
-    ): Promise<string[]> {
+    protected async execAndCollectLines(cmdPath: string, args: string[]): Promise<string[]> {
         return new Promise((resolve, reject) => {
             const proc = spawn(cmdPath, args, { shell: false });
             let stdout = '';

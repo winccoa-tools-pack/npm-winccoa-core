@@ -1,7 +1,6 @@
 {
-    "default": true,
-    "MD013": false,
-    "MD032": true,
-    "MD033": { "allowed_elements": ["center"]},
-    "MD024" : false
+  "default": true,
+  "MD013": { "line_length": 200, "code_blocks": false },
+  "MD024": false,
+  "MD033": { "allowed_elements": ["center"] }
 }

@@ -29,10 +29,8 @@ export class ProjEnvProject {
     private runnable: ProjEnvProjectRunnable = ProjEnvProjectRunnable.Unknown;
     private version?: string;
 
-    public initFromRegister() {
+    public initFromRegister() {}
 
-    }
-    
     //------------------------------------------------------------------------------
     /**
      * @brief Sets the project identifier
@@ -302,7 +300,6 @@ export class ProjEnvProject {
      * @return Returns 0 when project is un-registered successfully, otherwise -1.
      */
     public async unregisterProj(): Promise<number> {
-
         if (!this.getId()) this._errorHandler.exception(this.getInvalidReason());
 
         const result = await this._pmon?.unregisterProject(this.getId());
@@ -331,8 +328,7 @@ export class ProjEnvProject {
         ret += prefix + this.format('Name: $1\n', this.getName());
 
         const instDir = this.getInstallDir();
-        if (instDir !== undefined)
-          ret += prefix + this.format('Install directory: $1\n', instDir);
+        if (instDir !== undefined) ret += prefix + this.format('Install directory: $1\n', instDir);
         ret += prefix + this.format('Version: $1', this.getVersion() ?? '');
         return ret;
     }
@@ -345,9 +341,12 @@ export class ProjEnvProject {
      * @warning Work only with locale host.
      */
     public async deleteProj(): Promise<number> {
-        const id = this.getId();
-        // TODO use PmonComponent to delete project here
-        return 0;
+        const dirPath = this.getDir();
+
+        this.unregisterProj();
+
+        fs.rmSync(dirPath, { recursive: true, force: true });
+        return fs.existsSync(dirPath) ? -1 : 0;
     }
 
     //------------------------------------------------------------------------------
@@ -398,7 +397,7 @@ export class ProjEnvProject {
      * -2    | Could not restart project within timeOut.
      * -3    | Project could not be stopped within timeOut
      */
-    public async restart(timeOut = 0): Promise<number> {
+    public async restart(): Promise<number> {
         const result = this._pmon?.restartProject(this.getId());
         return result ?? -1;
     }
@@ -450,7 +449,7 @@ export class ProjEnvProject {
      */
     public async isPmonRunning(): Promise<boolean> {
         const result = await this._pmon?.getStatus(this.getId());
-        return result  === ProjEnvPmonStatus.Running;
+        return result === ProjEnvPmonStatus.Running;
     }
     //------------------------------------------------------------------------------
     /** @brief Function checks if the project has the pmon running.
@@ -496,20 +495,9 @@ export class ProjEnvProject {
      * @param   dbgFlags debug parameter e.g.: -dbg 2 or -report ALL
      * @return  Returns 0 when flag was set, otherwise returns -1 or -2.
      */
-    public sendDbgFlag(manIdx: number, dbgFlags: string): number {
-        return 0;
-    }
-
-    //------------------------------------------------------------------------------
-    /** @brief Returns the index of the 1st manager matching the given criteria.
-     *
-     * @param component Either a component name (e.g. "WCCOActrl") or a component constant (e.g. CTRL_COMPONENT)
-     * @param options Command line options that shall be PART of the manager's command line options, or a string PATTERN they shall match
-     * @return PMON index of the 1st manager matching the given criteria, or -1.
-     */
-    public getManagerIndex(component: unknown, options = ''): number {
-        // TODO: implement manager index lookup
-        return -1;
+    public async sendDbgFlag(manIdx: number, dbgFlags: string): Promise<number> {
+        const result = await this._pmon?.sendDebugFlag(dbgFlags, this.getId(), manIdx);
+        return result ?? -1;
     }
 
     //------------------------------------------------------------------------------
@@ -521,18 +509,9 @@ export class ProjEnvProject {
      * @param state Expected manager state.
      * @return Error code. Returns 0 when . Otherwise -1.
      */
-    public startManager(manIdx: number, timeOut = 0, state = ProjEnvManagerState.Running): number {
-        if (manIdx <= 0) {
-            this._errorHandler.severe(
-                (
-                    tr(
-                        'Invalid argument in function $1(). The manager index ($2) must be greater than 0!',
-                    ) as any
-                ).subst('startManager', manIdx),
-            );
-            return -1;
-        }
-        return 0;
+    public async startManager(manIdx: number): Promise<number> {
+        const result = await this._pmon?.startManager(this.getId(), manIdx);
+        return result ?? -1;
     }
 
     //------------------------------------------------------------------------------
@@ -544,22 +523,9 @@ export class ProjEnvProject {
      * @param state Expected manager state.
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
-    public stopManager(
-        manIdx: number,
-        timeOut = 0,
-        state = ProjEnvManagerState.NotRunning,
-    ): number {
-        if (manIdx <= 0) {
-            this._errorHandler.severe(
-                (
-                    tr(
-                        'Invalid argument in function $1(). The manager index ($2) must be greater than 0!',
-                    ) as any
-                ).subst('stopManager', manIdx),
-            );
-            return -1;
-        }
-        return 0;
+    public async stopManager(manIdx: number): Promise<number> {
+        const result = await this._pmon?.stopManager(this.getId(), manIdx);
+        return result ?? -1;
     }
 
     //------------------------------------------------------------------------------
@@ -568,18 +534,9 @@ export class ProjEnvProject {
      *               Index begin with 1. Pmon has idx 0 in progs file.
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
-    public deleteManager(manIdx: number): number {
-        if (manIdx <= 0) {
-            this._errorHandler.severe(
-                (
-                    tr(
-                        'Invalid argument in function $1(). The manager index ($2) must be greater than 0!',
-                    ) as any
-                ).subst('deleteManager', manIdx),
-            );
-            return -1;
-        }
-        return 0;
+    public async deleteManager(manIdx: number): Promise<number> {
+        const result = await this._pmon?.removeManager(this.getId(), manIdx);
+        return result ?? -1;
     }
 
     //------------------------------------------------------------------------------
@@ -590,9 +547,9 @@ export class ProjEnvProject {
      *               Index begin with 1. Pmon has idx 0 in progs file.
      * @return Error code. Returns -1 when failed, -2 when pmon is not reachable, otherwise returns the index of the inserted manager.
      */
-    public insertManager(opts: ProjEnvManagerOptions, manIdx = -1): number {
-        if (!opts.component) return -1;
-        return 0;
+    public async insertManager(opts: ProjEnvManagerOptions, manIdx = -1): Promise<number> {
+        const result = await this._pmon?.insertManagerAt(opts, this.getId(), manIdx);
+        return result ?? -1;
     }
 
     //------------------------------------------------------------------------------
@@ -603,21 +560,12 @@ export class ProjEnvProject {
      * @param opts Manager options.
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
-    public changeManagerOptions(manIdx: number, opts: ProjEnvManagerOptions): number {
-        if (manIdx <= 0) {
-            this._errorHandler.severe(
-                (
-                    tr(
-                        'Invalid argument in function $1(). The manager index ($2) must be greater than 0!',
-                    ) as any
-                ).subst('changeManagerOptions', manIdx),
-            );
-            return -1;
-        }
-
-        // TODO use PmonComponent setManagerOptionsAt() here
-
-        return 0;
+    public async changeManagerOptions(
+        manIdx: number,
+        opts: ProjEnvManagerOptions,
+    ): Promise<number> {
+        const result = await this._pmon?.setManagerOptionsAt(opts, this.getId(), manIdx);
+        return result ?? -1;
     }
 
     //------------------------------------------------------------------------------
@@ -628,7 +576,10 @@ export class ProjEnvProject {
      * @param startMode Start mode of the manager.
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
-    public changeManagerStartMode(manIdx: number, startMode: ProjEnvManagerStartMode): number {
+    public async changeManagerStartMode(
+        manIdx: number,
+        startMode: ProjEnvManagerStartMode,
+    ): Promise<number> {
         const current = this.getManagerOptions(manIdx);
         if (!current) return -1;
         current.startMode = startMode;
@@ -643,7 +594,7 @@ export class ProjEnvProject {
      * @param startOptions Start options of the manager.
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
-    public changeManagerStartOptions(manIdx: number, startOptions: string): number {
+    public async changeManagerStartOptions(manIdx: number, startOptions: string): Promise<number> {
         const current = this.getManagerOptions(manIdx);
         if (!current) return -1;
         current.startOptions = startOptions;

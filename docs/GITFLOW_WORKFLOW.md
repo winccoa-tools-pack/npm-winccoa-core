@@ -1,8 +1,12 @@
 # Git Flow Workflow (Guide)
 
-This repository template uses the Git Flow branching model. The repository includes GitHub Actions workflows that help enforce branch protection and automate parts of the release process.
+This repository template uses the Git Flow branching model. The repository
+includes GitHub Actions workflows that help enforce branch protection and
+automate parts of the release process.
 
 Summary
+
+**Branch Overview:**
 
 - main: Production-ready code (stable releases)
 - develop: Integration branch for ongoing development
@@ -35,7 +39,8 @@ git push origin develop
 
 Applying branch protection
 
-There is a workflow `Setup Git Flow Branch Protection` in `.github/workflows/setup-gitflow.yml` which can apply recommended protection settings to `main` and `develop`. Run it from the Actions tab or via `workflow_dispatch` if you have repository admin rights.
+There is a workflow `Setup Git Flow Branch Protection` in `.github/workflows/setup-gitflow.yml` which can apply recommended protection settings to `main` and `develop`.
+Run it from the Actions tab or via `workflow_dispatch` if you have repository admin rights.
 
 Notes
 

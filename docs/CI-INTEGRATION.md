@@ -4,15 +4,9 @@ This document describes how GitHub Actions runs integration tests against the Wi
 
 Required repository/organization secrets:
 
-- `DOCKER_USER` — Docker registry username.
-- `DOCKER_PASSWORD` — Docker registry password or token.
-
 Workflow file: `.github/workflows/integration-winccoa.yml`
 
 How it runs:
-
-- The workflow pulls the WinCC OA image, starts a container named `winccoa-ci`, mounts the repository into `/workspace`, and executes `npm ci` and the `ci:integration` script inside the container.
-- The script `.github/scripts/wait-for-winccoa.sh` can be used to wait for the runtime to be ready before running tests.
 
 Running manually:
 
@@ -21,15 +15,64 @@ Running manually:
 
 Notes:
 
-- The workflow executes tests inside the container to avoid requiring WinCC OA on the host runner.
-- If the image requires additional environment variables (license acceptance, ports, or credentials), add them as repository secrets and pass them to the `docker run` step in the workflow.
+## Running Unit Tests (no WinCC OA required)
+
+The repository provides a lightweight bootstrap test entrypoint for unit tests that do not require a WinCC OA installation.
+
+- Command: `npm test`
+- What it does:
+  - Runs style checks and the TypeScript build.
+  - Executes `test/core-utils.test.js`, which scans the `test/` folder for `*.test.ts` files and runs them using `ts-node` via `npx`.
+
+Notes:
+
+- `test/core-utils.test.js` will attempt to run tests with `npx ts-node --transpile-only <file>` so you don't need to add `ts-node` as a permanent devDependency.
+  The first run may install `ts-node` transiently via `npx`, which can be slower.
+- If you prefer to avoid `npx` fetching packages during CI, install `ts-node` as a devDependency and the bootstrap will use the local binary automatically.
+- The bootstrap intentionally skips files in `test/fixtures`.
+
+Test folder layout
+
+- `test/unit/` — unit tests that do NOT require a WinCC OA installation. These are executed by the
+  `test/core-utils.test.js` bootstrap and are suitable for running on GitHub-hosted runners.
+- `test/integration/` — tests that require a real WinCC OA runtime or containerized environment.
+  These are not executed by the default `npm test` and should be run by the `integration-winccoa.yml`
+  workflow or locally inside the WinCC OA container.
+
+Node runtime requirement for unit tests
+
+- The repo uses Node's built-in test runner for `test:unit`. This requires Node >= 20.
+- CI runners should use a Node 20+ image when running `npm run test:unit`.
+
+Running TypeScript unit tests
+
+- If you want to run `.ts` tests directly with Node's test runner, use `npm run test:unit:ts`.
+  This uses `ts-node` ESM loader — ensure `ts-node` is installed in devDependencies for CI stability.
+
+Troubleshooting:
+
+- If tests are skipped because `ts-node` cannot be run, you can run them locally after installing `ts-node`:
+
+```powershell
+npm install --save-dev ts-node
+npm test
+```
+
+Integration test toggle
+------------------------
+
+Integration tests in `test/integration` require a WinCC OA runtime. To allow developers to run the test suite locally without WinCC OA installed, the integration tests will be skipped unless the environment variable `WINCCOA_INTEGRATION` is set to `1`.
+
+- CI/Container runs: set `WINCCOA_INTEGRATION=1` in the job environment to make integration tests strict.
+- Local runs: omit `WINCCOA_INTEGRATION` to skip integration tests when WinCC OA is not available.
+
 
 Help / Safe Triggering
 
-- **What to check before running**: Ensure repository secrets `DOCKER_USER` and `DOCKER_PASSWORD` are configured if you intend the workflow to push images. If you only want to build and run tests, you can run the workflow without those secrets — the job will build and run tests but will skip the push step when credentials are missing.
-- **Avoid accidental pushes**: The build workflow accepts `docker_namespace` and `repo_name` inputs. Always supply your own Docker Hub namespace (or leave blank to default to the repository owner) so that images are not pushed into the upstream template namespace by mistake.
-- **How to run safely (Actions UI)**: Open the repository Actions tab, select "Build WinCC OA image", click "Run workflow" and set `docker_namespace` to your Docker Hub username and `repo_name` to an appropriate repo name.
-- **How to run safely (CLI)**: Use the GitHub CLI to dispatch a run and pass inputs. Example:
+  If you only want to build and run tests, you can run the workflow without those secrets — the job will build and run tests but will skip the push step when credentials are missing.
+  Always supply your own Docker Hub namespace (or leave blank to default to the repository owner) so that images are not pushed into the upstream template namespace by mistake.
+  click "Run workflow"
+  and set `docker_namespace` to your Docker Hub username and `repo_name` to an appropriate repo name.
 
 ```powershell
 # Run workflow and set your namespace/repo to avoid pushing into upstream
@@ -39,4 +82,5 @@ gh workflow run build-winccoa-image.yml \
     -f node_version=20
 ```
 
-- **Dry-run locally**: You can run the integration tests locally without building the custom image by using Docker to run the official WinCC OA image and executing `npm ci && npm run ci:integration` inside the container; see the `integration-winccoa.yml` steps for the exact invocation.
+  Use Docker to run the official WinCC OA image and executing `npm ci && npm run ci:integration` inside the container;
+  see the `integration-winccoa.yml` steps for the exact invocation.

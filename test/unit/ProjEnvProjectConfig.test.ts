@@ -3,7 +3,7 @@ import os from 'os';
 import path from 'path';
 import { strict as assert } from 'assert';
 import { describe, it, beforeEach, afterEach } from 'node:test';
-import ProjEnvProjectConfig from '../src/types/project/ProjEnvProjectConfig';
+import ProjEnvProjectConfig from '../../dist/types/project/ProjEnvProjectConfig.js';
 
 function writeFile(p: string, content: string) {
   fs.writeFileSync(p, content, 'utf-8');

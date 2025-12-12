@@ -5,7 +5,7 @@ import {
     getWinCCOAInstallationPathByVersion,
     getAvailableWinCCOAVersions,
     getWindowsAvailableVersions
-} from '../../dist/utils/winccoa-paths.js';
+} from '../../../dist/utils/winccoa-paths.js';
 
 describe('winccoa-paths', () => {
     describe('getWinCCOAInstallationPathByVersion', () => {

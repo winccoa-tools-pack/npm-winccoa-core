@@ -249,11 +249,11 @@ npm-shared-library-core/
 1. Merge PR to `develop`
 2. Merge `develop` → `main` for release
 3. CI/CD triggers:
-   - Runs full test suite
-   - Builds package
-   - Publishes to npm registry
-   - Creates GitHub release
-   - Updates changelog
+    - Runs full test suite
+    - Builds package
+    - Publishes to npm registry
+    - Creates GitHub release
+    - Updates changelog
 
 ---
 
@@ -301,21 +301,21 @@ npm-shared-library-core/
 ## Next Steps (Immediate)
 
 1. **Complete Phase 3.1**: Migrate version information types
-   - Copy `DetailedVersionInfo.ts`
-   - Update imports
-   - Create tests
-   - Commit and create PR
+    - Copy `DetailedVersionInfo.ts`
+    - Update imports
+    - Create tests
+    - Commit and create PR
 
 2. **Complete Phase 3.2**: Migrate component types
-   - Copy component type files
-   - Remove VS Code dependencies
-   - Create tests
-   - Commit and create PR
+    - Copy component type files
+    - Remove VS Code dependencies
+    - Create tests
+    - Commit and create PR
 
 3. **Plan Phase 4**: Define business logic migration scope
-   - Identify core logic to extract
-   - Map dependencies
-   - Create detailed task list
+    - Identify core logic to extract
+    - Map dependencies
+    - Create detailed task list
 
 ---
 
