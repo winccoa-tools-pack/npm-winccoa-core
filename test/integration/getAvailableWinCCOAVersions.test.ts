@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { strict as assert } from 'assert';
-import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths.ts';
+import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
 
 describe('getAvailableWinCCOAVersions (integration)', () => {
   it('detects at least one WinCC OA version (expects 3.x like 3.19)', () => {

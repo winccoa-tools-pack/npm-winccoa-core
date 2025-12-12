@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { parseVersionString } from '../../dist/utils/winccoa-version-info.js';
+import { parseVersionString } from '../../src/utils/winccoa-version-info';
 
 describe('winccoa-version-info', () => {
     describe('parseVersionString', () => {

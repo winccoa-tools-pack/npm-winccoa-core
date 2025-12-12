@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import fs from 'fs';
 import { strict as assert } from 'assert';
-import { getAvailableWinCCOAVersions, getWinCCOAInstallationPathByVersion } from '../../src/utils/winccoa-paths.ts';
+import { getAvailableWinCCOAVersions, getWinCCOAInstallationPathByVersion } from '../../src/utils/winccoa-paths';
 
 describe('getWinCCOAInstallationPathByVersion (integration)', () => {
   it('detects the WinCC OA installation path', () => {
