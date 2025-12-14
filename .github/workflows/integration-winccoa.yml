@@ -83,7 +83,7 @@ jobs:
             set -e
             # Run tests under Xvfb so VS Code can start headlessly
             echo "Starting integration tests under Xvfb (WINCCOA_INTEGRATION=1)";
-            WINCCOA_INTEGRATION=1 xvfb-run -s "-screen 0 1280x1024x24" sh -c "npm run ci:integration"
+            WINCCOA_INTEGRATION=1 xvfb-run -s "-screen 0 1280x1024x24" sh -c "npm install && npm run ci:integration"
           '
 
       - name: Collect logs on failure
