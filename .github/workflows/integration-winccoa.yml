@@ -81,26 +81,9 @@ jobs:
         run: |
           docker exec --user root winccoa-ci sh -c '
             set -e
-
-            # Ensure Node 20+ is available in container (install if missing or too old)
-            echo "Node version inside container:"; node -v || true
-            NODE_OK=0
-            if command -v node >/dev/null 2>&1; then
-              NV=$(node -v | sed 's/^v//; s/\..*$//') || true
-              if [ "${NV:-0}" -ge 20 ]; then
-                NODE_OK=1
-              fi
-            fi
-            if [ "$NODE_OK" -eq 0 ]; then
-              echo "Installing Node.js 20 inside container (requires apt-get)...";
-              apt-get update && apt-get install -y curl gnupg ca-certificates || true
-              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-              apt-get install -y nodejs || true
-            fi
-
             # Run tests under Xvfb so VS Code can start headlessly
             echo "Starting integration tests under Xvfb (WINCCOA_INTEGRATION=1)";
-            WINCCOA_INTEGRATION=1 xvfb-run -s "-screen 0 1280x1024x24" sh -c "npm ci && npm run ci:integration"
+            WINCCOA_INTEGRATION=1 xvfb-run -s "-screen 0 1280x1024x24" sh -c "npm run ci:integration"
           '
 
       - name: Collect logs on failure
