@@ -1,0 +1,10 @@
+LIST:9
+WCCILpmon;0;30;0;0;
+WCCILdataSQLite;1;30;0;0;
+WCCOAevent;1;30;0;0;
+WCCOAvalarch;1;30;0;0;
+WCCOActrl;1;30;0;0;-num 1
+WCCOActrl;1;30;0;0;-num 2
+WCCOAdb;1;30;0;0;
+WCCOAascii;1;30;0;0;
+WCCOAui;1;30;0;0;-iconBar;-menuBar;-m;gedi

@@ -58,21 +58,21 @@ npm install --save-dev ts-node
 npm test
 ```
 
-Integration test toggle
-------------------------
+## Integration test toggle
 
-Integration tests in `test/integration` require a WinCC OA runtime. To allow developers to run the test suite locally without WinCC OA installed, the integration tests will be skipped unless the environment variable `WINCCOA_INTEGRATION` is set to `1`.
+Integration tests in `test/integration` require a WinCC OA runtime. To allow developers to run the test suite locally without WinCC OA installed, the
+integration tests will be skipped unless the environment variable `WINCCOA_INTEGRATION` is set to `1`.
 
 - CI/Container runs: set `WINCCOA_INTEGRATION=1` in the job environment to make integration tests strict.
 - Local runs: omit `WINCCOA_INTEGRATION` to skip integration tests when WinCC OA is not available.
 
+## Help / Safe Triggering
 
-Help / Safe Triggering
-
-  If you only want to build and run tests, you can run the workflow without those secrets — the job will build and run tests but will skip the push step when credentials are missing.
-  Always supply your own Docker Hub namespace (or leave blank to default to the repository owner) so that images are not pushed into the upstream template namespace by mistake.
-  click "Run workflow"
-  and set `docker_namespace` to your Docker Hub username and `repo_name` to an appropriate repo name.
+If you only want to build and run tests, you can run the workflow without those secrets — the job will build and run tests but will skip the push step when
+credentials are missing.
+Always supply your own Docker Hub namespace (or leave blank to default to the repository owner) so that images are not pushed into the upstream template
+namespace by mistake.
+Click "Run workflow" and set `docker_namespace` to your Docker Hub username and `repo_name` to an appropriate repo name.
 
 ```powershell
 # Run workflow and set your namespace/repo to avoid pushing into upstream
@@ -82,5 +82,5 @@ gh workflow run build-winccoa-image.yml \
     -f node_version=20
 ```
 
-  Use Docker to run the official WinCC OA image and executing `npm ci && npm run ci:integration` inside the container;
-  see the `integration-winccoa.yml` steps for the exact invocation.
+Use Docker to run the official WinCC OA image and executing `npm ci && npm run ci:integration` inside the container;
+see the `integration-winccoa.yml` steps for the exact invocation.
