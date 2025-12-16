@@ -82,5 +82,8 @@ gh workflow run build-winccoa-image.yml \
     -f node_version=20
 ```
 
-Use Docker to run the official WinCC OA image and executing `npm ci && npm run ci:integration` inside the container;
+Use Docker to run the official WinCC OA image and execute `npm run ci:integration` inside the container;
 see the `integration-winccoa.yml` steps for the exact invocation.
+
+**Note:** The `ci:integration` script runs `npm ci` which requires `package-lock.json` to be in sync with `package.json`.
+If you see an error about lock file sync, run `npm install` locally to update `package-lock.json` and commit the changes.

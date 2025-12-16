@@ -29,13 +29,16 @@ jobs:
         cache: 'npm'
         
     - name: Install dependencies
-      run: npm install && npm ci
+      run: npm ci
       
     - name: Build package
       run: npm run build
       
-    - name: Run tests
-      run: npm test
+    - name: Run style checks
+      run: npm run style-check
+      
+    - name: Run unit tests
+      run: npm run test:unit
       env:
         CI: true
 
@@ -55,7 +58,7 @@ jobs:
         cache: 'npm'
         
     - name: Install dependencies
-      run: npm install && npm ci
+      run: npm ci
       
     - name: Build package
       run: npm run build
