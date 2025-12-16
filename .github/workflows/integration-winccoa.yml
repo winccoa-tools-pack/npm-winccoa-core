@@ -15,11 +15,10 @@ on:
         description: 'Repository name to use for image tag (overrides default)'
         required: false
         default: ''
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
     branches: [ main, develop ]
 
 permissions:
@@ -28,6 +27,7 @@ permissions:
 jobs:
   integration:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     env:
       WORKDIR: /workspace
       NODE_VERSION: ${{ github.event.inputs.node_version || '20' }}
