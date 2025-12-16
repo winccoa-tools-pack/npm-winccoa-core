@@ -7,7 +7,7 @@ export type WinCCOAErrorHandlerLogLevel = 'verbose' | 'info' | 'warning' | 'seve
 /** Output hook can be a function or a VS Code-like OutputChannel with appendLine(). */
 export type OutputHook = ((line: string) => void) | { appendLine: (line: string) => void };
 
-export interface WinCCOAErrorHandlerOptions  {
+export interface WinCCOAErrorHandlerOptions {
     verbose?: boolean;
     debugFlag?: string;
     /** If true, methods labeled 'exception' or 'severe' will throw Error objects. */

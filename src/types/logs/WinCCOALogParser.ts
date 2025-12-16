@@ -50,9 +50,9 @@ export class WinCCOALogParser {
      * Real WinCC OA format examples:
      * WCCOActrl    (0), 2025.10.15 13:54:33.236, SYS,  INFO,        1, Manager Start, PROJ, CTRL_BLOB_3.21, V 3.21 - 3.21.0 platform Windows AMD64
      * WCCOActrl    (0), 2025.10.15 13:54:34.364, CTRL, WARNING,     5/ctrl, Ort der folgenden Meldung:
-     * 
+     *
      * Format: MANAGER_NAME (NUMBER), TIMESTAMP, ERROR_TYPE, PRIORITY, ERROR_CODE[/CATALOG], TRANSLATION, ADDITIONAL_INFO...
-     * 
+     *
      * Note: Commas are the primary delimiters, spaces are optional and used for readability
      * @param line Single log line
      * @returns WinCCOALogEntry | null
@@ -66,20 +66,20 @@ export class WinCCOALogParser {
 
         // Split by comma and trim each part to handle optional spaces
         const rawParts = line.split(',');
-        
+
         if (rawParts.length < 6) {
             return null;
         }
 
         // Trim all parts to remove optional spacing
-        const parts = rawParts.map(part => part.trim());
+        const parts = rawParts.map((part) => part.trim());
 
         // Parse manager name and number: "WCCOActrl    (0)" or "WCCOActrl(0)"
         const managerMatch = parts[0].match(/^(.+?)\s*\((\d+)\)$/);
         if (!managerMatch) {
             return null;
         }
-        
+
         const managerName = managerMatch[1].trim();
         const managerNumber = parseInt(managerMatch[2], 10);
 
@@ -114,7 +114,7 @@ export class WinCCOALogParser {
             errorCode,
             translation,
             additionalInfo,
-            rawLine: line
+            rawLine: line,
         };
     }
 
@@ -126,15 +126,16 @@ export class WinCCOALogParser {
     private parseTimestamp(timestampStr: string): Date | null {
         try {
             // Convert WinCC OA format to ISO format
-            const isoFormat = timestampStr.replace(/^(\d{4})\.(\d{2})\.(\d{2})\s+/, '$1-$2-$3T') + 'Z';
+            const isoFormat =
+                timestampStr.replace(/^(\d{4})\.(\d{2})\.(\d{2})\s+/, '$1-$2-$3T') + 'Z';
             const date = new Date(isoFormat);
-            
+
             if (isNaN(date.getTime())) {
                 return null;
             }
-            
+
             return date;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             return null;
         }
@@ -147,7 +148,7 @@ export class WinCCOALogParser {
      * @returns Filtered array of log entries
      */
     public filterEntries(entries: WinCCOALogEntry[], filters: LogFilters): WinCCOALogEntry[] {
-        return entries.filter(entry => {
+        return entries.filter((entry) => {
             // Timestamp filter
             if (filters.startTime && entry.timestamp < filters.startTime) {
                 return false;
@@ -157,37 +158,58 @@ export class WinCCOALogParser {
             }
 
             // Manager name filter
-            if (filters.managerName && !entry.managerName.toLowerCase().includes(filters.managerName.toLowerCase())) {
+            if (
+                filters.managerName &&
+                !entry.managerName.toLowerCase().includes(filters.managerName.toLowerCase())
+            ) {
                 return false;
             }
 
             // Manager number filter
-            if (filters.managerNumber !== undefined && entry.managerNumber !== filters.managerNumber) {
+            if (
+                filters.managerNumber !== undefined &&
+                entry.managerNumber !== filters.managerNumber
+            ) {
                 return false;
             }
 
             // Error type filter (was category)
-            if (filters.errorType && !entry.errorType.toLowerCase().includes(filters.errorType.toLowerCase())) {
+            if (
+                filters.errorType &&
+                !entry.errorType.toLowerCase().includes(filters.errorType.toLowerCase())
+            ) {
                 return false;
             }
 
             // Priority filter
-            if (filters.priority && !entry.priority.toLowerCase().includes(filters.priority.toLowerCase())) {
+            if (
+                filters.priority &&
+                !entry.priority.toLowerCase().includes(filters.priority.toLowerCase())
+            ) {
                 return false;
             }
 
             // Error code filter
-            if (filters.errorCode && !entry.errorCode.toLowerCase().includes(filters.errorCode.toLowerCase())) {
+            if (
+                filters.errorCode &&
+                !entry.errorCode.toLowerCase().includes(filters.errorCode.toLowerCase())
+            ) {
                 return false;
             }
 
             // Translation filter
-            if (filters.translation && !entry.translation.toLowerCase().includes(filters.translation.toLowerCase())) {
+            if (
+                filters.translation &&
+                !entry.translation.toLowerCase().includes(filters.translation.toLowerCase())
+            ) {
                 return false;
             }
 
             // Additional info filter
-            if (filters.additionalInfo && !entry.additionalInfo.toLowerCase().includes(filters.additionalInfo.toLowerCase())) {
+            if (
+                filters.additionalInfo &&
+                !entry.additionalInfo.toLowerCase().includes(filters.additionalInfo.toLowerCase())
+            ) {
                 return false;
             }
 
@@ -201,9 +223,9 @@ export interface LogFilters {
     endTime?: Date;
     managerName?: string;
     managerNumber?: number;
-    errorType?: string;        // SYS, CTRL, IMPL, etc.
-    priority?: string;         // INFO, WARNING, SEVERE, FATAL
-    errorCode?: string;        // 1, 5/ctrl, etc.
-    translation?: string;      // Translated message
-    additionalInfo?: string;   // Additional info text search
+    errorType?: string; // SYS, CTRL, IMPL, etc.
+    priority?: string; // INFO, WARNING, SEVERE, FATAL
+    errorCode?: string; // 1, 5/ctrl, etc.
+    translation?: string; // Translated message
+    additionalInfo?: string; // Additional info text search
 }
