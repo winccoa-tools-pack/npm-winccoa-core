@@ -38,9 +38,19 @@ jobs:
       run: npm run style-check
       
     - name: Run unit tests
-      run: npm run test:unit
+      run: npm run test:unit 2>&1 | tee test-output.txt
       env:
         CI: true
+        
+    - name: Test Report Summary
+      if: always()
+      run: |
+        if [ -f test-output.txt ]; then
+          echo "## Test Results - Node ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 10 test-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
 
   package:
     runs-on: ubuntu-latest
