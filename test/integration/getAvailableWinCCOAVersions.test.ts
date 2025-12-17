@@ -8,13 +8,6 @@ describe('getAvailableWinCCOAVersions (integration)', () => {
     // Helpful debug output in CI logs
     // eslint-disable-next-line no-console
     console.log('Available WinCC OA versions:', versions);
-    // If this is a developer/local run and WinCC OA isn't installed, skip test.
-    // CI / integration runs should set WINCCOA_INTEGRATION=1 to make the test strict.
-    if (!Array.isArray(versions) || versions.length === 0) {
-      // eslint-disable-next-line no-console
-      console.warn('Skipping integration test: no WinCC OA installation detected.');
-      return;
-    }
 
     assert.ok(Array.isArray(versions), 'Result should be an array');
     assert.ok(versions.length > 0, 'No WinCC OA versions detected');

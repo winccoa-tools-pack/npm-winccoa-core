@@ -61,10 +61,10 @@ npm test
 ## Integration test toggle
 
 Integration tests in `test/integration` require a WinCC OA runtime. To allow developers to run the test suite locally without WinCC OA installed, the
-integration tests will be skipped unless the environment variable `WINCCOA_INTEGRATION` is set to `1`.
+integration tests will run when WinCC OA is available in the environment.
 
-- CI/Container runs: set `WINCCOA_INTEGRATION=1` in the job environment to make integration tests strict.
-- Local runs: omit `WINCCOA_INTEGRATION` to skip integration tests when WinCC OA is not available.
+- CI/Container runs: Integration tests run automatically when WinCC OA is installed in the Docker container.
+- Local runs: Integration tests run automatically when WinCC OA is installed locally.
 
 ## Help / Safe Triggering
 

@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------
 
 import { PmonComponent } from '../components/implementations';
-import { findProjectRegistryById } from '../project/ProjEnvProjectRegistry';
+import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
 import { OaLanguage } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
 import fs from 'fs';
@@ -28,8 +28,19 @@ import path from 'path';
 export class ProjEnvProject {
     private runnable: ProjEnvProjectRunnable = ProjEnvProjectRunnable.Unknown;
     private version?: string;
+    private currentProject = false;
 
-    public initFromRegister() {}
+    //------------------------------------------------------------------------------
+    public initFromRegister(registry: ProjEnvProjectRegistry) {
+        this.setId(registry.id);
+        this.setName(registry.name ?? registry.id);
+        this.setInstallDir(registry.installationDir);
+        this.setRunnable(!registry.notRunnable);
+        this.currentProject = registry.currentProject ?? false;
+    }
+
+    //------------------------------------------------------------------------------
+    public isCurrentProject(): boolean { return this.currentProject; }
 
     //------------------------------------------------------------------------------
     /**
