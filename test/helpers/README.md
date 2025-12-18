@@ -9,11 +9,13 @@ Helper functions for working with WinCC OA test projects in integration tests.
 ### Functions
 
 #### `registerRunnableTestProject()`
+
 Creates and registers a runnable WinCC OA test project from `test/fixtures/projects/runnable`.
 
 Returns a `ProjEnvProject` instance that is registered with WinCC OA.
 
 **Example:**
+
 ```typescript
 const project = await registerRunnableTestProject();
 try {
@@ -25,12 +27,15 @@ try {
 ```
 
 #### `unregisterTestProject(project: ProjEnvProject)`
+
 Unregisters and cleans up a test project. Automatically stops the project if running.
 
 #### `withRunnableTestProject(testFn: (project) => Promise<void>)`
+
 Convenience wrapper that automatically registers a test project, runs your test function, and cleans up afterwards.
 
 **Example:**
+
 ```typescript
 await withRunnableTestProject(async (project) => {
     await project.start();
@@ -40,12 +45,15 @@ await withRunnableTestProject(async (project) => {
 ```
 
 #### `getFixturesPath()`
+
 Returns the absolute path to the `test/fixtures` directory.
 
 #### `getTestProjectPath(projectName: string)`
+
 Returns the absolute path to a specific test project fixture.
 
 **Example:**
+
 ```typescript
 const path = getTestProjectPath('runnable');
 // Returns: /path/to/test/fixtures/projects/runnable
