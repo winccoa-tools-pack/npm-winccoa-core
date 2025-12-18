@@ -40,7 +40,9 @@ export class ProjEnvProject {
     }
 
     //------------------------------------------------------------------------------
-    public isCurrentProject(): boolean { return this.currentProject; }
+    public isCurrentProject(): boolean {
+        return this.currentProject;
+    }
 
     //------------------------------------------------------------------------------
     /**

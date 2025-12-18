@@ -26,21 +26,21 @@ export async function getRegisteredProjects(): Promise<ProjEnvProject[]> {
 /**Returns all running projects locate on the locale host
  */
 export async function getRunningProjects(): Promise<ProjEnvProject[]> {
-    return (await getRegisteredProjects()).filter(project => project.isRunning());
+    return (await getRegisteredProjects()).filter((project) => project.isRunning());
 }
 
 /**Returns all runnable projects locate on the locale host*/
 export async function getRunnableProjects(): Promise<ProjEnvProject[]> {
-    return (await getRegisteredProjects()).filter(project => project.isRunnable());
+    return (await getRegisteredProjects()).filter((project) => project.isRunnable());
 }
 
 /**Returns all current projects locate on the locale host.
  * A current project is the one that is currently active in WinCC OA.
  * Note: per WinCC OA, there can be only one current project at a time.
  * However, this function returns an array because you can have multiple WinCC OA installations
-*/
+ */
 export async function getCurrentProjects(): Promise<ProjEnvProject[]> {
-    return (await getRegisteredProjects()).filter(project => project.isCurrentProject());
+    return (await getRegisteredProjects()).filter((project) => project.isCurrentProject());
 }
 
 /** Export default object with all functions */
