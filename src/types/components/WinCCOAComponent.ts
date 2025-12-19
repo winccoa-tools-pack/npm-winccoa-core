@@ -166,13 +166,29 @@ export abstract class WinCCOAComponent {
         if (!p) throw new Error('Executable ' + this.getName() + ' not found');
 
         return new Promise((resolve, reject) => {
-            const proc = spawn(p, args, {  shell: false, detached: options.detached });
+            const spawnOptions: any = { shell: false };
+            
+            if (options.detached) {
+                // For detached processes, ignore stdio to prevent parent from waiting
+                spawnOptions.detached = true;
+                spawnOptions.stdio = 'ignore';
+            }
+            
+            const proc = spawn(p, args, spawnOptions);
 
-            proc.stdout?.on('data', (d) => { const str = d.toString(); this.stdOut += str; console.log(cmdId, 'STDOUT:', str); /* histEntry.stdOut += str; */ });
-            proc.stderr?.on('data', (d) => { const str = d.toString(); this.stdErr += str; console.log(cmdId, 'STDERR:', str); /* histEntry.stdErr += str; */ });
+            if (options.detached) {
+                // Unref to allow parent to exit independently
+                proc.unref();
+                // Resolve immediately for detached processes
+                resolve(0);
+            } else {
+                // Only capture output for non-detached processes
+                proc.stdout?.on('data', (d) => { const str = d.toString(); this.stdOut += str; console.log(cmdId, 'STDOUT:', str); /* histEntry.stdOut += str; */ });
+                proc.stderr?.on('data', (d) => { const str = d.toString(); this.stdErr += str; console.log(cmdId, 'STDERR:', str); /* histEntry.stdErr += str; */ });
 
-            proc.on('close', (code) => resolve(code ?? 0));
-            proc.on('error', (err) => reject(err));
+                proc.on('close', (code) => resolve(code ?? 0));
+                proc.on('error', (err) => reject(err));
+            }
         });
     }
 
