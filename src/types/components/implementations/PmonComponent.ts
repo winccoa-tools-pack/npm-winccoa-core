@@ -47,9 +47,16 @@ export class PmonComponent extends WinCCOAComponent {
      * @returns Promise that resolves when registration is complete with exit code
      */
     public async registerProject(configPath: string): Promise<number> {
+
+        if (configPath === undefined || configPath === '') {
+            throw new Error('Config path is not set for PmonComponent');
+        }
         // Use -config -autofreg -status options to register runnable project
         const args = ['-config', configPath, '-log', '+stderr', '-autofreg', '-status'];
-        return super.start(args);
+        const code = super.start(args);
+    
+        // the pmon returns 3 if the project is not running after registrations
+        return this.pmonStateCodeToStatus(await code) === ProjEnvPmonStatus.NotRunning ? 0 : -1;
     }
 
     /**
@@ -63,13 +70,20 @@ export class PmonComponent extends WinCCOAComponent {
         const args = ['-status', '-proj', projectName, '-log', '+stdout'];
         const code = super.start(args);
 
+        return this.pmonStateCodeToStatus(await code);
+    }
+
+    private pmonStateCodeToStatus(code: number): ProjEnvPmonStatus {
+        console.log('Pmon status code:', code);
         let status: ProjEnvPmonStatus = ProjEnvPmonStatus.Unknown;
 
-        if ((await code) === 0) status = ProjEnvPmonStatus.Running;
-        else if ((await code) === 3) status = ProjEnvPmonStatus.NotRunning;
+        if (code === 0) status = ProjEnvPmonStatus.Running;
+        else if (code === 3) status = ProjEnvPmonStatus.NotRunning;
+        else status = ProjEnvPmonStatus.Unknown;
 
         return status;
     }
+    
 
     /**
      * Starts pmon only (without auto-starting managers)

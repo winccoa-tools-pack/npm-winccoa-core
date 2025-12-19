@@ -117,11 +117,20 @@ describe('winnccoa-project-environment (integration)', () => {
         it('should return an array of runnable projects', async () => {
             const projects = await getRunnableProjects();
             assert.ok(Array.isArray(projects), 'Should return an array');
+            assert.ok(projects.length >= 0, 'Array length should be zero or more');
+            const proj = projects[0];
+            assert.strictEqual(proj.getId(), 'runnable', 'Project should have an ID: runnable');
+            assert.ok(proj.isRunnable(), 'The projects should be runnable');
+            assert.ok(proj.isRegistered(), 'The projects should be runnable');
+            assert.ok(proj.getInstallDir() != '', 'The projects should have an install dir');
+            assert.strictEqual(proj.getDir(), proj.getInstallDir() + proj.getId(), 'The projects directory should be installDir + id');
         });
 
         it('should return only runnable projects', async () => {
             const projects = await getRunnableProjects();
             
+            assert.ok(Array.isArray(projects), 'Should return an array');
+            assert.ok(projects.length >= 0, 'Array length should be zero or more');
             // Verify all returned projects are runnable
             for (const project of projects) {
                 assert.ok(project.isRunnable(), 'Each project should be runnable');
@@ -134,8 +143,8 @@ describe('winnccoa-project-environment (integration)', () => {
             const runnableProjects = await getRunnableProjects();
             const found = runnableProjects.find(p => p.getId() === testProject!.getId());
             
-            assert.ok(found, 'Runnable test project should be in runnable projects list');
-            assert.ok(found.isRunnable(), 'Found project should be marked as runnable');
+            assert.ok(found, `Runnable test project ${testProject!.getId()} should be in runnable projects list`);
+            assert.ok(found.isRunnable(), `Found project ${found.getId()} should be marked as runnable`);
         });
 
         it('should not include non-runnable projects', async () => {
@@ -207,8 +216,8 @@ describe('winnccoa-project-environment (integration)', () => {
             const foundInRegistered = registered.find(p => p.getId() === testProject!.getId());
             const foundInRunnable = runnable.find(p => p.getId() === testProject!.getId());
             
-            assert.ok(foundInRegistered, 'Test project should be in registered list');
-            assert.ok(foundInRunnable, 'Test project should be in runnable list');
+            assert.ok(foundInRegistered, `Test project '${testProject!.getId()}' should be in registered list`);
+            assert.ok(foundInRunnable, `Test project '${testProject!.getId()}' should be in runnable list`);
         });
 
         it('should filter registered projects correctly', async () => {

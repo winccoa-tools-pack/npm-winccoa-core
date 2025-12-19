@@ -10,8 +10,27 @@ import {
     getWinCCOAInstallationPathByVersion,
     getAvailableWinCCOAVersions,
 } from '../../utils/winccoa-paths.js';
+import { randomUUID } from 'crypto';
+
+/*
+class CommandHistoryEntry {
+    private command: string;
+    private args: string[];
+    private timestamp: Date;
+    public stdOut: string = '';
+    public stdErr: string = '';
+
+    constructor(command: string, args: string[]) {
+        this.command = command;
+        this.args = args;
+        this.timestamp = new Date();
+    }
+}
+*/
 
 export abstract class WinCCOAComponent {
+
+    public commandHistory: CommandHistoryEntry[] = [];
     /**
      * Accumulated standard output from the last spawned process.
      * Use this to inspect output produced by helper commands invoked
@@ -136,13 +155,21 @@ export abstract class WinCCOAComponent {
         options: { detached?: boolean; waitForLog?: string } = {},
     ): Promise<number> {
         const p = this.getPath();
+        // const histEntry = new CommandHistoryEntry(this.getName(), args);
+        this.stdOut = '';
+        this.stdErr = '';
+
+        const cmdId = randomUUID();
+
+
+        console.log(cmdId, 'Starting component', this.getName(), 'with args', args, 'from', p, 'options', options);
         if (!p) throw new Error('Executable ' + this.getName() + ' not found');
 
         return new Promise((resolve, reject) => {
-            const proc = spawn(p, args, { detached: !!options.detached });
+            const proc = spawn(p, args, {  shell: false, detached: options.detached });
 
-            proc.stdout?.on('data', (d) => (this.stdOut += d.toString()));
-            proc.stderr?.on('data', (d) => (this.stdErr += d.toString()));
+            proc.stdout?.on('data', (d) => { const str = d.toString(); this.stdOut += str; console.log(cmdId, 'STDOUT:', str); /* histEntry.stdOut += str; */ });
+            proc.stderr?.on('data', (d) => { const str = d.toString(); this.stdErr += str; console.log(cmdId, 'STDERR:', str); /* histEntry.stdErr += str; */ });
 
             proc.on('close', (code) => resolve(code ?? 0));
             proc.on('error', (err) => reject(err));

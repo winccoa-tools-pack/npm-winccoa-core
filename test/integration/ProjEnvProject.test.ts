@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it, afterEach } from 'node:test';
 import { strict as assert } from 'assert';
 import { ProjEnvProject } from '../../src/types/project/ProjEnvProject';
 import {
@@ -25,7 +25,7 @@ describe('ProjEnvProject (integration)', () => {
             assert.ok(project, 'Project should be created');
             assert.ok(project.getId(), 'Project should have an ID');
             assert.ok(project.getName(), 'Project should have a name');
-            assert.ok(project.isRegistered(), 'Project should be registered');
+            assert.ok(project.isRegistered(), `Project ${project.getId()} should be registered`);
         });
 
         it('should unregister a project', async () => {
@@ -141,7 +141,7 @@ describe('ProjEnvProject (integration)', () => {
     describe('Project Configuration', () => {
         it('should get config path', async () => {
             await withRunnableTestProject(async (project) => {
-                const configPath = project.getConfigPathWithName('config');
+                const configPath = project.getConfigPath('config');
                 assert.ok(configPath, 'Config path should be returned');
                 assert.ok(configPath.includes('config'), 'Config path should contain "config"');
             });
@@ -149,7 +149,7 @@ describe('ProjEnvProject (integration)', () => {
 
         it('should get config path with custom filename', async () => {
             await withRunnableTestProject(async (project) => {
-                const customPath = project.getConfigPathWithName('custom.cfg');
+                const customPath = project.getConfigPath('custom.cfg');
                 assert.ok(customPath.includes('custom.cfg'), 'Config path should contain custom filename');
             });
         });

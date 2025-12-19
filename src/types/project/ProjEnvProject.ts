@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------
 
 import { PmonComponent } from '../components/implementations';
-import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
+import { findProjectRegistryById, reloadProjectRegistries, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
 import { OaLanguage } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
 import fs from 'fs';
@@ -32,9 +32,9 @@ export class ProjEnvProject {
 
     //------------------------------------------------------------------------------
     public initFromRegister(registry: ProjEnvProjectRegistry) {
+        this.setInstallDir(registry.installationDir);
         this.setId(registry.id);
         this.setName(registry.name ?? registry.id);
-        this.setInstallDir(registry.installationDir);
         this.setRunnable(!registry.notRunnable);
         this.currentProject = registry.currentProject ?? false;
     }
@@ -73,14 +73,6 @@ export class ProjEnvProject {
                 this.version = this.getProjectVersion();
             }
         }
-
-        if (this.version === undefined) {
-            /// todo throw error here
-        }
-
-        if (this.installPath === undefined) {
-            /// todo throw error here
-        }
     }
 
     //------------------------------------------------------------------------------
@@ -101,16 +93,14 @@ export class ProjEnvProject {
         return this._id;
     }
 
-    public getConfigPath(): string {
-        // TODO: implement path logic
-        return '';
-    }
-
     /**
      * Gets the WinCC OA version from project config file
      */
     private getProjectVersion(): string | undefined {
         const configPath = this.getConfigPath();
+
+        if (configPath === '') { return undefined; }
+
         const cfg = new ProjEnvProjectConfig(configPath);
 
         return cfg.getEntryValue('proj_version');
@@ -175,7 +165,8 @@ export class ProjEnvProject {
      */
     public setInstallDir(dirPath: string): void {
         if (!dirPath) return;
-        this.installPath = dirPath;
+        // Store path without trailing separator - getDir() will add it
+        this.installPath = dirPath.replace(/[/\\]+$/, '');
     }
 
     //------------------------------------------------------------------------------
@@ -196,7 +187,8 @@ export class ProjEnvProject {
         if (!this.getId()) return '';
         const base = this.getInstallDir();
         if (!base) return '';
-        return base + this.getId() + '/' + relativeDirPath;
+        // Add separator between base and ID, handle both forward and backslash
+        return base + '/' + this.getId() + (relativeDirPath ? '/' + relativeDirPath : '');
     }
 
     //------------------------------------------------------------------------------
@@ -205,7 +197,7 @@ export class ProjEnvProject {
      * @param configFileName Name of the config file. Default: "config"
      * @return Project config path.
      */
-    public getConfigPathWithName(configFileName = 'config'): string {
+    public getConfigPath(configFileName = 'config'): string {
         const p = this.getDir(ProjEnvProjectFileSysStruct.CONFIG_REL_PATH);
         if (!p) return '';
         return p + configFileName;
@@ -297,12 +289,15 @@ export class ProjEnvProject {
      * @return Returns 0 when project is registered successfully, otherwise -1.
      */
     public async registerProj(): Promise<number> {
+        
         // set the name in case the user forgot it
         if (!this.getName()) this.setName(this.getId());
 
         if (!this.isValid()) this._errorHandler.exception(this.getInvalidReason());
 
-        const result = await this._pmon?.registerProject(this.getId());
+        const result = await this._pmon.registerProject(this.getConfigPath());
+        console.log('Registration result for project', this.getId(), ':', result);
+        reloadProjectRegistries();
         return result ?? -1;
     }
 
@@ -315,7 +310,7 @@ export class ProjEnvProject {
     public async unregisterProj(): Promise<number> {
         if (!this.getId()) this._errorHandler.exception(this.getInvalidReason());
 
-        const result = await this._pmon?.unregisterProject(this.getId());
+        const result = await this._pmon.unregisterProject(this.getId());
         return result ?? -1;
     }
 
@@ -375,8 +370,8 @@ export class ProjEnvProject {
      *         -5 = After-started hook failed
      */
     public async start(): Promise<number> {
-        this._pmon?.startPmonOnly(this.getName());
-        const result = await this._pmon?.startProject(this.getId());
+        this._pmon.startPmonOnly(this.getName());
+        const result = await this._pmon.startProject(this.getId());
         return result ?? -1;
     }
 
@@ -390,7 +385,7 @@ export class ProjEnvProject {
    * @return Error code. Returns 0 when successful. Otherwise -1.
    */
     public async stop(): Promise<number> {
-        const result = await this._pmon?.stopProject(this.getId());
+        const result = await this._pmon.stopProject(this.getId());
         return result ?? -1;
     }
 
@@ -411,7 +406,7 @@ export class ProjEnvProject {
      * -3    | Project could not be stopped within timeOut
      */
     public async restart(): Promise<number> {
-        const result = this._pmon?.restartProject(this.getId());
+        const result = this._pmon.restartProject(this.getId());
         return result ?? -1;
     }
 
@@ -423,7 +418,7 @@ export class ProjEnvProject {
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
     public async killManager(manIdx: number): Promise<number> {
-        const result = await this._pmon?.killManager(this.getId(), manIdx);
+        const result = await this._pmon.killManager(this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -440,7 +435,7 @@ export class ProjEnvProject {
      * -2    | Cannot connect to pmon.
      */
     public async startPmon(): Promise<number> {
-        const result = await this._pmon?.startPmonOnly(this.getId());
+        const result = await this._pmon.startPmonOnly(this.getId());
         return result ?? -1;
     }
     //------------------------------------------------------------------------------
@@ -449,7 +444,7 @@ export class ProjEnvProject {
      * @return Returns 0 when successful, otherwise -1.
      */
     public async stopPmon(): Promise<number> {
-        const result = await this._pmon?.stopProjectAndPmon(this.getId());
+        const result = await this._pmon.stopProjectAndPmon(this.getId());
         return result ?? -1;
     }
 
@@ -461,7 +456,7 @@ export class ProjEnvProject {
      * @return Returns TRUE when pmon is running on the host, otherwise FALSE.
      */
     public async isPmonRunning(): Promise<boolean> {
-        const result = await this._pmon?.getStatus(this.getId());
+        const result = await this._pmon.getStatus(this.getId());
         return result === ProjEnvPmonStatus.Running;
     }
     //------------------------------------------------------------------------------
@@ -470,7 +465,7 @@ export class ProjEnvProject {
      * @return Returns TRUE when pmon for this project is running on the host, otherwise FALSE.
      */
     public async isPmonRunningForProject(): Promise<boolean> {
-        const result = await this._pmon?.getStatus(this.getId());
+        const result = await this._pmon.getStatus(this.getId());
         return result === ProjEnvPmonStatus.Running;
     }
     //------------------------------------------------------------------------------
@@ -509,7 +504,7 @@ export class ProjEnvProject {
      * @return  Returns 0 when flag was set, otherwise returns -1 or -2.
      */
     public async sendDbgFlag(manIdx: number, dbgFlags: string): Promise<number> {
-        const result = await this._pmon?.sendDebugFlag(dbgFlags, this.getId(), manIdx);
+        const result = await this._pmon.sendDebugFlag(dbgFlags, this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -523,7 +518,7 @@ export class ProjEnvProject {
      * @return Error code. Returns 0 when . Otherwise -1.
      */
     public async startManager(manIdx: number): Promise<number> {
-        const result = await this._pmon?.startManager(this.getId(), manIdx);
+        const result = await this._pmon.startManager(this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -537,7 +532,7 @@ export class ProjEnvProject {
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
     public async stopManager(manIdx: number): Promise<number> {
-        const result = await this._pmon?.stopManager(this.getId(), manIdx);
+        const result = await this._pmon.stopManager(this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -548,7 +543,7 @@ export class ProjEnvProject {
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
     public async deleteManager(manIdx: number): Promise<number> {
-        const result = await this._pmon?.removeManager(this.getId(), manIdx);
+        const result = await this._pmon.removeManager(this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -561,7 +556,7 @@ export class ProjEnvProject {
      * @return Error code. Returns -1 when failed, -2 when pmon is not reachable, otherwise returns the index of the inserted manager.
      */
     public async insertManager(opts: ProjEnvManagerOptions, manIdx = -1): Promise<number> {
-        const result = await this._pmon?.insertManagerAt(opts, this.getId(), manIdx);
+        const result = await this._pmon.insertManagerAt(opts, this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -577,7 +572,7 @@ export class ProjEnvProject {
         manIdx: number,
         opts: ProjEnvManagerOptions,
     ): Promise<number> {
-        const result = await this._pmon?.setManagerOptionsAt(opts, this.getId(), manIdx);
+        const result = await this._pmon.setManagerOptionsAt(opts, this.getId(), manIdx);
         return result ?? -1;
     }
 
@@ -677,7 +672,7 @@ export class ProjEnvProject {
         section = 'general',
         configFile = 'config',
     ): number {
-        const cfg = new ProjEnvProjectConfig(this.getConfigPathWithName(configFile));
+        const cfg = new ProjEnvProjectConfig(this.getConfigPath(configFile));
         if (cfg.insertValue(value, key, section)) return -1;
         return 0;
     }
@@ -698,7 +693,7 @@ export class ProjEnvProject {
         section = 'general',
         configFile = 'config',
     ): number {
-        const cfg = new ProjEnvProjectConfig(this.getConfigPathWithName(configFile));
+        const cfg = new ProjEnvProjectConfig(this.getConfigPath(configFile));
         if (cfg.setValue(value, key, section)) return -1;
         return 0;
     }
@@ -719,7 +714,7 @@ export class ProjEnvProject {
         section = 'general',
         configFile = 'config',
     ): number {
-        const cfg = new ProjEnvProjectConfig(this.getConfigPathWithName(configFile));
+        const cfg = new ProjEnvProjectConfig(this.getConfigPath(configFile));
         if (cfg.deleteValue(value, key, section)) return -1;
         return 0;
     }
@@ -732,7 +727,7 @@ export class ProjEnvProject {
      * @return Error code. Returns 0 when successful. Otherwise -1.
      */
     public deleteCfgEntry(key: string, section = 'general', configFile = 'config'): number {
-        const cfg = new ProjEnvProjectConfig(this.getConfigPathWithName(configFile));
+        const cfg = new ProjEnvProjectConfig(this.getConfigPath(configFile));
         if (cfg.deleteEntry(key, section)) return -1;
         return 0;
     }
@@ -775,14 +770,15 @@ export class ProjEnvProject {
     protected installPath?: string;
 
     // Pmon object to control pmon self.
-    protected _pmon?: PmonComponent;
+    protected _pmon: PmonComponent = new PmonComponent();
 
     // Languages
     protected _languages: OaLanguage[] = [];
 
-    protected _errorHandler!: WinCCOAErrorHandler;
+    protected _errorHandler: WinCCOAErrorHandler = new WinCCOAErrorHandler();
 
     //--------------------------------------------------------------------------------
     //@private members
     //--------------------------------------------------------------------------------
 }
+

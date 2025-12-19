@@ -10,6 +10,12 @@ export async function getRegisteredProjects(): Promise<ProjEnvProject[]> {
     const projects: ProjEnvProject[] = [];
 
     for (const registry of registries) {
+        // Skip registry entries with empty or invalid IDs
+        if (!registry.id || registry.id.trim().length === 0) {
+            console.warn(`Skipping registry entry with empty ID`);
+            continue;
+        }
+
         try {
             const project = new ProjEnvProject();
             project.initFromRegister(registry);

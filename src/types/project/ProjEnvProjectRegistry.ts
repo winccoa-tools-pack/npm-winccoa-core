@@ -38,6 +38,7 @@ export interface ProductRegistry extends ProjEnvProjectRegistry {
 
 let registeredProjectsCache: ProjEnvProjectRegistry[];
 let registeredProducts: ProductRegistry[];
+let fileWatcher: fs.FSWatcher | undefined;
 
 export function getRegisteredProjects(): ProjEnvProjectRegistry[] {
     loadProjectRegistries();
@@ -63,14 +64,33 @@ export function getLastUsedProjectDir(version: string): string | undefined {
     return getProductByVersion(version)?.lastUsedProjectDir;
 }
 
+export function reloadProjectRegistries(): void {
+    loadProjectRegistries();
+}
+
 function loadProjectRegistries(): void {
     if (registeredProjectsCache && registeredProjectsCache.length > 0) {
         return;
     }
 
     const configPath: string = getPvssInstConfPath();
-    /// TODO create createFileSystemWatcher to configPath and update the list on every change by calling the fucntion parseProjRegistryFile()
     parseProjRegistryFile(configPath);
+    
+    // Set up file watcher to refresh cache when pvssInst.conf changes
+    if (!fileWatcher && fs.existsSync(configPath)) {
+        try {
+            fileWatcher = fs.watch(configPath, (eventType) => {
+                if (eventType === 'change') {
+                    // Clear cache and reload on next access
+                    registeredProjectsCache = [];
+                    registeredProducts = [];
+                }
+            });
+        } catch (error) {
+            // Silently fail if file watching is not supported
+            console.warn('Could not create file watcher for pvssInst.conf:', error);
+        }
+    }
 }
 
 function parseProjRegistryFile(configPath: string): void {
@@ -102,11 +122,20 @@ function parseProjRegistryFile(configPath: string): void {
                 products.push(currentProductRegistry);
             }
 
+            // Extract content inside the brackets
+            // Format: Software\<company>\<product>\Configs\<projectID>
+            // or:     Software\<company>\<product>\<versionNumber>
+            const sectionPath = trimmedLine.slice(1, -1); // Remove [ and ]
+            const pathParts = sectionPath.split('\\');
+
+            // Extract project ID or version from the last part of the path
+            const projectId = pathParts[pathParts.length - 1] || '';
+
             // Start new project section
             inProjectSection = true;
             currentProjectSection = {
                 currentProject: false,
-                id: '',
+                id: projectId,
                 installationDir: '',
                 notRunnable: false,
                 installationDate: '',
