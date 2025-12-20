@@ -64,19 +64,19 @@ export function ProjEnvProjectStateToString(state: ProjEnvProjectState): string 
 
 export interface ProjEnvManagerInfo {
     state: ProjEnvManagerState;
-    pid?: number;
+    pid: number;
     startMode: ProjEnvManagerStartMode;
-    startTime?: Date;
-    managerNumber?: number;
+    startTime: Date;
+    managerNumber: number;
 }
 
 export interface ProjEnvManagerOptions {
-    component?: string;
-    startMode?: ProjEnvManagerStartMode;
-    secondToKill?: number;
-    restart?: number;
-    resetStartCounter?: number;
-    startOptions?: string;
+    component: string;
+    startMode: ProjEnvManagerStartMode;
+    secondToKill: number;
+    restart: number;
+    resetStartCounter: number;
+    startOptions: string;
 }
 
 export function startModeToString(mode: ProjEnvManagerStartMode): string {
@@ -91,3 +91,37 @@ export function startModeToString(mode: ProjEnvManagerStartMode): string {
             return '';
     }
 }
+
+export enum ProjEnvProjectRunnable {
+    Unknown = -1,
+    Runnable = 0,
+    NotRunnable = 1,
+}
+
+export const ProjEnvProjectFileSysStruct = Object.freeze({
+    BIN_REL_PATH: 'bin/',
+    SOURCE_REL_PATH: 'source/',
+    HELP_REL_PATH: 'help/',
+    MSG_REL_PATH: 'msg/',
+    CONFIG_REL_PATH: 'config/',
+    PICTURES_REL_PATH: 'pictures/',
+    PRINTERS_REL_PATH: 'printers/',
+    COLORDB_REL_PATH: 'colorDB/',
+    PANELS_REL_PATH: 'panels/',
+    IMAGES_REL_PATH: 'images/',
+    SCRIPTS_REL_PATH: 'scripts/',
+    LIBS_REL_PATH: 'scripts/libs/',
+    DATA_REL_PATH: 'data/',
+    DB_REL_PATH: 'db/wincc_oa/',
+    LOG_REL_PATH: 'log/',
+    DPLIST_REL_PATH: 'dplist/',
+    NLS_REL_PATH: 'nls/',
+    JAVASCRIPT_REL_PATH: 'javascript/',
+    PIXMAPS_REL_PATH: 'pictures/',
+    ICONS_REL_PATH: 'pictures/',
+    GIF_REL_PATH: 'pictures/',
+} as const);
+
+export type ProjEnvProjectFileSysStructKey = keyof typeof ProjEnvProjectFileSysStruct;
+export type ProjEnvProjectFileSysStructValue =
+    (typeof ProjEnvProjectFileSysStruct)[ProjEnvProjectFileSysStructKey];

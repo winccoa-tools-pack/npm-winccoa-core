@@ -3,13 +3,13 @@ import { describe, it } from 'node:test';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { PmonComponent } from '../dist/types/components/implementations/PmonComponent.js';
+import { PmonComponent } from '../../dist/types/components/implementations/PmonComponent.js';
 
 describe('Pmon CLI parser (examples)', () => {
   it('parses MGRLIST:LIST into manager options', async () => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const sample = fs.readFileSync(path.join(__dirname, 'fixtures', 'list.txt'), 'utf8');
+    const sample = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'list.txt'), 'utf8');
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
@@ -28,7 +28,7 @@ describe('Pmon CLI parser (examples)', () => {
   it('parses MGRLIST:STATI into manager status and project state', async () => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const sample = fs.readFileSync(path.join(__dirname, 'fixtures', 'stopped-stati.txt'), 'utf8');
+    const sample = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'stopped-stati.txt'), 'utf8');
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');

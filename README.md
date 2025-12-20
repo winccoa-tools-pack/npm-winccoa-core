@@ -1,127 +1,129 @@
-# NPM Shared Library Template
+# WinCC OA Core Utils
 
-Minimal starter template for creating shared npm libraries with Git Flow workflow.
+Core utilities and type definitions for WinCC OA development. This library provides essential functionality for managing WinCC OA projects, components, and system interactions.
+
+## 📦 Installation
+
+```bash
+npm install @winccoa-tools-pack/core-utils
+```
 
 ## 🚀 Quick Start
 
-### Initial Setup
+### Working with Projects
 
-1. **Create repository from this template**
+```typescript
+import {
+    getRegisteredProjects,
+    getRunningProjects,
+    getRunnableProjects,
+    getCurrentProjects,
+    findProjectForFile
+} from '@winccoa-tools-pack/core-utils';
 
-   ```bash
-   # Via GitHub CLI
-   gh repo create winccoa-tools-pack/<your-library-name> \
-     --template winccoa-tools-pack/template-npm-shared-library \
-     --public
-   ```
+// Get all registered projects from the system
+const allProjects = await getRegisteredProjects();
+console.log(`Found ${allProjects.length} registered projects`);
 
-2. **Clone and initialize Git Flow**
+// Filter to only running projects
+const running = await getRunningProjects();
+console.log(`${running.length} projects are currently running`);
 
-   ```bash
-   git clone https://github.com/winccoa-tools-pack/<your-library-name>
-   cd <your-library-name>
+// Get projects that can be started
+const runnable = await getRunnableProjects();
 
-   # Initialize Git Flow locally (if you use the git-flow tool)
-   git flow init -d
-   git push -u origin develop
-   ```
+// Get the current active project (if any)
+const current = await getCurrentProjects();
+if (current.length > 0) {
+    console.log(`Current project: ${current[0].getName()}`);
+}
 
-3. **Install dependencies and build**
-
-   ```bash
-   npm install
-   npm run build
-   npm test
-   ```
-
-## 🌳 Git Flow Workflow
-
-This template uses [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for branch management:
-
-### Branch Structure
-
-- **`main`** - Production-ready code (stable releases)
-- **`develop`** - Integration branch (pre-release features)
-- **`feature/*`** - New features
-- **`release/*`** - Release preparation
-- **`hotfix/*`** - Emergency fixes for production
-
-### Common Commands
-
-```bash
-# Start a new feature
-git flow feature start my-feature
-
-# Finish feature (merges to develop)
-git flow feature finish my-feature
-
-# Start a release
-git flow release start 1.0.0
-
-# Finish release (merges to main and develop, creates tag)
-git flow release finish 1.0.0
-
-# Hotfix for production
-git flow hotfix start 1.0.1
-git flow hotfix finish 1.0.1
+// Find which project a file belongs to
+const filePath = '/opt/WinCC_OA_Projects/myProject/config/config';
+const project = await findProjectForFile(filePath);
+if (project) {
+    console.log(`File belongs to project: ${project.getName()}`);
+    console.log(`Project ID: ${project.getId()}`);
+    console.log(`Project is runnable: ${project.isRunnable()}`);
+}
 ```
 
-### Branch Protection
+### Managing Individual Projects
 
-This template includes a GitHub Actions workflow `setup-gitflow` that can apply branch protection rules and validate the Git Flow branch structure. The recommended default protections are:
+```typescript
+import { ProjEnvProject } from '@winccoa-tools-pack/core-utils';
 
-- **main**: Requires PR reviews, status checks, no force pushes
-- **develop**: Requires PR reviews, status checks, allows force pushes (for rebasing)
+// Create and register a new project
+const project = new ProjEnvProject();
+project.setId('myProject');
+project.setInstallDir('/opt/WinCC_OA_Projects/');
+project.setVersion('3.21');
+await project.registerProj();
 
-To apply or validate branch protection in your new repository, run the `Setup Git Flow Branch Protection` workflow from the Actions tab or via `workflow_dispatch`.
+// Check project status
+if (project.isRegistered()) {
+    console.log('Project successfully registered');
+}
 
-For a short guide on the Git Flow process and branch naming, see `docs/GITFLOW_WORKFLOW.md`.
-
-## 🔐 NPM Publishing Setup
-
-To enable automatic publishing to the NPM registry when creating releases, you need to configure an NPM access token:
-
-### Why NPM_TOKEN is Required
-
-The `release.yml` workflow automatically publishes your package to NPM when you merge a release PR to `main`. This requires authentication with the NPM registry.
-
-### How to Get an NPM Access Token
-
-1. **Log in to NPM**
-   - Go to [npmjs.com](https://www.npmjs.com/) and sign in (or create an account)
-
-2. **Generate Access Token**
-   - Navigate to **Access Tokens** in your account settings: <https://www.npmjs.com/settings/~/tokens>
-   - Click **"Generate New Token"** → Select **"Automation"** type
-   - Copy the generated token (you won't see it again!)
-
-3. **Add Token to Repository**
-   - Go to your GitHub repository settings
-   - Navigate to **Settings** → **Secrets and variables** → **Actions**
-   - Click **"New repository secret"**
-   - Name: `NPM_TOKEN`
-   - Value: Paste your NPM access token
-   - Click **"Add secret"**
-
-### Token Permissions
-
-- **Automation tokens** are recommended for CI/CD (they don't expire but can be revoked)
-- The token needs **publish** permission for your package scope
-- For scoped packages (`@winccoa-tools-pack/...`), ensure your NPM organization allows publishing
-
-### Testing Without NPM_TOKEN
-
-If `NPM_TOKEN` is not configured, the workflow will:
-
-- ✅ Still run tests and build the package
-- ✅ Create GitHub releases with artifacts
-- ⚠️ Skip NPM publishing with a warning message
-
-You can always publish manually later:
-
-```bash
-npm publish --access public
+// Unregister when done
+await project.unregisterProj();
 ```
+
+### Working with WinCC OA Installations
+
+```typescript
+import {
+    getAvailableWinCCOAVersions,
+    getWinCCOAInstallationPathByVersion
+} from '@winccoa-tools-pack/core-utils';
+
+// Get all installed WinCC OA versions (sorted highest to lowest)
+const versions = getAvailableWinCCOAVersions();
+console.log('Installed versions:', versions);
+// Example output: ['3.20', '3.19', '3.18']
+
+// Get installation path for a specific version
+const path = getWinCCOAInstallationPathByVersion('3.20');
+if (path) {
+    console.log(`WinCC OA 3.20 installed at: ${path}`);
+}
+
+// Paths are cached for performance - first lookup queries registry/filesystem,
+// subsequent lookups return cached value immediately
+```
+
+## ✨ Features
+
+### Component Management
+
+- **WinCCOAComponent**: Base class for all WinCC OA components
+  - Automatic executable discovery across installed versions
+  - Process timeout handling for reliable execution
+  - Detached process spawning support
+  - Version-specific component targeting
+  - Stdout/stderr capture with timestamped logging
+
+### Project Management
+
+- **ProjEnvProject**: Complete project lifecycle management
+  - Project registration and unregistration
+  - Async operations with automatic retry logic
+  - Status polling with proper async/await
+  - Configuration file handling
+
+### Project Registry
+
+- **ProjEnvProjectRegistry**: Automatic project tracking
+  - Real-time file system monitoring (pvssInst.conf)
+  - Debounced cache refresh (100ms) for performance
+  - Automatic invalidation on configuration changes
+
+### Utilities
+
+- Path resolution for WinCC OA installations
+- Version detection and comparison
+- Localization helpers
+- Log parsing and error handling
 
 ## 📦 Development
 
@@ -132,31 +134,59 @@ npm install
 # Build the library
 npm run build
 
-# Run tests
+# Run all tests
 npm test
+
+# Run only unit tests. Without WinCC OA instalation
+npm run test:unit
+
+# Run only integration tests. WinCC OA must be installed.
+npm run test:integration
 
 # Lint code
 npm run lint
+
+# Format code
+npm run format
+
+# Check code style
+npm run style-check
 ```
 
-## Windows EOL (CRLF) note
+## 🌳 Git Flow Workflow
 
-On Windows you may see Git report that some config files (like `.prettierrc.json`) will have CRLF replaced by LF. This repository enforces LF for tooling/config files via `.gitattributes` to avoid spurious diffs.
+This project uses [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for branch management:
 
-If you see such warnings, run the following once in your local clone to apply the normalization:
+### Branch Structure
+
+- **`main`** - Production-ready code (stable releases)
+- **`develop`** - Integration branch (pre-release features)
+- **`feature/*`** - New features
+- **`release/*`** - Release preparation
+- **`hotfix/*`** - Emergency fixes for production
+
+For detailed workflow information, see [docs/GITFLOW_WORKFLOW.md](docs/GITFLOW_WORKFLOW.md).
+
+## 📖 Documentation
+
+- [Source Code Overview](src/README.md) - Detailed module documentation
+- [Changelog](CHANGELOG.md) - Version history and updates
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- [Development Docs](docs/dev/README.md) - Development guidelines
+
+## 🔧 Configuration
+
+### Windows EOL (CRLF) Note
+
+This repository enforces LF line endings for configuration files via `.gitattributes` to avoid spurious diffs.
+
+If you see CRLF→LF warnings on Windows, normalize the files once:
 
 ```powershell
 cd C:\path\to\repo
-git fetch origin
-git checkout <your-branch>
-git pull
 git add --renormalize .
-git status --porcelain
-# If there are normalization changes to commit:
-git commit -m "chore: apply eol normalization per .gitattributes" || Write-Host "Nothing to commit"
+git commit -m "chore: apply eol normalization per .gitattributes"
 ```
-
-After this the config files will be normalized and you should no longer see CRLF→LF warnings for those files.
 
 ## 🏆 Recognition
 
@@ -171,15 +201,17 @@ Special thanks to all our [contributors](https://github.com/orgs/winccoa-tools-p
 
 ## 📜 License
 
-This project is basically licensed under the **MIT License** - see the [LICENSE](https://github.com/winccoa-tools-pack/.github/blob/main/LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](https://github.com/winccoa-tools-pack/.github/blob/main/LICENSE) file for details.
 
-It might happens, that the partial repositories contains third party SW which are using other license models.
+Note: Some dependencies may use different license models.
 
 ---
 
 ## ⚠️ Disclaimer
 
-**WinCC OA** and **Siemens** are trademarks of Siemens AG. This project is not affiliated with, endorsed by, or sponsored by Siemens AG. This is a community-driven open source project created to enhance the development experience for WinCC OA developers.
+**WinCC OA** and **Siemens** are trademarks of Siemens AG.
+This project is not affiliated with, endorsed by, or sponsored by Siemens AG.
+This is a community-driven open source project created to enhance the development experience for WinCC OA developers.
 
 ---
 
@@ -194,5 +226,9 @@ We're excited to be part of your development journey.
 ## Quick Links
 
 • [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+• [📚 Documentation](docs/dev/README.md)
+• [🐛 Report Issues](https://github.com/winccoa-tools-pack/npm-shared-library-core/issues)
+
+---
 
 <center>Made with ❤️ for and by the WinCC OA community</center>

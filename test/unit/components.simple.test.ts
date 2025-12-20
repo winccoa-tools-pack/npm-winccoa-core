@@ -36,7 +36,7 @@ import {
     VideoDriverComponent,
     VisionComponent,
     WebUIComponent
-} from '../dist/types/components/implementations/index.js';
+} from '../../dist/types/components/implementations/index.js';
 
 const classes = [
     AndroidComponent,

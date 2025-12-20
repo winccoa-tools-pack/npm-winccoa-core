@@ -3,12 +3,12 @@ import { test } from 'node:test';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { PmonComponent } from '../dist/types/components/implementations/PmonComponent.js';
+import { PmonComponent } from '../../dist/types/components/implementations/PmonComponent.js';
 
 test('PmonComponent LIST parsing - parse MGRLIST:LIST output into managers', async () => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'list.txt'), 'utf8');
+    const fixture = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'list.txt'), 'utf8');
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => fixture.split('\n');

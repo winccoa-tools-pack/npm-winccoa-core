@@ -263,7 +263,8 @@ When building parsers, treat any line starting with `ERROR` as a command failure
 
 ## Suggested parser unit tests
 
-Below are suggested Node/TypeScript test snippets you can add to unit tests for the parser in `npm-shared-library-core`. The examples use the real outputs above as fixtures — copy the exact blocks into test fixtures (do not alter them).
+Below are suggested Node/TypeScript test snippets you can add to unit tests for the parser in `npm-shared-library-core`.
+The examples use the real outputs above as fixtures — copy the exact blocks into test fixtures (do not alter them).
 
 - Test: parse `MGRLIST:LIST` into manager option objects
   - Input: the `MGRLIST:LIST` example block above

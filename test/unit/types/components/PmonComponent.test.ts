@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'assert';
-import { PmonComponent } from '../../../dist/types/components/implementations/PmonComponent.js';
+import { PmonComponent } from '../../../../src/types/components/implementations/PmonComponent';
 
 test('PmonComponent exists() returns false when executable missing', async () => {
     const p = new PmonComponent();
@@ -17,5 +17,5 @@ test('PmonComponent.registerSubProject throws when executable missing', async ()
 
     await assert.rejects(async () => {
         await p.registerSubProject('some/path');
-    }, /pmon executable not found/);
+    }, /Executable WCCILpmon not found/);
 });

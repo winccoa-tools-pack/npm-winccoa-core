@@ -1,11 +1,10 @@
 LIST:9
-WCCILpmon;0;30;3;1;
-WCCILdataSQLite;0;30;3;1;
-WCCOAnextgenarch;0;30;2;2;
-WCCILevent;0;30;3;1;
-WCCILproxy;0;30;2;2;
-WCCOActrl;0;30;3;1;-num 1 -f pvss_scripts.lst
-WCCILsim;0;-30;3;1;
-WCCOActrl;2;30;2;2;webclient_http.ctl -num 2
-WCCOAui;1;30;3;1;-m gedi -n -num 4
-;
+WCCILpmon;0;30;0;0;
+WCCILdataSQLite;1;30;0;0;
+WCCOAevent;1;30;0;0;
+WCCOAvalarch;1;30;0;0;
+WCCOActrl;1;30;0;0;-num 1
+WCCOActrl;1;30;0;0;-num 2
+WCCOAdb;1;30;0;0;
+WCCOAascii;1;30;0;0;
+WCCOAui;1;30;0;0;-iconBar;-menuBar;-m;gedi
