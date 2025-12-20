@@ -73,4 +73,5 @@ export default {
     getRunningProjects,
     getRunnableProjects,
     getCurrentProjects,
+    findProjectForFile,
 };
