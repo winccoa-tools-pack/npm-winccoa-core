@@ -67,30 +67,6 @@ export async function getCurrentProjects(): Promise<ProjEnvProject[]> {
     return (await getRegisteredProjects()).filter((project) => project.isCurrentProject());
 }
 
-/**
- * Find the WinCC OA project path for a given file or folder path
- * Checks all registered projects and returns the project path that contains the given path
- * @param selectedPath - The path to check (file or folder)
- * @returns The project installation directory, or null if not found
- */
-export function findProjectPathForFile(selectedPath: string): string | null {
-    const allProjects = getProjects();
-
-    // Normalize the selected path for comparison
-    const normalizedPath = path.normalize(selectedPath).toLowerCase();
-
-    // Find the project whose installation directory is a parent of the selected path
-    // Sort by path length descending to find the most specific (deepest) match first
-    const matchingProject = allProjects
-        .filter((project) => {
-            const projectPath = path.normalize(project.installationDir).toLowerCase();
-            return normalizedPath.startsWith(projectPath);
-        })
-        .sort((a, b) => b.installationDir.length - a.installationDir.length)[0];
-
-    return matchingProject ? matchingProject.installationDir : null;
-}
-
 /** Export default object with all functions */
 export default {
     getRegisteredProjects,
