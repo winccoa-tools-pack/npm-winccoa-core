@@ -281,6 +281,9 @@ function parseProjRegistryFile(configPath: string): void {
                     currentProjectSection.installationVersion = value.replace(/['"]/g, '');
                     break;
                 case 'notrunnable':
+                    console.log(
+                        `Parsing notRunnable for project ${currentProjectSection.id}: ${value}`,
+                    );
                     currentProjectSection.notRunnable =
                         value.toLowerCase() === 'true' || value === '1';
                     break;
