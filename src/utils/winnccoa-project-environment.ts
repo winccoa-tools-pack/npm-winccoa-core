@@ -1,4 +1,3 @@
-import path from 'path';
 import { ProjEnvProject } from '../types/project/ProjEnvProject';
 import { getRegisteredProjects as getRegistries } from '../types/project/ProjEnvProjectRegistry';
 
