@@ -71,13 +71,15 @@ export abstract class WinCCOAComponent {
      * executable by scanning known WinCC OA installation directories.
      *
      * The search strategy:
-     * - Query available WinCC OA versions (cached by utils)
+     * - If version is specified, search only in that version's installation
+     * - Otherwise, query all available WinCC OA versions (cached by utils)
      * - For each version, resolve the installation root and check
      *   `bin/<executable>` and `bin/<executable>.exe` for existence.
      *
      * Returns the absolute path to the executable when found or `null`
      * if not present on the host system.
      *
+     * @param version - Optional WinCC OA version to search in (e.g., '3.20')
      * @returns absolute path to executable or `null`
      */
     public getPath(version?: string): string | null {
@@ -112,11 +114,10 @@ export abstract class WinCCOAComponent {
     }
 
     /**
-     * Attempts to extract a version string from provided output or from the
-     * component's last recorded `stdOut`. Returns the parsed version string
-     * (e.g., '3.20.1') or `null` when no version could be found.
+     * Executes the component with the `-version` flag and extracts the version string
+     * from the output. Uses a 5-second timeout to prevent hanging.
      *
-     * @returns parsed version string or `null`
+     * @returns parsed version string (e.g., '3.20.1') or `null` when no version could be found
      */
     public async getFullVersion(): Promise<string | null> {
         const lines = await (this as any).execAndCollectLines(
@@ -147,12 +148,28 @@ export abstract class WinCCOAComponent {
      * Captures stdout/stderr into `stdOut`/`stdErr` and resolves with the
      * exit code when the process closes. Rejects on process start errors.
      *
-     * @param args - Array of arguments to pass to the executable
-     * @param options.detached - Whether to spawn the process detached
-     * @param options.timeout - Timeout in milliseconds (rejects if exceeded)
-     * @returns Promise resolving with process exit code
+     * **Detached Process Behavior:**
+     * When `detached: true`, the process runs independently of the parent:
+     * - Sets `stdio: 'ignore'` to prevent blocking on I/O streams
+     * - Calls `unref()` to allow parent to exit independently
+     * - Resolves immediately with exit code 0
+     * - stdout/stderr are NOT captured for detached processes
      *
-     * TODO implement the option waitForLog. need to wait until the std-err coontains the specific string
+     * **Timeout Behavior:**
+     * When timeout is specified, the process is killed if it doesn't complete
+     * within the given time. The promise rejects with a timeout error.
+     *
+     * **Version Selection:**
+     * If a specific version is provided, the component executable from that
+     * WinCC OA version will be used.
+     *
+     * @param args - Array of arguments to pass to the executable
+     * @param options.detached - Whether to spawn the process detached (default: false)
+     * @param options.timeout - Timeout in milliseconds; kills process if exceeded (optional)
+     * @param options.version - Specific WinCC OA version to use (optional)
+     * @param options.waitForLog - Wait for specific log output (TODO: not yet implemented)
+     * @returns Promise resolving with process exit code (0 for detached processes)
+     * @throws Error if executable not found or timeout exceeded
      */
     public async start(
         args: string[] = [],
@@ -248,9 +265,18 @@ export abstract class WinCCOAComponent {
      * Execute a command and collect stdout lines as an array of strings.
      * Returns trimmed lines (excluding empty lines and terminating ';').
      *
-     * @param cmdPath - Path to the executable
-     * @param args - Arguments to pass
-     * @param timeout - Optional timeout in milliseconds
+     * This is a utility method for executing short-lived commands that produce
+     * line-based output. Stderr is captured separately but not returned.
+     *
+     * **Timeout Behavior:**
+     * If timeout is specified and exceeded, the process is killed and the
+     * promise rejects with a timeout error.
+     *
+     * @param cmdPath - Absolute path to the executable
+     * @param args - Array of command-line arguments to pass
+     * @param timeout - Optional timeout in milliseconds; kills process if exceeded
+     * @returns Array of trimmed, non-empty output lines
+     * @throws Error if process fails to spawn or timeout is exceeded
      */
     protected async execAndCollectLines(
         cmdPath: string,

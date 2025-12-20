@@ -348,9 +348,16 @@ export class ProjEnvProject {
     }
 
     //------------------------------------------------------------------------------
-    /** Function register sub-project.
+    /**
+     * Registers the project with the WinCC OA system.
+     * The project must have a valid configuration file.
+     *
+     * **Retry Logic:**
+     * If the first registration attempt fails, automatically retries once.
+     * This handles transient failures from file system delays or temporary locks.
+     *
      * @synchronized Function is not thread safe.
-     * @return Returns 0 when project is registered successfully, otherwise -1.
+     * @returns 0 when project is registered successfully, -1 if config not found, -2 on failure
      */
     public async registerProj(): Promise<number> {
         // set the name in case the user forgot it
@@ -381,6 +388,22 @@ export class ProjEnvProject {
     }
 
     //------------------------------------------------------------------------------
+    /**
+     * Internal helper to register a project with the WinCC OA system.
+     *
+     * **Registration Process:**
+     * 1. Calls pmon's registerProject command
+     * 2. Polls registration status using isRegistered() with 100ms intervals
+     * 3. Waits up to 5 seconds (50 attempts) for registration to complete
+     * 4. Reloads project registry cache automatically via file watching
+     *
+     * **Async Behavior:**
+     * Uses async/await to properly wait between status checks, preventing
+     * busy-waiting and allowing the file system watcher to detect changes.
+     *
+     * @param configFile - Absolute path to the project's config file
+     * @returns 0 on success, -2 on timeout or failure
+     */
     private async tryToRegister(configFile: string): Promise<number> {
         const result = await this._pmon.registerProject(configFile, this.getVersion() ?? '');
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
@@ -409,10 +432,16 @@ export class ProjEnvProject {
     }
 
     //------------------------------------------------------------------------------
-    /** Function un-register project.
-     * The project will be un-registered only. The projects files remain unchanged.
+    /**
+     * Unregisters the project from the WinCC OA system.
+     * The project files remain unchanged; only the system registration is removed.
+     *
+     * **Retry Logic:**
+     * If the first unregistration attempt fails, automatically retries once.
+     * This handles transient failures from file system delays or temporary locks.
+     *
      * @synchronized Function is not thread safe.
-     * @return Returns 0 when project is un-registered successfully, otherwise -1.
+     * @returns 0 when project is unregistered successfully, -2 on failure
      */
     public async unregisterProj(): Promise<number> {
         if (!this.getId()) this._errorHandler.exception(this.getInvalidReason());
@@ -431,6 +460,22 @@ export class ProjEnvProject {
     }
 
     //------------------------------------------------------------------------------
+    /**
+     * Internal helper to unregister a project from the WinCC OA system.
+     *
+     * **Unregistration Process:**
+     * 1. Calls pmon's unregisterProject command
+     * 2. Polls registration status using isRegistered() with 100ms intervals
+     * 3. Waits up to 0.5 seconds (5 attempts) for unregistration to complete
+     * 4. Reloads project registry cache automatically via file watching
+     *
+     * **Async Behavior:**
+     * Uses async/await to properly wait between status checks, preventing
+     * busy-waiting and allowing the file system watcher to detect changes.
+     *
+     * @param projId - The project ID to unregister
+     * @returns 0 on success, -2 on timeout or failure
+     */
     private async tryToUnregister(projId: string): Promise<number> {
         const result = await this._pmon.unregisterProject(projId);
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);

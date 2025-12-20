@@ -39,22 +39,63 @@ export interface ProductRegistry extends ProjEnvProjectRegistry {
     currentproject?: string;
 }
 
+/**
+ * Cache for registered projects loaded from pvssInst.conf.
+ * Automatically refreshed when the configuration file changes.
+ */
 let registeredProjectsCache: ProjEnvProjectRegistry[];
+
+/**
+ * Cache for registered products (WinCC OA installations) loaded from pvssInst.conf.
+ * Automatically refreshed when the configuration file changes.
+ */
 let registeredProducts: ProductRegistry[];
+
+/**
+ * File system watcher for pvssInst.conf.
+ * Monitors changes to the configuration file and triggers cache refresh.
+ */
 let fileWatcher: fs.FSWatcher | undefined;
+
+/**
+ * Debounce timeout handle for file change events.
+ * Prevents multiple rapid reloads by waiting 500ms after the last change.
+ */
 let reloadTimeout: NodeJS.Timeout | undefined;
 
+/**
+ * Retrieves all registered WinCC OA projects from the system configuration.
+ * Loads from pvssInst.conf on first call and caches the results.
+ * The cache is automatically refreshed when the configuration file changes.
+ *
+ * @returns Array of all registered project configurations
+ */
 export function getRegisteredProjects(): ProjEnvProjectRegistry[] {
     loadProjectRegistries();
     return registeredProjectsCache;
 }
 
+/**
+ * Retrieves all registered WinCC OA product installations (versions) from the system.
+ * Loads from pvssInst.conf on first call and caches the results.
+ * The cache is automatically refreshed when the configuration file changes.
+ *
+ * @returns Array of all registered product (version) configurations
+ */
 export function getRegisteredProducts(): ProductRegistry[] {
     loadProjectRegistries();
     return registeredProducts;
 }
 
-export function findProjectRegistryById(id: string): ProjEnvProjectRegistry | undefined {
+/**
+ * Finds a registered project by its unique identifier.
+ *
+ * @param id - The project ID to search for
+ * @returns Project registry entry if found, undefined otherwise
+ */
+export function findProjectRegistryById(
+    id: string,
+): ProjEnvProjectRegistry | undefined {
     return getRegisteredProjects().find((projRegistry) => projRegistry.id === id);
 }
 
@@ -68,10 +109,32 @@ export function getLastUsedProjectDir(version: string): string | undefined {
     return getProductByVersion(version)?.lastUsedProjectDir;
 }
 
+/**
+ * Forces an immediate reload of project registries from pvssInst.conf.
+ * Useful when you need to ensure the cache is up-to-date.
+ * Note: File watching with automatic reload is already active, so this
+ * is typically only needed for manual refresh scenarios.
+ */
 export function reloadProjectRegistries(): void {
     loadProjectRegistries();
 }
 
+/**
+ * Internal function that loads project registries from pvssInst.conf and sets up file watching.
+ *
+ * **File Watching Behavior:**
+ * - Sets up a file system watcher on first call to monitor pvssInst.conf
+ * - Uses debouncing (500ms) to handle rapid successive file changes
+ * - Prevents premature reads of incomplete file writes
+ * - Automatically updates cache when changes are detected
+ *
+ * **Debouncing Strategy:**
+ * Multiple file change events within 500ms are collapsed into a single reload.
+ * This ensures the file is fully written and prevents performance issues from
+ * excessive parsing during bulk operations.
+ *
+ * The watcher remains active for the lifetime of the process.
+ */
 function loadProjectRegistries(): void {
     if (fileWatcher) {
         return;
