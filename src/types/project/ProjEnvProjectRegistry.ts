@@ -247,7 +247,9 @@ function parseProjRegistryFile(configPath: string): void {
             currentproject = '';
         } else if (trimmedLine.includes('=')) {
             const [key, value] = trimmedLine.split('=', 2).map((s: string) => s.trim());
-
+ console.log(
+                        `Parsing ${key} for project ${currentProjectSection.id}: ${value}`,
+                    );
             switch (key.toLowerCase()) {
                 case 'firstPAStart':
                     inProductSection = true;
@@ -281,9 +283,6 @@ function parseProjRegistryFile(configPath: string): void {
                     currentProjectSection.installationVersion = value.replace(/['"]/g, '');
                     break;
                 case 'notrunnable':
-                    console.log(
-                        `Parsing notRunnable for project ${currentProjectSection.id}: ${value}`,
-                    );
                     currentProjectSection.notRunnable =
                         value.toLowerCase() === 'true' || value === '1';
                     break;
