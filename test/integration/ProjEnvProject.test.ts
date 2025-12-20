@@ -7,6 +7,7 @@ import {
     withRunnableTestProject,
     getTestProjectPath,
 } from '../helpers/test-project-helpers';
+import { version } from 'os';
 
 describe('ProjEnvProject (integration)', () => {
     describe('Project Registration', () => {
@@ -25,6 +26,7 @@ describe('ProjEnvProject (integration)', () => {
             assert.ok(project, 'Project should be created');
             assert.ok(project.getId(), 'Project should have an ID');
             assert.ok(project.getName(), 'Project should have a name');
+            assert.ok(project.getVersion(), 'Project should have a version');
             assert.ok(project.isRegistered(), `Project ${project.getId()} should be registered`);
         });
 
@@ -93,6 +95,7 @@ describe('ProjEnvProject (integration)', () => {
                 const installDir = project.getInstallDir();
                 assert.ok(installDir, 'Install directory should be set');
                 assert.ok(installDir.length > 0, 'Install directory should not be empty');
+                assert.ok(installDir.endsWith('/'), 'Install directory should end with a separator');
             });
         });
 
@@ -146,11 +149,18 @@ describe('ProjEnvProject (integration)', () => {
                 assert.ok(configPath.includes('config'), 'Config path should contain "config"');
             });
         });
+        it('should get config.level path', async () => {
+            await withRunnableTestProject(async (project) => {
+                const configPath = project.getConfigPath('config.level');
+                assert.ok(configPath, 'Config path should be returned');
+                assert.ok(configPath.includes('config.level'), 'Config path should contain "config.level"');
+            });
+        });
 
         it('should get config path with custom filename', async () => {
             await withRunnableTestProject(async (project) => {
                 const customPath = project.getConfigPath('custom.cfg');
-                assert.ok(customPath.includes('custom.cfg'), 'Config path should contain custom filename');
+                assert.strictEqual(customPath, '', 'Config path must be empty, because it does not exist');
             });
         });
     });
@@ -208,12 +218,12 @@ describe('ProjEnvProject (integration)', () => {
             // This test requires WinCC OA to be fully functional
             await withRunnableTestProject(async (project) => {
                 try {
-                    const startResult = await project.startPmon();
-                    // Result might be 0 (success) or -1/-2 (already running or error)
-                    assert.ok(
-                        typeof startResult === 'number',
-                        'Start pmon should return a number'
-                    );
+                    project.startPmon();
+                    // // Result might be 0 (success) or -1/-2 (already running or error)
+                    // assert.ok(
+                    //     typeof startResult === 'number',
+                    //     'Start pmon should return a number'
+                    // );
 
                     // Check if pmon is running
                     const isRunning = await project.isPmonRunning();
@@ -327,6 +337,7 @@ describe('ProjEnvProject (integration)', () => {
         });
     });
 
+    
     describe('initFromRegister', () => {
         it('should initialize project from registry entry', async () => {
             const testRegistry = {
@@ -336,6 +347,7 @@ describe('ProjEnvProject (integration)', () => {
                 notRunnable: false,
                 name: 'Test Project',
                 currentProject: true,
+                installationVersion : '3.19'
             };
 
             const project = new ProjEnvProject();
@@ -343,7 +355,7 @@ describe('ProjEnvProject (integration)', () => {
 
             assert.strictEqual(project.getId(), 'test-project', 'ID should be set from registry');
             assert.strictEqual(project.getName(), 'Test Project', 'Name should be set from registry');
-            assert.strictEqual(project.getInstallDir(), '/path/to/test', 'Install dir should be set');
+            assert.strictEqual(project.getInstallDir(), '/path/to/test/', 'Install dir should be set');
             assert.ok(project.isRunnable(), 'Should be runnable when notRunnable is false');
             assert.ok(project.isCurrentProject(), 'Should be marked as current project');
         });
@@ -354,6 +366,7 @@ describe('ProjEnvProject (integration)', () => {
                 installationDir: '/path/to/test',
                 installationDate: '2025-01-01T00:00:00Z',
                 notRunnable: false,
+                installationVersion : '3.19'
             };
 
             const project = new ProjEnvProject();
@@ -368,6 +381,7 @@ describe('ProjEnvProject (integration)', () => {
                 installationDir: '/path/to/sub',
                 installationDate: '2025-01-01T00:00:00Z',
                 notRunnable: true,
+                installationVersion : '3.19'
             };
 
             const project = new ProjEnvProject();

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it, afterEach } from 'node:test';
 import { strict as assert } from 'assert';
 import {
     getRegisteredProjects,
@@ -115,15 +115,38 @@ describe('winnccoa-project-environment (integration)', () => {
 
     describe('getRunnableProjects', () => {
         it('should return an array of runnable projects', async () => {
-            const projects = await getRunnableProjects();
+            let projects = await getRunnableProjects();
             assert.ok(Array.isArray(projects), 'Should return an array');
             assert.ok(projects.length >= 0, 'Array length should be zero or more');
-            const proj = projects[0];
+            projects.forEach(proj => {
+                console.log(`Runnable project ID: ${proj.getId()}`);
+            });
+            let proj = projects.find(p => p.getId() === 'runnable');
+            
+            assert.ok(!proj, 'runnable project does not exists per default');
+
+            proj = projects.find(p => p.getId().startsWith('DemoApplication_'));
+            assert.ok(proj, 'DemoApplication_<version> project does shall be imstalled');
+            assert.strictEqual(proj.getId(), 'DemoApplication_' + proj.getVersion(), 'Project should have an ID: runnable');
+            assert.ok(proj.isRunnable(), 'The projects DemoApplication_<version> should be runnable');
+            assert.ok(proj.isRegistered(), 'The projects DemoApplication_<version> should be registered');
+            assert.ok(proj.getInstallDir() != '', 'The projects DemoApplication_<version> should have an install dir');
+
+            await registerRunnableTestProject();
+            projects = await getRunnableProjects();
+            projects.forEach(proj => {
+                console.log(`Second try. Runnable project ID: ${proj.getId()}`);
+            });
+            proj = projects.find(p => p.getId() === 'runnable');
+            assert.ok(proj, 'runnable project found');
+
+            assert.ok(proj, 'Should find project with ID: runnable');
             assert.strictEqual(proj.getId(), 'runnable', 'Project should have an ID: runnable');
             assert.ok(proj.isRunnable(), 'The projects should be runnable');
-            assert.ok(proj.isRegistered(), 'The projects should be runnable');
+            assert.ok(proj.isRegistered(), 'The projects should be registered');
             assert.ok(proj.getInstallDir() != '', 'The projects should have an install dir');
-            assert.strictEqual(proj.getDir(), proj.getInstallDir() + proj.getId(), 'The projects directory should be installDir + id');
+
+            assert.strictEqual(proj.getDir(), proj.getInstallDir() + proj.getId() + '/', 'The projects directory should be installDir + id');
         });
 
         it('should return only runnable projects', async () => {
@@ -204,6 +227,10 @@ describe('winnccoa-project-environment (integration)', () => {
     describe('Integration between helper functions', () => {
         it('should have consistent results across helper functions', async () => {
             testProject = await registerRunnableTestProject();
+
+            assert.ok(testProject, 'Do we have test project?');
+            assert.ok(testProject.isRegistered(), 'is project registered?');
+            assert.ok(testProject.isRunnable(), 'is project runnable?');
             
             const registered = await getRegisteredProjects();
             const runnable = await getRunnableProjects();
@@ -213,11 +240,14 @@ describe('winnccoa-project-environment (integration)', () => {
                 'Runnable projects should be subset of all registered projects');
             
             // Test project should be in both lists
-            const foundInRegistered = registered.find(p => p.getId() === testProject!.getId());
-            const foundInRunnable = runnable.find(p => p.getId() === testProject!.getId());
+            // registered.forEach(p => {
+            //      console.log(`Registered project: ${p.getId()}`);
+            // });
+            const foundInRegistered = registered.find(p => p.getId() == 'runnable');
+            const foundInRunnable = runnable.find(p => p.getId() == 'runnable');
             
-            assert.ok(foundInRegistered, `Test project '${testProject!.getId()}' should be in registered list`);
-            assert.ok(foundInRunnable, `Test project '${testProject!.getId()}' should be in runnable list`);
+            assert.ok(foundInRegistered, `Test project 'runnable' should be in registered list`);
+            assert.ok(foundInRunnable, `Test project 'runnable' should be in runnable list`);
         });
 
         it('should filter registered projects correctly', async () => {

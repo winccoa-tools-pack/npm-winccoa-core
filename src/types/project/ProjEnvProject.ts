@@ -19,6 +19,7 @@ import {
 } from './ProjEnv';
 import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
 import path from 'path';
+import { sleep } from '../components/implementations/PmonComponent';
 
 /**
  * @brief WinCC OA Project class for managing project lifecycle and configuration
@@ -32,11 +33,26 @@ export class ProjEnvProject {
 
     //------------------------------------------------------------------------------
     public initFromRegister(registry: ProjEnvProjectRegistry) {
+        // console.log(`__initFromRegister__, Initializing project from registry: ID=${registry.id}, InstallDir=${registry.installationDir}`);
         this.setInstallDir(registry.installationDir);
-        this.setId(registry.id);
+
+        if (!this.getId() || registry.id != this.getId()) {
+            this._id = registry.id;
+        } else {
+            throw new Error(`Project ID mismatch during initFromRegister: expected ${this.getId()}, got ${registry.id}`);
+        }
         this.setName(registry.name ?? registry.id);
         this.setRunnable(!registry.notRunnable);
         this.currentProject = registry.currentProject ?? false;
+
+        if (this.isRunnable()) {
+            if (registry.installationVersion !== undefined) {
+                console.log(`[${new Date().toISOString()}]`, this.getId() + ` Setting project version from registry: ${registry.installationVersion}`);
+                this.version = registry.installationVersion;
+            } else {
+                this.version = this.getProjectVersion();
+            }
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -69,8 +85,9 @@ export class ProjEnvProject {
         if (this.runnable == ProjEnvProjectRunnable.Unknown) {
             const registry = findProjectRegistryById(id);
             if (registry) {
-                this.installPath = registry.installationDir;
-                this.version = this.getProjectVersion();
+                this.initFromRegister(registry);
+                // this.installPath = registry.installationDir;
+                // this.version = this.getProjectVersion();
             }
         }
     }
@@ -99,7 +116,13 @@ export class ProjEnvProject {
     private getProjectVersion(): string | undefined {
         const configPath = this.getConfigPath();
 
-        if (configPath === '') { return undefined; }
+        if (configPath === '') {
+            if (this.isRunnable()) {
+              throw new Error('The project config file does not exist for project ' + this.getId());
+            }
+            console.log(`[${new Date().toISOString()}]`, 'Config path is empty ' + this.getId());
+            return undefined;
+        }
 
         const cfg = new ProjEnvProjectConfig(configPath);
 
@@ -145,6 +168,7 @@ export class ProjEnvProject {
      */
     public setVersion(version: string): void {
         if (!version) {
+            throw new Error('Project version must not be empty: ' + this.getId());
             return;
         }
         this.version = version;
@@ -165,8 +189,21 @@ export class ProjEnvProject {
      */
     public setInstallDir(dirPath: string): void {
         if (!dirPath) return;
-        // Store path without trailing separator - getDir() will add it
-        this.installPath = dirPath.replace(/[/\\]+$/, '');
+        // Store path with trailing separator
+        this.installPath = dirPath;
+
+        // unse unix style separators
+        this.installPath = this.installPath.replace(/\\/g, '/').replace(/\/\//g, '/');
+        
+        if (!this.installPath.endsWith('/')) {
+            this.installPath += '/';
+        }
+
+        if (!fs.existsSync(this.installPath)) {
+            console.warn(`[${new Date().toISOString()}] Warning: Project install directory does not exist: ${this.installPath}`);
+        } else {
+            console.log(`[${new Date().toISOString()}] __setInstallDir__, Set project install dir: ${this.installPath}`);
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -184,11 +221,23 @@ export class ProjEnvProject {
      * @return Project dir path.
      */
     public getDir(relativeDirPath = ''): string {
-        if (!this.getId()) return '';
+        if (!this.getId()) {
+            throw new Error('Project ID is not set');
+            return '';
+        }
         const base = this.getInstallDir();
-        if (!base) return '';
+        if (!base) {
+            throw new Error('Project install directory is not set: ' + this.getId());
+            return '';
+        }
+
+        let retPath = base  + this.getId() + '/' + relativeDirPath;
         // Add separator between base and ID, handle both forward and backslash
-        return base + '/' + this.getId() + (relativeDirPath ? '/' + relativeDirPath : '');
+        if (!retPath.endsWith('/')) {
+            retPath += '/';
+        }
+
+        return retPath;
     }
 
     //------------------------------------------------------------------------------
@@ -199,7 +248,8 @@ export class ProjEnvProject {
      */
     public getConfigPath(configFileName = 'config'): string {
         const p = this.getDir(ProjEnvProjectFileSysStruct.CONFIG_REL_PATH);
-        if (!p) return '';
+        console.log(`[${new Date().toISOString()}] __getConfigPath__, project dir: ${p}, config file name: ${configFileName}`);
+        if (!p || !fs.existsSync(p + configFileName)) return '';
         return p + configFileName;
     }
 
@@ -260,6 +310,9 @@ export class ProjEnvProject {
             return this.format('The project install directory is empty.\n$1', this.toString('\t'));
         if (!this.getName())
             return this.format('The project name is empty.\n$1', this.toString('\t'));
+        
+        if (this.isRunnable() && !this.getVersion())
+            return this.format('The project version is empty.\n$1', this.toString('\t'));
         return '';
     }
 
@@ -295,10 +348,48 @@ export class ProjEnvProject {
 
         if (!this.isValid()) this._errorHandler.exception(this.getInvalidReason());
 
-        const result = await this._pmon.registerProject(this.getConfigPath());
-        console.log('Registration result for project', this.getId(), ':', result);
-        reloadProjectRegistries();
-        return result ?? -1;
+        const configFile = this.getConfigPath('config');
+
+        if (!configFile) {
+            this._errorHandler.severe(`Cannot register project ${this.getId()}: Config file ${this.getDir() + ProjEnvProjectFileSysStruct.CONFIG_REL_PATH + 'config'} not found.`);
+            return -1;
+        }
+
+        let result: number;
+
+        try {
+            result = await this.tryToRegister(configFile);
+        } catch (error) {
+            console.warn(`First attempt to register project ${this.getId()} failed:`, error);
+            // retry once if registration fails
+            result = await this.tryToRegister(configFile);
+        }
+
+        return result ?? -2;
+    }
+
+    //------------------------------------------------------------------------------
+    private async tryToRegister(configFile: string): Promise<number> {
+         const result = await this._pmon.registerProject(configFile, this.getVersion() ?? '');
+        console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
+        let counter : number = 0;
+        while (!this.isRegistered()) {
+        //   reloadProjectRegistries();
+
+        //   if (this.isRegistered()) {
+        //     break;
+        //   }
+
+          ++counter;
+          if (counter > 5) {
+            console.warn(`[${new Date().toISOString()}] Registration of project '${this.getId()}' is taking longer than expected.`);
+            break;
+          }
+
+          console.log(`[${new Date().toISOString()}] Waiting for project '${this.getId()}' to be registered...`);
+          sleep(1000);
+        } 
+        return result ?? -2;
     }
 
     //------------------------------------------------------------------------------
@@ -310,8 +401,40 @@ export class ProjEnvProject {
     public async unregisterProj(): Promise<number> {
         if (!this.getId()) this._errorHandler.exception(this.getInvalidReason());
 
-        const result = await this._pmon.unregisterProject(this.getId());
-        return result ?? -1;
+        let result: number;
+
+        try {
+            result = await this.tryToUnregister(this.getId());
+        } catch (error) {
+            console.warn(`First attempt to register project ${this.getId()} failed:`, error);
+            // retry once if registration fails
+            result = await this.tryToUnregister(this.getId());
+        }
+
+        return result ?? -2;
+    }
+
+    //------------------------------------------------------------------------------
+    private async tryToUnregister(projId: string): Promise<number> {
+         const result = await this._pmon.unregisterProject(projId);
+        console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
+        let counter : number = 0;
+        while (this.isRegistered()) {
+        //   reloadProjectRegistries();
+
+        //   if (!this.isRegistered()) {
+        //     break;
+        //   }
+
+          ++counter;
+          if (counter > 5) {
+            console.warn(`[${new Date().toISOString()}] UN-Registration of project ${this.getId()} is taking longer than expected.`);
+            break;
+          }
+
+          sleep(1000);
+        } 
+        return result ?? -2;
     }
 
     //------------------------------------------------------------------------------

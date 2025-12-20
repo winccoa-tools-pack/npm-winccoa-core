@@ -9,7 +9,10 @@ export async function getRegisteredProjects(): Promise<ProjEnvProject[]> {
     const registries = getRegistries();
     const projects: ProjEnvProject[] = [];
 
+    console.log(`Found ${registries.length} registered projects in the registry.`);
+
     for (const registry of registries) {
+      //  console.log(`Processing registry entry for project ID: ${registry.id}`);
         // Skip registry entries with empty or invalid IDs
         if (!registry.id || registry.id.trim().length === 0) {
             console.warn(`Skipping registry entry with empty ID`);
@@ -37,6 +40,10 @@ export async function getRunningProjects(): Promise<ProjEnvProject[]> {
 
 /**Returns all runnable projects locate on the locale host*/
 export async function getRunnableProjects(): Promise<ProjEnvProject[]> {
+    (await getRegisteredProjects()).forEach(p => {
+                 console.log(`__getRunnableProjects__, Registered project: ${p.getId()} is runnable: ${p.isRunnable()}`);
+            });
+
     return (await getRegisteredProjects()).filter((project) => project.isRunnable());
 }
 

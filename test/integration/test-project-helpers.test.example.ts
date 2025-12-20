@@ -28,6 +28,7 @@ describe('Test Project Helpers Example', () => {
     it('should use project with automatic cleanup', async () => {
         await withRunnableTestProject(async (project) => {
             assert.ok(project.getId(), 'Project should have an ID');
+            console.log(`Using test project with ID: ${project.getId()}`);
             assert.ok(project.isRegistered(), 'Project should be registered');
             
             // Your test logic here

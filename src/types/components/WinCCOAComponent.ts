@@ -30,7 +30,7 @@ class CommandHistoryEntry {
 
 export abstract class WinCCOAComponent {
 
-    public commandHistory: CommandHistoryEntry[] = [];
+    // public commandHistory: CommandHistoryEntry[] = [];
     /**
      * Accumulated standard output from the last spawned process.
      * Use this to inspect output produced by helper commands invoked
@@ -81,9 +81,9 @@ export abstract class WinCCOAComponent {
      *
      * @returns absolute path to executable or `null`
      */
-    public getPath(): string | null {
+    public getPath(version?: string): string | null {
         const exe = this.getExecutableName();
-        const versions = getAvailableWinCCOAVersions();
+        const versions = version ? [version] : getAvailableWinCCOAVersions();
 
         for (const v of versions) {
             const base = getWinCCOAInstallationPathByVersion(v);
@@ -117,11 +117,11 @@ export abstract class WinCCOAComponent {
      * component's last recorded `stdOut`. Returns the parsed version string
      * (e.g., '3.20.1') or `null` when no version could be found.
      *
-     * @param output - Optional raw output to parse; falls back to `stdOut`.
      * @returns parsed version string or `null`
      */
-    public getVersion(output?: string): string | null {
-        const parsed = this.parseVersionOutput(output || this.stdOut || '');
+    public async getFullVersion(): Promise<string | null> {
+        const lines = await (this as any).execAndCollectLines(this.getPath() || '', ['-version'], 5000);
+        const parsed = this.parseVersionOutput(lines.join('\n'));
         return parsed || null;
     }
 
@@ -146,27 +146,28 @@ export abstract class WinCCOAComponent {
      *
      * @param args - Array of arguments to pass to the executable
      * @param options.detached - Whether to spawn the process detached
+     * @param options.timeout - Timeout in milliseconds (rejects if exceeded)
      * @returns Promise resolving with process exit code
      *
      * TODO implement the option waitForLog. need to wait until the std-err coontains the specific string
      */
     public async start(
         args: string[] = [],
-        options: { detached?: boolean; waitForLog?: string } = {},
+        options: { detached?: boolean; waitForLog?: string; timeout?: number; version?: string } = {},
     ): Promise<number> {
-        const p = this.getPath();
+        const p = this.getPath(options.version);
         // const histEntry = new CommandHistoryEntry(this.getName(), args);
         this.stdOut = '';
         this.stdErr = '';
 
         const cmdId = randomUUID();
 
-
-        console.log(cmdId, 'Starting component', this.getName(), 'with args', args, 'from', p, 'options', options);
+        console.log(`[${new Date().toISOString()}]`, cmdId, 'Starting component', this.getName(), 'with args', args, 'from', p, 'options', options);
         if (!p) throw new Error('Executable ' + this.getName() + ' not found');
 
         return new Promise((resolve, reject) => {
             const spawnOptions: any = { shell: false };
+            let timeoutHandle: NodeJS.Timeout | null = null;
             
             if (options.detached) {
                 // For detached processes, ignore stdio to prevent parent from waiting
@@ -182,12 +183,26 @@ export abstract class WinCCOAComponent {
                 // Resolve immediately for detached processes
                 resolve(0);
             } else {
-                // Only capture output for non-detached processes
-                proc.stdout?.on('data', (d) => { const str = d.toString(); this.stdOut += str; console.log(cmdId, 'STDOUT:', str); /* histEntry.stdOut += str; */ });
-                proc.stderr?.on('data', (d) => { const str = d.toString(); this.stdErr += str; console.log(cmdId, 'STDERR:', str); /* histEntry.stdErr += str; */ });
+                // Set up timeout if specified
+                if (options.timeout && options.timeout > 0) {
+                    timeoutHandle = setTimeout(() => {
+                        proc.kill();
+                        reject(new Error(`Process timeout after ${options.timeout}ms`));
+                    }, options.timeout);
+                }
 
-                proc.on('close', (code) => resolve(code ?? 0));
-                proc.on('error', (err) => reject(err));
+                // Only capture output for non-detached processes
+                proc.stdout?.on('data', (d) => { const str = d.toString(); this.stdOut += str; console.log(`[${new Date().toISOString()}]`, cmdId, 'STDOUT:', str); /* histEntry.stdOut += str; */ });
+                proc.stderr?.on('data', (d) => { const str = d.toString(); this.stdErr += str; console.log(`[${new Date().toISOString()}]`, cmdId, 'STDERR:', str); /* histEntry.stdErr += str; */ });
+
+                proc.on('close', (code) => {
+                    if (timeoutHandle) clearTimeout(timeoutHandle);
+                    resolve(code ?? 0);
+                });
+                proc.on('error', (err) => {
+                    if (timeoutHandle) clearTimeout(timeoutHandle);
+                    reject(err);
+                });
             }
         });
     }
@@ -195,11 +210,23 @@ export abstract class WinCCOAComponent {
     /**
      * Execute a command and collect stdout lines as an array of strings.
      * Returns trimmed lines (excluding empty lines and terminating ';').
+     * 
+     * @param cmdPath - Path to the executable
+     * @param args - Arguments to pass
+     * @param timeout - Optional timeout in milliseconds
      */
-    protected async execAndCollectLines(cmdPath: string, args: string[]): Promise<string[]> {
+    protected async execAndCollectLines(cmdPath: string, args: string[], timeout?: number): Promise<string[]> {
         return new Promise((resolve, reject) => {
             const proc = spawn(cmdPath, args, { shell: false });
             let stdout = '';
+            let timeoutHandle: NodeJS.Timeout | null = null;
+
+            if (timeout && timeout > 0) {
+                timeoutHandle = setTimeout(() => {
+                    proc.kill();
+                    reject(new Error(`execAndCollectLines timeout after ${timeout}ms`));
+                }, timeout);
+            }
 
             proc.stdout?.on('data', (d) => {
                 const s = d.toString();
@@ -213,6 +240,7 @@ export abstract class WinCCOAComponent {
             });
 
             proc.on('close', (_code) => {
+                if (timeoutHandle) clearTimeout(timeoutHandle);
                 const lines = stdout
                     .split(/\r?\n/)
                     .map((l) => l.trim())
@@ -220,7 +248,10 @@ export abstract class WinCCOAComponent {
                 resolve(lines);
             });
 
-            proc.on('error', (err) => reject(err));
+            proc.on('error', (err) => {
+                if (timeoutHandle) clearTimeout(timeoutHandle);
+                reject(err);
+            });
         });
     }
 }

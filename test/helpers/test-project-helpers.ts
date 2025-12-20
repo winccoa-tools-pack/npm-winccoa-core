@@ -47,14 +47,18 @@ export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
     project.setDir(projectPath);
     project.setName('test-runnable-project');
 
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+    console.log(`Registering test project with WinCC OA version: ${testVersion}`);
+    project.setVersion(testVersion);
+
+
     // Update config file with actual WinCC OA path and version
     const configPath = path.join(projectPath, 'config', 'config');
     if (fs.existsSync(configPath)) {
         try {
             // Get the first available WinCC OA version for testing
-            const availableVersions = getAvailableWinCCOAVersions();
-            if (availableVersions.length > 0) {
-                const testVersion = availableVersions[0];
+            
                 const testPath = getWinCCOAInstallationPathByVersion(testVersion);
                 
                 if (testPath) {
@@ -68,7 +72,7 @@ export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
                     // Write back the updated config
                     fs.writeFileSync(configPath, configContent, 'utf-8');
                 }
-            }
+            
         } catch (error) {
             console.warn('Warning: Could not update test project config file:', error);
         }

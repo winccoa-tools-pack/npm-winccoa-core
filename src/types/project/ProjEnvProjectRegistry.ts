@@ -1,5 +1,6 @@
 import * as os from 'os';
 import * as fs from 'fs';
+import path from 'path';
 
 /**
  * Represents the basic configuration information for a WinCC OA project
@@ -29,6 +30,8 @@ export interface ProjEnvProjectRegistry {
 
     /** Whether this is the currently active project in WinCC OA */
     currentProject?: boolean;
+
+    installationVersion?: string;
 }
 
 export interface ProductRegistry extends ProjEnvProjectRegistry {
@@ -39,6 +42,7 @@ export interface ProductRegistry extends ProjEnvProjectRegistry {
 let registeredProjectsCache: ProjEnvProjectRegistry[];
 let registeredProducts: ProductRegistry[];
 let fileWatcher: fs.FSWatcher | undefined;
+let reloadTimeout: NodeJS.Timeout | undefined;
 
 export function getRegisteredProjects(): ProjEnvProjectRegistry[] {
     loadProjectRegistries();
@@ -69,7 +73,8 @@ export function reloadProjectRegistries(): void {
 }
 
 function loadProjectRegistries(): void {
-    if (registeredProjectsCache && registeredProjectsCache.length > 0) {
+
+    if (fileWatcher) {
         return;
     }
 
@@ -79,21 +84,37 @@ function loadProjectRegistries(): void {
     // Set up file watcher to refresh cache when pvssInst.conf changes
     if (!fileWatcher && fs.existsSync(configPath)) {
         try {
+            console.log(`[${new Date().toISOString()}] Setting up file watcher for pvssInst.conf:`, configPath);
             fileWatcher = fs.watch(configPath, (eventType) => {
                 if (eventType === 'change') {
-                    // Clear cache and reload on next access
-                    registeredProjectsCache = [];
-                    registeredProducts = [];
+                    // Debounce file changes - wait 500ms after last change before reloading
+                    if (reloadTimeout) {
+                        clearTimeout(reloadTimeout);
+                    }
+                    console.log(`[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 500ms`);
+                    reloadTimeout = setTimeout(() => {
+                        console.log(`[${new Date().toISOString()}] pvssInst.conf changed, reloading project registries`);
+                        reloadTimeout = undefined;
+                        console.log(`[${new Date().toISOString()}] Reloading project registries. Current cache size: ${registeredProjectsCache.length}`);
+                        parseProjRegistryFile(configPath);
+                        console.log(`[${new Date().toISOString()}] Project registries reloaded. Current cache size: ${registeredProjectsCache.length}`);
+                    }, 500);
                 }
             });
         } catch (error) {
             // Silently fail if file watching is not supported
-            console.warn('Could not create file watcher for pvssInst.conf:', error);
+            console.warn(`[${new Date().toISOString()}] Could not create file watcher for pvssInst.conf:`, error);
         }
     }
 }
 
 function parseProjRegistryFile(configPath: string): void {
+    console.log(`[${new Date().toISOString()}] Loading project registries from ${configPath}`);
+    
+    if (!fs.existsSync(configPath)) {
+        throw new Error(`The WinCC OA is probably not installed. The pvssInst.conf file not found at path: ${configPath}`);
+    }
+
     const content = fs.readFileSync(configPath, 'utf-8');
     const lines = content.split('\n');
     const projects: ProjEnvProjectRegistry[] = [];
@@ -103,23 +124,30 @@ function parseProjRegistryFile(configPath: string): void {
         currentProject: false,
         id: '',
         installationDir: '',
-        notRunnable: false,
+        notRunnable: true,
         installationDate: '',
+        installationVersion: undefined
     };
-    let currentProductRegistry: ProductRegistry = currentProjectSection;
 
-    let inProjectSection = false;
+    let lastUsedProjectDir : string = '';
+    let currentproject : string = '';
     let inProductSection = false;
+
 
     for (const line of lines) {
         const trimmedLine = line.trim();
 
         if (trimmedLine.startsWith('[') && trimmedLine.endsWith(']')) {
             // Save previous project if complete
-            if (inProjectSection) {
-                projects.push(currentProjectSection);
-            } else if (inProductSection) {
+            if (inProductSection) {
+                const currentProductRegistry: ProductRegistry = currentProjectSection;
+                currentProductRegistry.lastUsedProjectDir = lastUsedProjectDir;
+                currentProductRegistry.currentproject = currentproject;
+                currentProductRegistry.notRunnable = true;
+                inProductSection = false;
                 products.push(currentProductRegistry);
+            } else if (currentProjectSection.id != '') {
+                projects.push(currentProjectSection);
             }
 
             // Extract content inside the brackets
@@ -132,25 +160,48 @@ function parseProjRegistryFile(configPath: string): void {
             const projectId = pathParts[pathParts.length - 1] || '';
 
             // Start new project section
-            inProjectSection = true;
             currentProjectSection = {
                 currentProject: false,
                 id: projectId,
                 installationDir: '',
-                notRunnable: false,
+                notRunnable: true,
                 installationDate: '',
             };
-            inProductSection = false;
-            currentProductRegistry = currentProjectSection;
-        } else if (inProjectSection && trimmedLine.includes('=')) {
+            
+            lastUsedProjectDir = '';
+            currentproject = '';
+        } else if (trimmedLine.includes('=')) {
             const [key, value] = trimmedLine.split('=', 2).map((s: string) => s.trim());
 
             switch (key.toLowerCase()) {
+                case "firstPAStart":
+                    inProductSection = true;
+                    break;
+                case 'currentproject':
+                    currentproject = value.replace(/['"]/g, '');
+                    inProductSection = true;
+                    break;
+                case 'lastusedprojectdir':
+                    lastUsedProjectDir = value.replace(/['"]/g, '');
+                    inProductSection = true;
+                    break;
                 case 'installationdir':
-                    currentProjectSection.installationDir = value.replace(/['"]/g, '');
+                    {
+                        const entryValue = value.replace(/['"]/g, '');
+                        const idFromPath = path.basename(entryValue);
+    
+                        if (idFromPath && idFromPath !== currentProjectSection.id) {
+                            throw new Error(`Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`);
+                        }
+    
+                        currentProjectSection.installationDir = path.dirname(entryValue);
+                    }
                     break;
                 case 'installationdate':
                     currentProjectSection.installationDate = value.replace(/['"]/g, '');
+                    break;
+                case 'installationversion':
+                    currentProjectSection.installationVersion = value.replace(/['"]/g, '');
                     break;
                 case 'notrunnable':
                     currentProjectSection.notRunnable =
@@ -158,16 +209,6 @@ function parseProjRegistryFile(configPath: string): void {
                     break;
                 case 'company':
                     currentProjectSection.company = value.replace(/['"]/g, '');
-                    break;
-                case 'currentproject':
-                    currentProductRegistry = currentProjectSection;
-                    currentProductRegistry.currentproject = value.replace(/['"]/g, '');
-                    inProductSection = true;
-                    break;
-                case 'lastusedprojectdir':
-                    currentProductRegistry = currentProjectSection;
-                    currentProductRegistry.lastUsedProjectDir = value.replace(/['"]/g, '');
-                    inProductSection = true;
                     break;
                 case 'name':
                     currentProjectSection.name = value.replace(/['"]/g, '');
@@ -180,11 +221,16 @@ function parseProjRegistryFile(configPath: string): void {
     }
 
     // Don't forget the last project
-    if (inProjectSection) {
-        projects.push(currentProjectSection);
-    } else if (inProductSection) {
+    if (inProductSection) {
+        const currentProductRegistry: ProductRegistry = currentProjectSection;
+        currentProductRegistry.lastUsedProjectDir = lastUsedProjectDir;
+        currentProductRegistry.currentproject = currentproject;
+        currentProductRegistry.notRunnable = true;
         products.push(currentProductRegistry);
+    } else if (currentProjectSection.id != '') {
+        projects.push(currentProjectSection);
     }
+
 
     registeredProjectsCache = projects;
     registeredProducts = products;

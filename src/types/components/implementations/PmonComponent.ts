@@ -25,7 +25,12 @@ export class PmonComponent extends WinCCOAComponent {
      */
     public async registerSubProject(projectPath: string): Promise<number> {
         const args = ['-regsubf', '-proj', projectPath, '-log', '+stderr'];
-        return super.start(args);
+        const code =  super.start(args);
+
+        
+        sleep(2000); // wait a second to let the registry update
+
+        return code;
     }
 
     /**
@@ -37,7 +42,9 @@ export class PmonComponent extends WinCCOAComponent {
     public async unregisterProject(projectName: string): Promise<number> {
         // Use -unreg option to unregister project
         const args = ['-unreg', projectName, '-log', '+stderr'];
-        return super.start(args);
+        const code =  super.start(args);
+
+        return code;
     }
 
     /**
@@ -46,17 +53,20 @@ export class PmonComponent extends WinCCOAComponent {
      * @param outputCallback - Optional callback for output logging
      * @returns Promise that resolves when registration is complete with exit code
      */
-    public async registerProject(configPath: string): Promise<number> {
+    public async registerProject(configPath: string, projectVersion: string): Promise<number> {
 
         if (configPath === undefined || configPath === '') {
             throw new Error('Config path is not set for PmonComponent');
         }
         // Use -config -autofreg -status options to register runnable project
         const args = ['-config', configPath, '-log', '+stderr', '-autofreg', '-status'];
-        const code = super.start(args);
+        const code = super.start(args, { version: projectVersion });
     
         // the pmon returns 3 if the project is not running after registrations
-        return this.pmonStateCodeToStatus(await code) === ProjEnvPmonStatus.NotRunning ? 0 : -1;
+
+        const state = this.pmonStateCodeToStatus(await code);
+
+        return (state !== ProjEnvPmonStatus.Unknown) ? 0 : -1;
     }
 
     /**
@@ -577,3 +587,7 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return state;
     }
 }
+export const sleep = async (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
