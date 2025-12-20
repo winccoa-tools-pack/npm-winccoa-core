@@ -46,7 +46,7 @@ export class ProjEnvProject {
             );
         }
         this.setName(registry.name ?? registry.id);
-        this.setRunnable(!registry.notRunnable);
+        this.setRunnable(registry.notRunnable !== undefined ? !registry.notRunnable : false);
         this.currentProject = registry.currentProject ?? false;
 
         if (this.isRunnable()) {
