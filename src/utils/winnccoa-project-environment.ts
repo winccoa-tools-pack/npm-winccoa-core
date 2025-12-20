@@ -40,12 +40,6 @@ export async function getRunningProjects(): Promise<ProjEnvProject[]> {
 
 /**Returns all runnable projects locate on the locale host*/
 export async function getRunnableProjects(): Promise<ProjEnvProject[]> {
-    (await getRegisteredProjects()).forEach((p) => {
-        console.log(
-            `__getRunnableProjects__, Registered project: ${p.getId()} is runnable: ${p.isRunnable()}`,
-        );
-    });
-
     return (await getRegisteredProjects()).filter((project) => project.isRunnable());
 }
 
