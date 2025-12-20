@@ -17,7 +17,8 @@ import {
     getRegisteredProjects,
     getRunningProjects,
     getRunnableProjects,
-    getCurrentProjects
+    getCurrentProjects,
+    findProjectForFile
 } from '@winccoa-tools-pack/core-utils';
 
 // Get all registered projects from the system
@@ -35,6 +36,15 @@ const runnable = await getRunnableProjects();
 const current = await getCurrentProjects();
 if (current.length > 0) {
     console.log(`Current project: ${current[0].getName()}`);
+}
+
+// Find which project a file belongs to
+const filePath = '/opt/WinCC_OA_Projects/myProject/config/config';
+const project = await findProjectForFile(filePath);
+if (project) {
+    console.log(`File belongs to project: ${project.getName()}`);
+    console.log(`Project ID: ${project.getId()}`);
+    console.log(`Project is runnable: ${project.isRunnable()}`);
 }
 ```
 

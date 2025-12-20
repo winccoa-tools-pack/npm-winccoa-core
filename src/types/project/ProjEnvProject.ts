@@ -932,6 +932,19 @@ export class ProjEnvProject {
         return '';
     }
 
+    //---------------------------------------------------------------------------
+    /** @brief Function checks if the given file path belongs to this project.
+     * @param filePath Full path to the file to check.
+     * @return Returns TRUE if the file belongs to this project, otherwise FALSE.
+     */
+    public isProjectFile(filePath: string): boolean {
+        const projDir = this.getDir();
+        if (!projDir) return false;
+        const normalizedProjDir = path.normalize(projDir).toLowerCase();
+        const normalizedFilePath = path.normalize(filePath).toLowerCase();
+        return normalizedFilePath.startsWith(normalizedProjDir);
+    }
+
     //--------------------------------------------------------------------------------
     //@protected members
     //--------------------------------------------------------------------------------
