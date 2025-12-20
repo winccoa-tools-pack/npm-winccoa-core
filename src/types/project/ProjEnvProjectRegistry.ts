@@ -283,8 +283,13 @@ function parseProjRegistryFile(configPath: string): void {
                     currentProjectSection.installationVersion = value.replace(/['"]/g, '');
                     break;
                 case 'notrunnable':
-                    currentProjectSection.notRunnable =
-                        value.toLowerCase() === 'true' || value === '1';
+                    {
+                      if ((value === '0') ||  value === '"0"') {
+                        currentProjectSection.notRunnable = false;
+                      } else {
+                        currentProjectSection.notRunnable = true;
+                      }
+                    }
                     break;
                 case 'company':
                     currentProjectSection.company = value.replace(/['"]/g, '');
