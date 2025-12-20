@@ -1,10 +1,7 @@
 //--------------------------------------------------------------------------------
 
 import { PmonComponent } from '../components/implementations';
-import {
-    findProjectRegistryById,
-    ProjEnvProjectRegistry,
-} from '../project/ProjEnvProjectRegistry';
+import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
 import { OaLanguage } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
 import fs from 'fs';
@@ -474,7 +471,6 @@ export class ProjEnvProject {
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
         let counter: number = 0;
         while (this.isRegistered()) {
-
             ++counter;
             if (counter > 5) {
                 console.warn(

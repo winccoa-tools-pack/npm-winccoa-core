@@ -93,9 +93,7 @@ export function getRegisteredProducts(): ProductRegistry[] {
  * @param id - The project ID to search for
  * @returns Project registry entry if found, undefined otherwise
  */
-export function findProjectRegistryById(
-    id: string,
-): ProjEnvProjectRegistry | undefined {
+export function findProjectRegistryById(id: string): ProjEnvProjectRegistry | undefined {
     return getRegisteredProjects().find((projRegistry) => projRegistry.id === id);
 }
 
