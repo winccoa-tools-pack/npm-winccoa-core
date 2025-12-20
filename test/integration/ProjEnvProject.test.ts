@@ -7,7 +7,7 @@ import {
     withRunnableTestProject,
     getTestProjectPath,
 } from '../helpers/test-project-helpers';
-import { version } from 'os';
+import { OaLanguage } from '../../src/types/localization/OaLanguage';
 
 describe('ProjEnvProject (integration)', () => {
     describe('Project Registration', () => {
@@ -133,7 +133,7 @@ describe('ProjEnvProject (integration)', () => {
 
         it('should set and get languages', async () => {
             await withRunnableTestProject(async (project) => {
-                const testLangs = ['en_US', 'de_DE'];
+                const testLangs = [OaLanguage.en_US, OaLanguage.de_AT];
                 project.setLanguages(testLangs);
                 const langs = project.getLanguages();
                 assert.deepStrictEqual(langs, testLangs, 'Languages should match');

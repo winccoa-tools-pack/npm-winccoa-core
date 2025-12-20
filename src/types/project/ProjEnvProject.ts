@@ -3,7 +3,6 @@
 import { PmonComponent } from '../components/implementations';
 import {
     findProjectRegistryById,
-    reloadProjectRegistries,
     ProjEnvProjectRegistry,
 } from '../project/ProjEnvProjectRegistry';
 import { OaLanguage } from '../localization/OaLanguage';
@@ -409,12 +408,6 @@ export class ProjEnvProject {
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
         let counter: number = 0;
         while (!this.isRegistered()) {
-            //   reloadProjectRegistries();
-
-            //   if (this.isRegistered()) {
-            //     break;
-            //   }
-
             ++counter;
             if (counter > 50) {
                 console.warn(
@@ -481,11 +474,6 @@ export class ProjEnvProject {
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
         let counter: number = 0;
         while (this.isRegistered()) {
-            //   reloadProjectRegistries();
-
-            //   if (!this.isRegistered()) {
-            //     break;
-            //   }
 
             ++counter;
             if (counter > 5) {
