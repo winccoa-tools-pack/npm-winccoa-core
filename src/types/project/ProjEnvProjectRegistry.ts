@@ -155,7 +155,7 @@ function loadProjectRegistries(): void {
                         clearTimeout(reloadTimeout);
                     }
                     console.log(
-                        `[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 500ms`,
+                        `[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 100ms`,
                     );
                     reloadTimeout = setTimeout(() => {
                         console.log(
@@ -169,7 +169,7 @@ function loadProjectRegistries(): void {
                         console.log(
                             `[${new Date().toISOString()}] Project registries reloaded. Current cache size: ${registeredProjectsCache.length}`,
                         );
-                    }, 500);
+                    }, 100);
                 }
             });
         } catch (error) {
@@ -247,9 +247,6 @@ function parseProjRegistryFile(configPath: string): void {
             currentproject = '';
         } else if (trimmedLine.includes('=')) {
             const [key, value] = trimmedLine.split('=', 2).map((s: string) => s.trim());
- console.log(
-                        `Parsing ${key} for project ${currentProjectSection.id}: ${value}`,
-                    );
             switch (key.toLowerCase()) {
                 case 'firstPAStart':
                     inProductSection = true;
@@ -284,11 +281,11 @@ function parseProjRegistryFile(configPath: string): void {
                     break;
                 case 'notrunnable':
                     {
-                      if ((value === '0') ||  value === '"0"') {
-                        currentProjectSection.notRunnable = false;
-                      } else {
-                        currentProjectSection.notRunnable = true;
-                      }
+                        if (value === '0' || value === '"0"') {
+                            currentProjectSection.notRunnable = false;
+                        } else {
+                            currentProjectSection.notRunnable = true;
+                        }
                     }
                     break;
                 case 'company':
