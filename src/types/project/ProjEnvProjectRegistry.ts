@@ -73,46 +73,61 @@ export function reloadProjectRegistries(): void {
 }
 
 function loadProjectRegistries(): void {
-
     if (fileWatcher) {
         return;
     }
 
     const configPath: string = getPvssInstConfPath();
     parseProjRegistryFile(configPath);
-    
+
     // Set up file watcher to refresh cache when pvssInst.conf changes
     if (!fileWatcher && fs.existsSync(configPath)) {
         try {
-            console.log(`[${new Date().toISOString()}] Setting up file watcher for pvssInst.conf:`, configPath);
+            console.log(
+                `[${new Date().toISOString()}] Setting up file watcher for pvssInst.conf:`,
+                configPath,
+            );
             fileWatcher = fs.watch(configPath, (eventType) => {
                 if (eventType === 'change') {
                     // Debounce file changes - wait 500ms after last change before reloading
                     if (reloadTimeout) {
                         clearTimeout(reloadTimeout);
                     }
-                    console.log(`[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 500ms`);
+                    console.log(
+                        `[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 500ms`,
+                    );
                     reloadTimeout = setTimeout(() => {
-                        console.log(`[${new Date().toISOString()}] pvssInst.conf changed, reloading project registries`);
+                        console.log(
+                            `[${new Date().toISOString()}] pvssInst.conf changed, reloading project registries`,
+                        );
                         reloadTimeout = undefined;
-                        console.log(`[${new Date().toISOString()}] Reloading project registries. Current cache size: ${registeredProjectsCache.length}`);
+                        console.log(
+                            `[${new Date().toISOString()}] Reloading project registries. Current cache size: ${registeredProjectsCache.length}`,
+                        );
                         parseProjRegistryFile(configPath);
-                        console.log(`[${new Date().toISOString()}] Project registries reloaded. Current cache size: ${registeredProjectsCache.length}`);
+                        console.log(
+                            `[${new Date().toISOString()}] Project registries reloaded. Current cache size: ${registeredProjectsCache.length}`,
+                        );
                     }, 500);
                 }
             });
         } catch (error) {
             // Silently fail if file watching is not supported
-            console.warn(`[${new Date().toISOString()}] Could not create file watcher for pvssInst.conf:`, error);
+            console.warn(
+                `[${new Date().toISOString()}] Could not create file watcher for pvssInst.conf:`,
+                error,
+            );
         }
     }
 }
 
 function parseProjRegistryFile(configPath: string): void {
     console.log(`[${new Date().toISOString()}] Loading project registries from ${configPath}`);
-    
+
     if (!fs.existsSync(configPath)) {
-        throw new Error(`The WinCC OA is probably not installed. The pvssInst.conf file not found at path: ${configPath}`);
+        throw new Error(
+            `The WinCC OA is probably not installed. The pvssInst.conf file not found at path: ${configPath}`,
+        );
     }
 
     const content = fs.readFileSync(configPath, 'utf-8');
@@ -126,13 +141,12 @@ function parseProjRegistryFile(configPath: string): void {
         installationDir: '',
         notRunnable: true,
         installationDate: '',
-        installationVersion: undefined
+        installationVersion: undefined,
     };
 
-    let lastUsedProjectDir : string = '';
-    let currentproject : string = '';
+    let lastUsedProjectDir: string = '';
+    let currentproject: string = '';
     let inProductSection = false;
-
 
     for (const line of lines) {
         const trimmedLine = line.trim();
@@ -167,14 +181,14 @@ function parseProjRegistryFile(configPath: string): void {
                 notRunnable: true,
                 installationDate: '',
             };
-            
+
             lastUsedProjectDir = '';
             currentproject = '';
         } else if (trimmedLine.includes('=')) {
             const [key, value] = trimmedLine.split('=', 2).map((s: string) => s.trim());
 
             switch (key.toLowerCase()) {
-                case "firstPAStart":
+                case 'firstPAStart':
                     inProductSection = true;
                     break;
                 case 'currentproject':
@@ -189,11 +203,13 @@ function parseProjRegistryFile(configPath: string): void {
                     {
                         const entryValue = value.replace(/['"]/g, '');
                         const idFromPath = path.basename(entryValue);
-    
+
                         if (idFromPath && idFromPath !== currentProjectSection.id) {
-                            throw new Error(`Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`);
+                            throw new Error(
+                                `Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`,
+                            );
                         }
-    
+
                         currentProjectSection.installationDir = path.dirname(entryValue);
                     }
                     break;
@@ -230,7 +246,6 @@ function parseProjRegistryFile(configPath: string): void {
     } else if (currentProjectSection.id != '') {
         projects.push(currentProjectSection);
     }
-
 
     registeredProjectsCache = projects;
     registeredProducts = products;

@@ -29,7 +29,6 @@ class CommandHistoryEntry {
 */
 
 export abstract class WinCCOAComponent {
-
     // public commandHistory: CommandHistoryEntry[] = [];
     /**
      * Accumulated standard output from the last spawned process.
@@ -120,7 +119,11 @@ export abstract class WinCCOAComponent {
      * @returns parsed version string or `null`
      */
     public async getFullVersion(): Promise<string | null> {
-        const lines = await (this as any).execAndCollectLines(this.getPath() || '', ['-version'], 5000);
+        const lines = await (this as any).execAndCollectLines(
+            this.getPath() || '',
+            ['-version'],
+            5000,
+        );
         const parsed = this.parseVersionOutput(lines.join('\n'));
         return parsed || null;
     }
@@ -153,7 +156,12 @@ export abstract class WinCCOAComponent {
      */
     public async start(
         args: string[] = [],
-        options: { detached?: boolean; waitForLog?: string; timeout?: number; version?: string } = {},
+        options: {
+            detached?: boolean;
+            waitForLog?: string;
+            timeout?: number;
+            version?: string;
+        } = {},
     ): Promise<number> {
         const p = this.getPath(options.version);
         // const histEntry = new CommandHistoryEntry(this.getName(), args);
@@ -162,19 +170,30 @@ export abstract class WinCCOAComponent {
 
         const cmdId = randomUUID();
 
-        console.log(`[${new Date().toISOString()}]`, cmdId, 'Starting component', this.getName(), 'with args', args, 'from', p, 'options', options);
+        console.log(
+            `[${new Date().toISOString()}]`,
+            cmdId,
+            'Starting component',
+            this.getName(),
+            'with args',
+            args,
+            'from',
+            p,
+            'options',
+            options,
+        );
         if (!p) throw new Error('Executable ' + this.getName() + ' not found');
 
         return new Promise((resolve, reject) => {
             const spawnOptions: any = { shell: false };
             let timeoutHandle: NodeJS.Timeout | null = null;
-            
+
             if (options.detached) {
                 // For detached processes, ignore stdio to prevent parent from waiting
                 spawnOptions.detached = true;
                 spawnOptions.stdio = 'ignore';
             }
-            
+
             const proc = spawn(p, args, spawnOptions);
 
             if (options.detached) {
@@ -192,8 +211,26 @@ export abstract class WinCCOAComponent {
                 }
 
                 // Only capture output for non-detached processes
-                proc.stdout?.on('data', (d) => { const str = d.toString(); this.stdOut += str; console.log(`[${new Date().toISOString()}]`, cmdId, 'STDOUT:', str); /* histEntry.stdOut += str; */ });
-                proc.stderr?.on('data', (d) => { const str = d.toString(); this.stdErr += str; console.log(`[${new Date().toISOString()}]`, cmdId, 'STDERR:', str); /* histEntry.stdErr += str; */ });
+                proc.stdout?.on('data', (d) => {
+                    const str = d.toString();
+                    this.stdOut += str;
+                    console.log(
+                        `[${new Date().toISOString()}]`,
+                        cmdId,
+                        'STDOUT:',
+                        str,
+                    ); /* histEntry.stdOut += str; */
+                });
+                proc.stderr?.on('data', (d) => {
+                    const str = d.toString();
+                    this.stdErr += str;
+                    console.log(
+                        `[${new Date().toISOString()}]`,
+                        cmdId,
+                        'STDERR:',
+                        str,
+                    ); /* histEntry.stdErr += str; */
+                });
 
                 proc.on('close', (code) => {
                     if (timeoutHandle) clearTimeout(timeoutHandle);
@@ -210,12 +247,16 @@ export abstract class WinCCOAComponent {
     /**
      * Execute a command and collect stdout lines as an array of strings.
      * Returns trimmed lines (excluding empty lines and terminating ';').
-     * 
+     *
      * @param cmdPath - Path to the executable
      * @param args - Arguments to pass
      * @param timeout - Optional timeout in milliseconds
      */
-    protected async execAndCollectLines(cmdPath: string, args: string[], timeout?: number): Promise<string[]> {
+    protected async execAndCollectLines(
+        cmdPath: string,
+        args: string[],
+        timeout?: number,
+    ): Promise<string[]> {
         return new Promise((resolve, reject) => {
             const proc = spawn(cmdPath, args, { shell: false });
             let stdout = '';

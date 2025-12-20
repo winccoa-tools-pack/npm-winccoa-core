@@ -1,7 +1,11 @@
 //--------------------------------------------------------------------------------
 
 import { PmonComponent } from '../components/implementations';
-import { findProjectRegistryById, reloadProjectRegistries, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
+import {
+    findProjectRegistryById,
+    reloadProjectRegistries,
+    ProjEnvProjectRegistry,
+} from '../project/ProjEnvProjectRegistry';
 import { OaLanguage } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
 import fs from 'fs';
@@ -39,7 +43,9 @@ export class ProjEnvProject {
         if (!this.getId() || registry.id != this.getId()) {
             this._id = registry.id;
         } else {
-            throw new Error(`Project ID mismatch during initFromRegister: expected ${this.getId()}, got ${registry.id}`);
+            throw new Error(
+                `Project ID mismatch during initFromRegister: expected ${this.getId()}, got ${registry.id}`,
+            );
         }
         this.setName(registry.name ?? registry.id);
         this.setRunnable(!registry.notRunnable);
@@ -47,7 +53,11 @@ export class ProjEnvProject {
 
         if (this.isRunnable()) {
             if (registry.installationVersion !== undefined) {
-                console.log(`[${new Date().toISOString()}]`, this.getId() + ` Setting project version from registry: ${registry.installationVersion}`);
+                console.log(
+                    `[${new Date().toISOString()}]`,
+                    this.getId() +
+                        ` Setting project version from registry: ${registry.installationVersion}`,
+                );
                 this.version = registry.installationVersion;
             } else {
                 this.version = this.getProjectVersion();
@@ -118,7 +128,9 @@ export class ProjEnvProject {
 
         if (configPath === '') {
             if (this.isRunnable()) {
-              throw new Error('The project config file does not exist for project ' + this.getId());
+                throw new Error(
+                    'The project config file does not exist for project ' + this.getId(),
+                );
             }
             console.log(`[${new Date().toISOString()}]`, 'Config path is empty ' + this.getId());
             return undefined;
@@ -194,15 +206,15 @@ export class ProjEnvProject {
 
         // unse unix style separators
         this.installPath = this.installPath.replace(/\\/g, '/').replace(/\/\//g, '/');
-        
+
         if (!this.installPath.endsWith('/')) {
             this.installPath += '/';
         }
 
         if (!fs.existsSync(this.installPath)) {
-            console.warn(`[${new Date().toISOString()}] Warning: Project install directory does not exist: ${this.installPath}`);
-        } else {
-            console.log(`[${new Date().toISOString()}] __setInstallDir__, Set project install dir: ${this.installPath}`);
+            console.warn(
+                `[${new Date().toISOString()}] Warning: Project install directory does not exist: ${this.installPath}`,
+            );
         }
     }
 
@@ -231,7 +243,7 @@ export class ProjEnvProject {
             return '';
         }
 
-        let retPath = base  + this.getId() + '/' + relativeDirPath;
+        let retPath = base + this.getId() + '/' + relativeDirPath;
         // Add separator between base and ID, handle both forward and backslash
         if (!retPath.endsWith('/')) {
             retPath += '/';
@@ -248,7 +260,6 @@ export class ProjEnvProject {
      */
     public getConfigPath(configFileName = 'config'): string {
         const p = this.getDir(ProjEnvProjectFileSysStruct.CONFIG_REL_PATH);
-        console.log(`[${new Date().toISOString()}] __getConfigPath__, project dir: ${p}, config file name: ${configFileName}`);
         if (!p || !fs.existsSync(p + configFileName)) return '';
         return p + configFileName;
     }
@@ -310,7 +321,7 @@ export class ProjEnvProject {
             return this.format('The project install directory is empty.\n$1', this.toString('\t'));
         if (!this.getName())
             return this.format('The project name is empty.\n$1', this.toString('\t'));
-        
+
         if (this.isRunnable() && !this.getVersion())
             return this.format('The project version is empty.\n$1', this.toString('\t'));
         return '';
@@ -342,7 +353,6 @@ export class ProjEnvProject {
      * @return Returns 0 when project is registered successfully, otherwise -1.
      */
     public async registerProj(): Promise<number> {
-        
         // set the name in case the user forgot it
         if (!this.getName()) this.setName(this.getId());
 
@@ -351,7 +361,9 @@ export class ProjEnvProject {
         const configFile = this.getConfigPath('config');
 
         if (!configFile) {
-            this._errorHandler.severe(`Cannot register project ${this.getId()}: Config file ${this.getDir() + ProjEnvProjectFileSysStruct.CONFIG_REL_PATH + 'config'} not found.`);
+            this._errorHandler.severe(
+                `Cannot register project ${this.getId()}: Config file ${this.getDir() + ProjEnvProjectFileSysStruct.CONFIG_REL_PATH + 'config'} not found.`,
+            );
             return -1;
         }
 
@@ -370,25 +382,29 @@ export class ProjEnvProject {
 
     //------------------------------------------------------------------------------
     private async tryToRegister(configFile: string): Promise<number> {
-         const result = await this._pmon.registerProject(configFile, this.getVersion() ?? '');
+        const result = await this._pmon.registerProject(configFile, this.getVersion() ?? '');
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
-        let counter : number = 0;
+        let counter: number = 0;
         while (!this.isRegistered()) {
-        //   reloadProjectRegistries();
+            //   reloadProjectRegistries();
 
-        //   if (this.isRegistered()) {
-        //     break;
-        //   }
+            //   if (this.isRegistered()) {
+            //     break;
+            //   }
 
-          ++counter;
-          if (counter > 5) {
-            console.warn(`[${new Date().toISOString()}] Registration of project '${this.getId()}' is taking longer than expected.`);
-            break;
-          }
+            ++counter;
+            if (counter > 50) {
+                console.warn(
+                    `[${new Date().toISOString()}] Registration of project '${this.getId()}' is taking longer than expected.`,
+                );
+                break;
+            }
 
-          console.log(`[${new Date().toISOString()}] Waiting for project '${this.getId()}' to be registered...`);
-          sleep(1000);
-        } 
+            console.log(
+                `[${new Date().toISOString()}] Waiting for project '${this.getId()}' to be registered...`,
+            );
+            await sleep(100);
+        }
         return result ?? -2;
     }
 
@@ -416,24 +432,26 @@ export class ProjEnvProject {
 
     //------------------------------------------------------------------------------
     private async tryToUnregister(projId: string): Promise<number> {
-         const result = await this._pmon.unregisterProject(projId);
+        const result = await this._pmon.unregisterProject(projId);
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
-        let counter : number = 0;
+        let counter: number = 0;
         while (this.isRegistered()) {
-        //   reloadProjectRegistries();
+            //   reloadProjectRegistries();
 
-        //   if (!this.isRegistered()) {
-        //     break;
-        //   }
+            //   if (!this.isRegistered()) {
+            //     break;
+            //   }
 
-          ++counter;
-          if (counter > 5) {
-            console.warn(`[${new Date().toISOString()}] UN-Registration of project ${this.getId()} is taking longer than expected.`);
-            break;
-          }
+            ++counter;
+            if (counter > 5) {
+                console.warn(
+                    `[${new Date().toISOString()}] UN-Registration of project ${this.getId()} is taking longer than expected.`,
+                );
+                break;
+            }
 
-          sleep(1000);
-        } 
+            await sleep(100);
+        }
         return result ?? -2;
     }
 
@@ -904,4 +922,3 @@ export class ProjEnvProject {
     //@private members
     //--------------------------------------------------------------------------------
 }
-
