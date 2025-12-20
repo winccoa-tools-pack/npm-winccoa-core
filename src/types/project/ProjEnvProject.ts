@@ -34,7 +34,7 @@ export class ProjEnvProject {
     //------------------------------------------------------------------------------
     public initFromRegister(registry: ProjEnvProjectRegistry) {
         console.log(
-            `__initFromRegister__, Initializing project from registry: ID=${registry.id}, InstallDir=${registry.installationDir}`,
+            '__initFromRegister__, Initializing project from registry: ', registry
         );
         this.setInstallDir(registry.installationDir);
 
@@ -46,7 +46,10 @@ export class ProjEnvProject {
             );
         }
         this.setName(registry.name ?? registry.id);
-        this.setRunnable(registry.notRunnable !== undefined ? !registry.notRunnable : false);
+
+        if (registry.notRunnable !== undefined)
+          this.setRunnable(!registry.notRunnable);
+
         this.currentProject = registry.currentProject ?? false;
 
         if (this.isRunnable()) {
