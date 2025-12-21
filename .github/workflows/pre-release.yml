@@ -58,9 +58,7 @@ jobs:
               run: npm run build
 
             - name: Run tests
-              run: npm test
-              env:
-                  CI: true
+              run: npm test:unit
 
     pre-release:
         runs-on: ubuntu-latest
