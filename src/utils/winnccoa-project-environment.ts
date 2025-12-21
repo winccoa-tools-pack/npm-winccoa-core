@@ -49,7 +49,7 @@ export async function getRegisteredProjects(): Promise<ProjEnvProject[]> {
 /**Returns all running projects locate on the locale host
  */
 export async function getRunningProjects(): Promise<ProjEnvProject[]> {
-    return (await getRegisteredProjects()).filter((project) => project.isRunning());
+    return (await getRunnableProjects‎()).filter((project) => project.isRunning());
 }
 
 /**Returns all runnable projects locate on the locale host*/
