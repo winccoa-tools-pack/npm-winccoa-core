@@ -25,4 +25,6 @@ We're excited to be part of your development journey. **Happy Coding! 🚀**
 
 • [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
 
+---
+
 <center>Made with ❤️ for and by the WinCC OA community</center>
