@@ -1,9 +1,14 @@
 name: Release
 
 on:
-    pull_request:
-        types: [closed]
-        branches: [main, master]
+    workflow_run:
+        workflows:
+            - "CI/CD Pipeline"
+            - "Integration Tests - WinCC OA"
+        types:
+            - completed
+        branches:
+            - main
     workflow_dispatch:
         inputs:
             release_type:
@@ -25,45 +30,12 @@ permissions:
     issues: write
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-
-        strategy:
-            matrix:
-                node-version: [20.x]
-
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v6
-              with:
-                  fetch-depth: 0
-                  token: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: "npm"
-
-            - name: Install dependencies
-              run: npm install && npm ci
-
-            - name: Build package
-              run: npm run build
-
-            - name: Run tests
-              run: npm test
-              env:
-                  CI: true
-
     release:
         runs-on: ubuntu-latest
-        needs: test
-        # Only run on merged release PRs or manual workflow dispatch
+        # Only run if the triggering workflow succeeded or manual dispatch
         if: |
             github.event_name == 'workflow_dispatch' ||
-            (github.event.pull_request.merged == true &&
-             (startsWith(github.head_ref, 'release/') || contains(github.event.pull_request.labels.*.name, 'release')))
+            github.event.workflow_run.conclusion == 'success'
         outputs:
             version: ${{ steps.release.outputs.version }}
             changelog: ${{ steps.changelog.outputs.changelog }}

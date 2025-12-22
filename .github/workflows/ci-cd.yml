@@ -38,45 +38,10 @@ jobs:
       run: npm run style-check
       
     - name: Run unit tests
-      run: npm run test:unit 2>&1 | tee test-output.txt
+      run: npm run test:unit
       env:
         CI: true
         
-    - name: Test Report Summary
-      if: always()
-      run: |
-        if [ -f test-output.txt ]; then
-          echo "## Test Results - Node ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 10 test-output.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-        fi
-        
-    - name: Comment Test Results on PR
-      if: always() && github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          const output = fs.readFileSync('test-output.txt', 'utf8');
-          const lines = output.split('\n');
-          const summary = lines.slice(-10).join('\n');
-          
-          const body = `## 🧪 Test Results - Node ${{ matrix.node-version }}
-          
-          \`\`\`
-          ${summary}
-          \`\`\`
-          
-          <sub>Workflow run: [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: body
-          });
-
   package:
     runs-on: ubuntu-latest
     needs: test
