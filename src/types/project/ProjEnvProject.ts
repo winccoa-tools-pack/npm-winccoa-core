@@ -1,13 +1,13 @@
 //--------------------------------------------------------------------------------
 
-import { PmonComponent } from '../components/implementations';
-import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
-import { OaLanguage } from '../localization/OaLanguage';
-import { tr } from '../../utils/winccoa-localization';
+import { PmonComponent } from '../components/implementations/PmonComponent.js';
+import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry.js';
+import { OaLanguage } from '../localization/OaLanguage.js';
+import { tr } from '../../utils/winccoa-localization.js';
 import fs from 'fs';
 // import { getComponentName } from "../../utils/winccoa-components"
-import { ProjEnvPmonProjectStatus, ProjEnvPmonStatus } from './ProjEnvPmonStatus';
-import { ProjEnvProjectConfig } from './ProjEnvProjectConfig';
+import { ProjEnvPmonProjectStatus, ProjEnvPmonStatus } from './ProjEnvPmonStatus.js';
+import { ProjEnvProjectConfig } from './ProjEnvProjectConfig.js';
 import {
     ProjEnvProjectRunnable,
     ProjEnvManagerState,
@@ -16,10 +16,10 @@ import {
     ProjEnvManagerInfo,
     ProjEnvProjectFileSysStruct,
     ProjEnvProjectState,
-} from './ProjEnv';
-import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
+} from './ProjEnv.js';
+import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler.js';
 import path from 'path';
-import { sleep } from '../components/implementations/PmonComponent';
+import { sleep } from '../components/implementations/PmonComponent.js';
 
 /**
  * @brief WinCC OA Project class for managing project lifecycle and configuration
