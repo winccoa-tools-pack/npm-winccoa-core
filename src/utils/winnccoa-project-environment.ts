@@ -72,5 +72,5 @@ export default {
     getRunningProjects,
     getRunnableProjects,
     getCurrentProjects,
-    getProjectByProjectPath
+    getProjectByProjectPath,
 };
