@@ -1,5 +1,5 @@
-import { ProjEnvProject } from '../types/project/ProjEnvProject';
-import { getRegisteredProjects as getRegistries } from '../types/project/ProjEnvProjectRegistry';
+import { ProjEnvProject } from '../types/project/ProjEnvProject.js';
+import { getRegisteredProjects as getRegistries } from '../types/project/ProjEnvProjectRegistry.js';
 
 /**
  * Finds and returns the ProjEnvProject instance for a given file or folder path
