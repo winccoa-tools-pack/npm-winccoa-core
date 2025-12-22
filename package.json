@@ -40,9 +40,6 @@
     "tsx": "^4.21.0",
     "typescript": "^5.2.0"
   },
-  "overrides": {
-    "glob": "^9.0.0"
-  },
   "engines": {
     "node": ">=20"
   }
