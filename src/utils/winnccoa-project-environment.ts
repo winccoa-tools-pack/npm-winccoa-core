@@ -7,7 +7,7 @@ import { getRegisteredProjects as getRegistries } from '../types/project/ProjEnv
  * @param selectedPath - The file or folder path to check
  * @returns ProjEnvProject instance if found, undefined otherwise
  */
-export async function findProjectForFile(
+export async function getProjectByProjectPath(
     selectedPath: string,
 ): Promise<ProjEnvProject | undefined> {
     return (await getRegisteredProjects()).find((project: ProjEnvProject) => {
@@ -49,7 +49,7 @@ export async function getRegisteredProjects(): Promise<ProjEnvProject[]> {
 /**Returns all running projects locate on the locale host
  */
 export async function getRunningProjects(): Promise<ProjEnvProject[]> {
-    return (await getRunnableProjects‎()).filter((project) => project.isRunning());
+    return (await getRunnableProjects()).filter((project) => project.isRunning());
 }
 
 /**Returns all runnable projects locate on the locale host*/
@@ -72,5 +72,5 @@ export default {
     getRunningProjects,
     getRunnableProjects,
     getCurrentProjects,
-    findProjectForFile,
+    getProjectByProjectPath
 };
