@@ -1,5 +1,5 @@
 {
-  "name": "@winccoa-tools-pack/core-utils",
+  "name": "@winccoa-tools-pack/npm-shared-library-core",
   "version": "0.1.0",
   "type": "module",
   "author": "winccoa-tools-pack",

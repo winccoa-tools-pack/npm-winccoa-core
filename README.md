@@ -5,7 +5,7 @@ Core utilities and type definitions for WinCC OA development. This library provi
 ## 📦 Installation
 
 ```bash
-npm install @winccoa-tools-pack/core-utils
+npm install @winccoa-tools-pack/npm-shared-library-core
 ```
 
 ## 🚀 Quick Start
@@ -19,7 +19,7 @@ import {
     getRunnableProjects,
     getCurrentProjects,
     findProjectForFile
-} from '@winccoa-tools-pack/core-utils';
+} from '@winccoa-tools-pack/npm-shared-library-core';
 
 // Get all registered projects from the system
 const allProjects = await getRegisteredProjects();
@@ -51,7 +51,7 @@ if (project) {
 ### Managing Individual Projects
 
 ```typescript
-import { ProjEnvProject } from '@winccoa-tools-pack/core-utils';
+import { ProjEnvProject } from '@winccoa-tools-pack/npm-shared-library-core';
 
 // Create and register a new project
 const project = new ProjEnvProject();
@@ -75,7 +75,7 @@ await project.unregisterProj();
 import {
     getAvailableWinCCOAVersions,
     getWinCCOAInstallationPathByVersion
-} from '@winccoa-tools-pack/core-utils';
+} from '@winccoa-tools-pack/npm-shared-library-core';
 
 // Get all installed WinCC OA versions (sorted highest to lowest)
 const versions = getAvailableWinCCOAVersions();
