@@ -45,7 +45,7 @@ that provides core WinCC OA functionality for building automation tools, IDE ext
 ┌─────────────────────────────────────┐
 │   Applications & Extensions         │  ← VS Code Extension, CLI tools, etc.
 ├─────────────────────────────────────┤
-│   @winccoa-tools-pack/npm-shared-library-core    │  ← This library (core functionality)
+│   @winccoa-tools-pack/npm-winccoa-core    │  ← This library (core functionality)
 ├─────────────────────────────────────┤
 │   Node.js Runtime & Platform APIs   │  ← File system, OS detection, etc.
 ├─────────────────────────────────────┤
@@ -102,21 +102,21 @@ import {
     getAvailableWinCCOAVersions,
     parseVersionString,
     compareVersions,
-} from '@winccoa-tools-pack/npm-shared-library-core/utils';
+} from '@winccoa-tools-pack/npm-winccoa-core/utils';
 
 // Types
 import {
     DetailedVersionInfo,
     WinCCOAComponent,
     ComponentType,
-} from '@winccoa-tools-pack/npm-shared-library-core/types';
+} from '@winccoa-tools-pack/npm-winccoa-core/types';
 
 // Core Logic
 import {
     detectProject,
     analyzeComponents,
     validateHealth,
-} from '@winccoa-tools-pack/npm-shared-library-core/core';
+} from '@winccoa-tools-pack/npm-winccoa-core/core';
 ```
 
 ### Module Organization
