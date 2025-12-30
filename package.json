@@ -1,7 +1,6 @@
 {
   "name": "@winccoa-tools-pack/npm-winccoa-core",
   "version": "0.1.0",
-  "type": "module",
   "author": "winccoa-tools-pack",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -12,6 +11,16 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./utils/*": {
+      "import": "./dist/esm/utils/*.js",
+      "require": "./dist/cjs/utils/*.js",
+      "types": "./dist/utils/*.d.ts"
+    },
+    "./types/*": {
+      "import": "./dist/esm/types/*.js",
+      "require": "./dist/cjs/types/*.js",
+      "types": "./dist/types/*.d.ts"
     }
   },
   "files": [
