@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { PmonComponent } from '../../dist/types/components/implementations/PmonComponent.js';
+import { PmonComponent } from '../../src/types/components/implementations/PmonComponent';
 
 test('PmonComponent LIST parsing - parse MGRLIST:LIST output into managers', async () => {
     const __filename = fileURLToPath(import.meta.url);

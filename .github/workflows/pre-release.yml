@@ -226,13 +226,13 @@ jobs:
                       Install the pre-release version:
 
                       ```bash
-                      npm install @winccoa-tools-pack/core-utils@${{ steps.release.outputs.version }}
+                      npm install @winccoa-tools-pack/npm-winccoa-core@${{ steps.release.outputs.version }}
                       ```
 
                       Or with Yarn:
 
                       ```bash
-                      yarn add @winccoa-tools-pack/core-utils@${{ steps.release.outputs.version }}
+                      yarn add @winccoa-tools-pack/npm-winccoa-core@${{ steps.release.outputs.version }}
                       ```
 
                       ### 🔄 Feedback
