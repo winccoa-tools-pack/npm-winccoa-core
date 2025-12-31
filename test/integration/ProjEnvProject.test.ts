@@ -390,4 +390,44 @@ describe('ProjEnvProject (integration)', () => {
             assert.ok(!project.isRunnable(), 'Should not be runnable when notRunnable is true');
         });
     });
+
+    
+
+    describe('Project Languages', () => {
+        it('should get project languages', async () => {
+            await withRunnableTestProject(async (project) => {
+                const languages = project.getLanguages();
+                assert.ok(languages, 'Project languages should be set');
+                assert.ok(languages.length === 2, 'Found two languages in test fixture');
+                assert.ok(
+                    languages.includes(OaLanguage.en_US),
+                    'Project languages should include en_US'
+                );
+                assert.ok(
+                    languages.includes(OaLanguage.de_AT),
+                    'Project languages should include de_AT'
+                );
+            });
+        });
+    });
+
+    describe('Project sub-projects', () => {
+        it('should get sub-project', async () => {
+            await withRunnableTestProject(async (project) => {
+                const subProjects = project.getSubProjects();
+                assert.ok(subProjects, 'Sub-Project should be set');
+                assert.ok(subProjects.length === 2, 'Found two sub-projects in test fixture');
+                assert.strictEqual(
+                    subProjects.at(0)?.getId(),
+                    'TestFramework_' + project.getVersion(),
+                    'First sub-project is the WinCC OA Test Framework'
+                );
+                assert.strictEqual(
+                    subProjects.at(1)?.getId(),
+                    'sub-proj',
+                    'Second sub-project is the sub-proj from our test fixture'
+                );
+            });
+        });
+    });
 });

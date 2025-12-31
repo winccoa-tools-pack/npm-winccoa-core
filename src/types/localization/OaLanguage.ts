@@ -141,3 +141,24 @@ export enum OaLanguage {
     tk_TM = 10090,
     uz_UZ = 10091,
 }
+
+export function OaLanguageFromString(entry: string): OaLanguage {
+    // Parse entry like "de_AT.utf8" to OaLanguage enum
+    // Extract the language code part (before the dot and encoding)
+    const langCode = entry.split('.')[0]; // e.g., "de_AT"
+
+    // Find matching OaLanguage enum value
+    const langValue = Object.entries(OaLanguage).find(([key]) =>
+        key.toLowerCase().startsWith(langCode.toLowerCase().replace('-', '_')),
+    )?.[1];
+
+    if (langValue !== undefined && typeof langValue === 'number') {
+        const language = langValue as OaLanguage;
+        return language;
+    } else {
+        console.warn(
+            `[${new Date().toISOString()}] Warning: Unknown language entry in project config: ${entry}`,
+        );
+        return OaLanguage.undefined;
+    }
+}

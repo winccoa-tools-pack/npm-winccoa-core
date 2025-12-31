@@ -148,12 +148,12 @@ export class ProjEnvProjectConfig {
         }
     }
 
-    public getEntryValue(key: string, _section = 'general'): string {
-        const sectionData: Record<string, string> = this.getSection(_section);
+    public getEntryValue(key: string, _section = 'general'): any {
+        const sectionData: Record<string, any> = this.getSection(_section);
         return sectionData[key];
     }
 
-    private getSection(section: string): Record<string, string> {
+    private getSection(section: string): Record<string, any> {
         const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
         return this.parseConfigSections(content)[section];
     }
@@ -165,7 +165,7 @@ export class ProjEnvProjectConfig {
      */
     private parseConfigSections(content: string): Record<string, Record<string, string>> {
         const lines = content.split('\n');
-        const sections: Record<string, Record<string, string>> = Object.create(null);
+        const sections: Record<string, Record<string, any>> = Object.create(null);
         let currentSection = '';
 
         for (const line of lines) {
@@ -177,7 +177,22 @@ export class ProjEnvProjectConfig {
             } else if (currentSection && trimmedLine.includes('=')) {
                 const [key, ...valueParts] = trimmedLine.split('=');
                 const value = valueParts.join('=').trim().replace(/['"]/g, '');
-                sections[currentSection][key.trim()] = value;
+                const trimmedKey = key.trim();
+                if (sections[currentSection][trimmedKey] !== undefined) {
+                    if (Array.isArray(sections[currentSection][trimmedKey])) {
+                        // already an array, do nothing
+                        const entries = sections[currentSection][trimmedKey] as string[];
+                        entries.push(value);
+                        sections[currentSection][trimmedKey] = entries;
+                    } else {
+                        sections[currentSection][trimmedKey] = [
+                            sections[currentSection][trimmedKey],
+                        ];
+                    }
+                } else {
+                    sections[currentSection][trimmedKey] = value;
+                    sections[currentSection][key.trim()] = value;
+                }
             }
         }
 

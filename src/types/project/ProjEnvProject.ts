@@ -2,7 +2,7 @@
 
 import { PmonComponent } from '../components/implementations';
 import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
-import { OaLanguage } from '../localization/OaLanguage';
+import { OaLanguage, OaLanguageFromString } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
 import fs from 'fs';
 // import { getComponentName } from "../../utils/winccoa-components"
@@ -51,7 +51,20 @@ export class ProjEnvProject {
 
         this.currentProject = registry.currentProject ?? false;
 
+        this._subProjects = [];
+        this._languages = [];
+
         if (this.isRunnable()) {
+            const configPath = this.getConfigPath();
+
+            if (configPath === '') {
+                throw new Error(
+                    'The project config file does not exist for project ' + this.getId(),
+                );
+            }
+
+            this._projectConfigFile.setConfigPath(configPath);
+
             if (registry.installationVersion !== undefined) {
                 console.log(
                     `[${new Date().toISOString()}]`,
@@ -62,6 +75,24 @@ export class ProjEnvProject {
             } else {
                 this.version = this.getProjectVersion();
             }
+
+            // read sub-projects ffrom config file
+            // the last one proj_path entry is the project itself
+            const subProjectsEntries = this._projectConfigFile.getEntryValue('proj_path');
+
+            subProjectsEntries.forEach((entry: string, _idx: number) => {
+                if (entry === this.getDir()) return; // skip self
+
+                const subProj = new ProjEnvProject();
+                subProj.setDir(entry);
+                this._subProjects.push(subProj);
+            });
+
+            // read languages from config file
+            const langEntries = this._projectConfigFile.getEntryValue('langs');
+            langEntries.forEach((entry: string, _idx: number) => {
+                this._languages.push(OaLanguageFromString(entry));
+            });
         }
     }
 
@@ -96,8 +127,6 @@ export class ProjEnvProject {
             const registry = findProjectRegistryById(id);
             if (registry) {
                 this.initFromRegister(registry);
-                // this.installPath = registry.installationDir;
-                // this.version = this.getProjectVersion();
             }
         }
     }
@@ -124,21 +153,7 @@ export class ProjEnvProject {
      * Gets the WinCC OA version from project config file
      */
     private getProjectVersion(): string | undefined {
-        const configPath = this.getConfigPath();
-
-        if (configPath === '') {
-            if (this.isRunnable()) {
-                throw new Error(
-                    'The project config file does not exist for project ' + this.getId(),
-                );
-            }
-            console.log(`[${new Date().toISOString()}]`, 'Config path is empty ' + this.getId());
-            return undefined;
-        }
-
-        const cfg = new ProjEnvProjectConfig(configPath);
-
-        return cfg.getEntryValue('proj_version');
+        return this._projectConfigFile.getEntryValue('proj_version');
     }
 
     //------------------------------------------------------------------------------
@@ -945,6 +960,15 @@ export class ProjEnvProject {
         return normalizedFilePath.startsWith(normalizedProjDir);
     }
 
+    //------------------------------------------------------------------------------
+    /** @brief Function returns sub-projects of this project.
+     * @details In case the project does not contains sub-projects, the function returns an empty array.
+     * @return Array of sub-projects.
+     */
+    public getSubProjects(): ProjEnvProject[] {
+        return this._subProjects;
+    }
+
     //--------------------------------------------------------------------------------
     //@protected members
     //--------------------------------------------------------------------------------
@@ -959,12 +983,18 @@ export class ProjEnvProject {
     // Pmon object to control pmon self.
     protected _pmon: PmonComponent = new PmonComponent();
 
-    // Languages
-    protected _languages: OaLanguage[] = [];
-
     protected _errorHandler: WinCCOAErrorHandler = new WinCCOAErrorHandler();
 
     //--------------------------------------------------------------------------------
     //@private members
     //--------------------------------------------------------------------------------
+
+    // Languages
+    private _languages: OaLanguage[] = [];
+
+    // sub-projects
+    private _subProjects: ProjEnvProject[] = [];
+
+    // project config file handler
+    private _projectConfigFile: ProjEnvProjectConfig = new ProjEnvProjectConfig();
 }
