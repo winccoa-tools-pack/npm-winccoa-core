@@ -5,14 +5,14 @@ import {
     getRunningProjects,
     getRunnableProjects,
     getCurrentProjects,
-} from '../../src/utils/winnccoa-project-environment';
+} from '../../src/utils/winccoa-project-environment';
 import {
     registerRunnableTestProject,
     unregisterTestProject,
 } from '../helpers/test-project-helpers';
 import { ProjEnvProject } from '../../src/types/project/ProjEnvProject';
 
-describe('winnccoa-project-environment (integration)', () => {
+describe('winccoa-project-environment (integration)', () => {
     let testProject: ProjEnvProject | undefined;
 
     afterEach(async () => {
@@ -274,7 +274,7 @@ describe('winnccoa-project-environment (integration)', () => {
 
     describe('Default export', () => {
         it('should export all functions as default object', async () => {
-            const defaultExport = await import('../../src/utils/winnccoa-project-environment');
+            const defaultExport = await import('../../src/utils/winccoa-project-environment');
             
             assert.ok(defaultExport.default, 'Should have default export');
             assert.strictEqual(typeof defaultExport.default.getRegisteredProjects, 'function',
@@ -288,7 +288,7 @@ describe('winnccoa-project-environment (integration)', () => {
         });
 
         it('should work when using default import', async () => {
-            const defaultExport = await import('../../src/utils/winnccoa-project-environment');
+            const defaultExport = await import('../../src/utils/winccoa-project-environment');
             
             const projects = await defaultExport.default.getRegisteredProjects();
             assert.ok(Array.isArray(projects), 'Default export functions should work');

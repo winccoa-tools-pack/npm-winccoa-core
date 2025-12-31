@@ -22,11 +22,11 @@ The repository provides a lightweight bootstrap test entrypoint for unit tests t
 - Command: `npm test`
 - What it does:
   - Runs style checks and the TypeScript build.
-  - Executes `test/core-utils.test.js`, which scans the `test/` folder for `*.test.ts` files and runs them using `ts-node` via `npx`.
+  - Executes `test/npm-winccoa-core.test.js`, which scans the `test/` folder for `*.test.ts` files and runs them using `ts-node` via `npx`.
 
 Notes:
 
-- `test/core-utils.test.js` will attempt to run tests with `npx ts-node --transpile-only <file>` so you don't need to add `ts-node` as a permanent devDependency.
+- `test/npm-winccoa-core.test.js` will attempt to run tests with `npx ts-node --transpile-only <file>` so you don't need to add `ts-node` as a permanent devDependency.
   The first run may install `ts-node` transiently via `npx`, which can be slower.
 - If you prefer to avoid `npx` fetching packages during CI, install `ts-node` as a devDependency and the bootstrap will use the local binary automatically.
 - The bootstrap intentionally skips files in `test/fixtures`.
@@ -34,7 +34,7 @@ Notes:
 Test folder layout
 
 - `test/unit/` — unit tests that do NOT require a WinCC OA installation. These are executed by the
-  `test/core-utils.test.js` bootstrap and are suitable for running on GitHub-hosted runners.
+  `test/npm-winccoa-core.test.js` bootstrap and are suitable for running on GitHub-hosted runners.
 - `test/integration/` — tests that require a real WinCC OA runtime or containerized environment.
   These are not executed by the default `npm test` and should be run by the `integration-winccoa.yml`
   workflow or locally inside the WinCC OA container.

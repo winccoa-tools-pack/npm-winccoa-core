@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { PmonComponent } from '../../dist/types/components/implementations/PmonComponent.js';
+import { PmonComponent } from '../../src/types/components/implementations/PmonComponent';
 
 describe('Pmon CLI parser (examples)', () => {
   it('parses MGRLIST:LIST into manager options', async () => {
