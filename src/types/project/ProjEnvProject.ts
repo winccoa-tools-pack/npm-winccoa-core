@@ -71,6 +71,10 @@ export class ProjEnvProject {
                 this._errorHandler.warning(
                     'The project config file does not exist for project ' + this.getId(),
                 );
+            } else if (!fs.existsSync(configPath)) {
+                this._errorHandler.warning(
+                    `The project config file does not exist for project ${this.getId()}: ${configPath}`
+                );
             } else {
                 this._projectConfigFile.setConfigPath(configPath);
 
@@ -92,6 +96,7 @@ export class ProjEnvProject {
                 // when we have no subpojects
                 if (subProjectsEntries.length > 0) {
                     subProjectsEntries.forEach((entry: string, _idx: number) => {
+                        console.log('Checking sub-project entry:', entry, 'at position', _idx);
                         if (!entry || entry.trim().length === 0) return;
 
                         entry = entry.replace(/\\/g, '/').replace(/\/\//g, '/').toLowerCase();
