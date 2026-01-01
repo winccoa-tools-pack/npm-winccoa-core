@@ -344,19 +344,21 @@ export class ProjEnvProject {
             if (!this.getVersion())
                 return this.format('The project version is empty.\n$1', this.toString('\t'));
 
-            if (this.getLanguages().length === 0)
-                return this.format('The project languages are empty.\n$1', this.toString('\t'));
+            if (this.isRegistered()) {
+                if (this.getLanguages().length === 0)
+                    return this.format('The project languages are empty.\n$1', this.toString('\t'));
 
-            let langIndex = 1;
-            for (const lang of this.getLanguages()) {
-                if (lang === OaLanguage.undefined) {
-                    return this.format(
-                        'The project has an undefined language configured at position $1.\n$2',
-                        langIndex,
-                        this.toString('\t'),
-                    );
+                let langIndex = 1;
+                for (const lang of this.getLanguages()) {
+                    if (lang === OaLanguage.undefined) {
+                        return this.format(
+                            'The project has an undefined language configured at position $1.\n$2',
+                            langIndex,
+                            this.toString('\t'),
+                        );
+                    }
+                    langIndex++;
                 }
-                langIndex++;
             }
         }
         return '';

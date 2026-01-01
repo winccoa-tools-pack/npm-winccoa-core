@@ -126,7 +126,7 @@ describe('winccoa-project-environment (integration)', () => {
             assert.ok(!proj, 'runnable project does not exists per default');
 
             proj = projects.find(p => p.getId().startsWith('DemoApplication_'));
-            assert.ok(proj, 'DemoApplication_<version> project does shall be imstalled');
+            assert.ok(proj, 'DemoApplication_<version> project does shall be installed');
             assert.strictEqual(proj.getId(), 'DemoApplication_' + proj.getVersion(), 'Project should have an ID: runnable');
             assert.ok(proj.isRunnable(), 'The projects DemoApplication_<version> should be runnable');
             assert.ok(proj.isRegistered(), 'The projects DemoApplication_<version> should be registered');
