@@ -77,6 +77,10 @@ export abstract class WinCCOAComponent {
             `[${new Date().toISOString()}] Setting WinCC OA version to ${version} for component ${this.getName()}`,
         );
         this._version = version;
+
+        if (!version) {
+            throw new Error('WinCC OA version must not be empty: ' + this.getName());
+        }
     }
 
     /**
