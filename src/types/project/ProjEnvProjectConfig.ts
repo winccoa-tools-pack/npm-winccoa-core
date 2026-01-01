@@ -156,7 +156,12 @@ export class ProjEnvProjectConfig {
                 console.log('Entry-list found for key:', sectionData[key], key, _section);
                 return sectionData[key] as string[];
             } else {
-                console.log('Wrapping single entry into array for key:', sectionData[key], key, _section);
+                console.log(
+                    'Wrapping single entry into array for key:',
+                    sectionData[key],
+                    key,
+                    _section,
+                );
                 return [sectionData[key] as string];
             }
         }
@@ -168,7 +173,12 @@ export class ProjEnvProjectConfig {
         const sectionData: Record<string, string | string[]> = this.getSection(_section);
         if (sectionData[key] !== undefined) {
             if (Array.isArray(sectionData[key])) {
-                console.log('Joining array entry into single string for key:', sectionData[key], key, _section);
+                console.log(
+                    'Joining array entry into single string for key:',
+                    sectionData[key],
+                    key,
+                    _section,
+                );
                 return sectionData[key].join('\n');
             } else {
                 console.log('Entry found for key:', sectionData[key], key, _section);
@@ -214,9 +224,9 @@ export class ProjEnvProjectConfig {
                 const [key, ...valueParts] = trimmedLine.split('=');
                 const value = valueParts.join('=').trim().replace(/['"]/g, '');
                 const trimmedKey = key.trim();
-                console.log(
-                    `Parsing key="${trimmedKey}" value="${value}" in section [${currentSection}]`,
-                );
+                // console.log(
+                //     `Parsing key="${trimmedKey}" value="${value}" in section [${currentSection}]`,
+                // );
                 // console.log('Current section data before insertion:', sections[currentSection][trimmedKey]);
                 if (sections[currentSection][trimmedKey] !== undefined) {
                     // console.log(`Key "${trimmedKey}" already exists in section [${currentSection}]. Converting to array. Is array:`, Array.isArray(sections[currentSection][trimmedKey]));

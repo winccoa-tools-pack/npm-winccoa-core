@@ -221,11 +221,6 @@ describe('ProjEnvProject (integration)', () => {
             await withRunnableTestProject(async (project) => {
                 try {
                     project.startPmon();
-                    // // Result might be 0 (success) or -1/-2 (already running or error)
-                    // assert.ok(
-                    //     typeof startResult === 'number',
-                    //     'Start pmon should return a number'
-                    // );
 
                     // Check if pmon is running
                     const isRunning = await project.isPmonRunning();
@@ -233,25 +228,11 @@ describe('ProjEnvProject (integration)', () => {
 
                     // Clean up - stop pmon
                     if (isRunning) {
-                        await project.stopPmon();
+                        await project.stopPmon(10);
                     }
                 } catch (error) {
                     console.warn('Pmon lifecycle test partially skipped:', error);
                 }
-            });
-        });
-
-        it('should check pmon running status', async () => {
-            await withRunnableTestProject(async (project) => {
-                const isRunning = await project.isPmonRunning();
-                assert.strictEqual(typeof isRunning, 'boolean', 'isPmonRunning should return boolean');
-
-                const isProjectPmonRunning = await project.isPmonRunningForProject();
-                assert.strictEqual(
-                    typeof isProjectPmonRunning,
-                    'boolean',
-                    'isPmonRunningForProject should return boolean'
-                );
             });
         });
     });

@@ -716,8 +716,8 @@ export class ProjEnvProject {
      * @brief Function stop the Pmon.
      * @return Returns 0 when successful, otherwise -1.
      */
-    public async stopPmon(): Promise<number> {
-        const result = await this._pmon.stopProjectAndPmon(this.getId());
+    public async stopPmon(timeout: number | undefined): Promise<number> {
+        const result = await this._pmon.stopProjectAndPmon(this.getId(), timeout);
         return result ?? -1;
     }
 
@@ -732,15 +732,7 @@ export class ProjEnvProject {
         const result = await this._pmon.getStatus(this.getId());
         return result === ProjEnvPmonStatus.Running;
     }
-    //------------------------------------------------------------------------------
-    /** @brief Function checks if the project has the pmon running.
-     * @details Checks if the pmon is running for this specific project.
-     * @return Returns TRUE when pmon for this project is running on the host, otherwise FALSE.
-     */
-    public async isPmonRunningForProject(): Promise<boolean> {
-        const result = await this._pmon.getStatus(this.getId());
-        return result === ProjEnvPmonStatus.Running;
-    }
+
     //------------------------------------------------------------------------------
     /** @brief Function checks if is the pmon running.
      * @return Returns TRUE when pmon with 'this' project is running on the host, otherwise FALSE.
