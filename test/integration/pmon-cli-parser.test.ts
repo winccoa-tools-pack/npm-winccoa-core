@@ -15,7 +15,10 @@ describe('Pmon CLI parser (examples)', () => {
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
 
-    pmon.setVersion(getAvailableWinCCOAVersions().pop() || '');
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+    console.log(`Registering test project with WinCC OA version: ${testVersion}`);
+    pmon.setVersion(testVersion);
 
     const managers = await pmon.getManagerOptionsList('MyProject');
     assert(Array.isArray(managers));
@@ -35,7 +38,10 @@ describe('Pmon CLI parser (examples)', () => {
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
-    pmon.setVersion(getAvailableWinCCOAVersions().pop() || '');
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+    console.log(`Registering test project with WinCC OA version: ${testVersion}`);
+    pmon.setVersion(testVersion);
 
     const parsed = await pmon.getProjectStatus('MyProject');
     assert(parsed);
