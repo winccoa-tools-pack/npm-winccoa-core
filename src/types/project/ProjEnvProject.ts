@@ -139,7 +139,7 @@ export class ProjEnvProject {
                             `Invalid language entry in project config: ${entry}`,
                         );
                     }
-                    console.log('Checking language entry:', entry, 'at position', _idx, oaLang);
+                    // console.log('Checking language entry:', entry, 'at position', _idx, oaLang);
                     this._languages.push(oaLang);
                 });
             }

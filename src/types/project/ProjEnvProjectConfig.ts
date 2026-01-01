@@ -153,12 +153,14 @@ export class ProjEnvProjectConfig {
         const sectionData: Record<string, string | string[]> = this.getSection(_section);
         if (sectionData[key] !== undefined) {
             if (Array.isArray(sectionData[key])) {
+                console.log('Entry-list found for key:', sectionData[key], key, _section);
                 return sectionData[key] as string[];
             } else {
-                console.log('Wrapping single entry into array for key:', key);
+                console.log('Wrapping single entry into array for key:', sectionData[key], key, _section);
                 return [sectionData[key] as string];
             }
         }
+        console.log('Entry-list not found for key:', key, _section);
         return undefined;
     }
 
@@ -166,12 +168,14 @@ export class ProjEnvProjectConfig {
         const sectionData: Record<string, string | string[]> = this.getSection(_section);
         if (sectionData[key] !== undefined) {
             if (Array.isArray(sectionData[key])) {
-                console.log('Joining array entry into single string for key:', key);
+                console.log('Joining array entry into single string for key:', sectionData[key], key, _section);
                 return sectionData[key].join('\n');
             } else {
+                console.log('Entry found for key:', sectionData[key], key, _section);
                 return sectionData[key] as string;
             }
         }
+        console.log('Entry not found for key:', key, _section);
         return undefined;
     }
 
