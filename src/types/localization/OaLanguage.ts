@@ -3,51 +3,14 @@
 */
 export enum OaLanguage {
     undefined = 65534,
+    // special entries for auto-detection.
+    // this is not valid language codes
+    // it is used in the [general] section as lang="auto" to automatic user language detection
+    // but       NOT in  [general] section as langs="auto"
+    auto = 65533,
 
-    de_AT_iso88591 = 0,
-    en_US_iso88591 = 1,
-    hu_HU_iso88592 = 2,
-    jp_JP_euc = 3,
-    zh_CN_gb2312 = 4,
-    en_GB_iso88591 = 5,
-    nl_NL_iso88591 = 6,
-    tr_TR_iso88599 = 7,
-    it_IT_iso88591 = 8,
-    fr_FR_iso88591 = 9,
-    es_ES_iso88591 = 10,
-    de_DE_iso88591 = 11,
-    el_GR_iso88597 = 12,
-    iw_IL_iso88598 = 13,
-    fr_CA_iso88591 = 14,
-    da_DK_iso88591 = 15,
-    fi_FI_iso88591 = 16,
-    no_NO_iso88591 = 17,
-    pt_PT_iso88591 = 18,
-    sv_SE_iso88591 = 19,
-    is_IS_iso88591 = 20,
-    cs_CZ_iso88592 = 21,
-    pl_PL_iso88592 = 22,
-    ro_RO_iso88592 = 23,
-    hr_HR_iso88592 = 24,
-    sk_SK_iso88592 = 25,
-    sl_SI_iso88592 = 26,
-    ru_RU_iso88595 = 27,
-    bg_BG_iso88595 = 28,
-    ar_SA_iso88596 = 29,
-    zh_TW_big5 = 30,
-    ko_KR_CP949 = 31,
-    ja_JP_sjis = 32,
-    th_TH_CP874 = 33,
-    de_CH_iso88591 = 34,
-    fr_CH_iso88591 = 35,
-    it_CH_iso88591 = 36,
-    fa_IR = 37,
-    vi_VN_tcvn = 38,
-    id_ID_iso88591 = 39,
-    lt_LT_iso885913 = 40,
     posix = 254,
     meta_iso88591 = 255,
-    neutral_iso88591 = 65535,
 
     de_AT = 10000,
     en_US = 10001,
@@ -143,14 +106,28 @@ export enum OaLanguage {
 }
 
 export function OaLanguageFromString(entry: string): OaLanguage {
+    if (!entry || entry.trim().length === 0) {
+        console.warn(`[${new Date().toISOString()}] Warning: Empty language entry given`);
+        return OaLanguage.undefined;
+    }
+
+    if (entry.toLowerCase() === 'auto') {
+        return OaLanguage.auto;
+    }
+
+    if (!entry.endsWith('.utf8')) {
+        console.warn(
+            `[${new Date().toISOString()}] Warning: Unexpected language entry format. Only .utf8 languages are supported: ${entry}`,
+        );
+        return OaLanguage.undefined;
+    }
+
     // Parse entry like "de_AT.utf8" to OaLanguage enum
     // Extract the language code part (before the dot and encoding)
     const langCode = entry.split('.')[0]; // e.g., "de_AT"
 
     // Find matching OaLanguage enum value
-    const langValue = Object.entries(OaLanguage).find(([key]) =>
-        key.toLowerCase().startsWith(langCode.toLowerCase().replace('-', '_')),
-    )?.[1];
+    const langValue = Object.entries(OaLanguage).find(([key]) => key === langCode)?.[1];
 
     if (langValue !== undefined && typeof langValue === 'number') {
         const language = langValue as OaLanguage;

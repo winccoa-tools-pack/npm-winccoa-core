@@ -400,13 +400,15 @@ describe('ProjEnvProject (integration)', () => {
                 const languages = project.getLanguages();
                 assert.ok(languages, 'Project languages should be set');
                 assert.strictEqual(languages.length, 2, 'Found two languages in test fixture');
-                assert.ok(
-                    languages.includes(OaLanguage.en_US),
-                    'Project languages should include en_US'
-                );
-                assert.ok(
-                    languages.includes(OaLanguage.de_AT),
+                assert.strictEqual(
+                    languages.at(0),
+                    OaLanguage.de_AT,
                     'Project languages should include de_AT'
+                );
+                assert.strictEqual(
+                    languages.at(1),
+                    OaLanguage.en_US,
+                    'Project languages should include en_US'
                 );
             });
         });

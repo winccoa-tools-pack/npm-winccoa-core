@@ -132,8 +132,15 @@ export class ProjEnvProject {
                 const langEntries =
                     (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
                 langEntries.forEach((entry: string, _idx: number) => {
-                    console.log('Checking language entry:', entry, 'at position', _idx);
-                    this._languages.push(OaLanguageFromString(entry));
+                    const oaLang = OaLanguageFromString(entry);
+                    if (oaLang === OaLanguage.undefined || oaLang === OaLanguage.auto) {
+                        console.warn(
+                            `[${new Date().toISOString()}]`,
+                            `Invalid language entry in project config: ${entry}`,
+                        );
+                    }
+                    console.log('Checking language entry:', entry, 'at position', _idx, oaLang);
+                    this._languages.push(oaLang);
                 });
             }
         }

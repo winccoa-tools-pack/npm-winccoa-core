@@ -1,9 +1,9 @@
 [general]
-pvss_path = "<WinCC_OA_PATH>"
-proj_path = "<WinCC_OA_PATH>/TestFramework_<WinCC_OA_VERSION>"
+pvss_path = "C:/Program Files/Siemens/WinCC_OA/3.21"
+#proj_path = "C:\Program Files\Siemens\WinCC_OA\3.21\/TestFramework_3.21"
 proj_path = "C:/ws/oa-tools-pack/npm-winccoa-core/test/fixtures/projects/sub-proj"
 proj_path = "C:/ws/oa-tools-pack/npm-winccoa-core/test/fixtures/projects/runnable"
-proj_version = "<WinCC_OA_VERSION>"
+proj_version = "3.21"
 
 lang = "auto"
 langs = "de_AT.utf8"

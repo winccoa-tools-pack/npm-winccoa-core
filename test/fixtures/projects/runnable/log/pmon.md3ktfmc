@@ -169,3 +169,129 @@ WCCILpmon    (1), 2025.12.20 21:59:28.328, SYS,  INFO,        3/pmon, Erhielt sh
 WCCILpmon    (1), 2025.12.20 21:59:28.330, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
 WCCILpmon    (1), 2025.12.20 21:59:28.332, SYS,  INFO,        2, Manager Stop
 WCCILpmon    (1), 2025.12.20 22:02:19.851, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 13:23:05.556, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 13:23:05.691, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 13:23:05.705, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 13:23:05.707, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 13:24:44.629, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 13:24:44.746, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 13:24:44.748, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 13:24:44.749, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 13:29:33.946, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 13:29:34.075, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 13:29:34.078, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 13:29:34.079, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 13:31:51.551, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 13:31:51.664, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 13:31:51.667, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 13:31:51.669, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 13:32:56.041, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 13:32:56.164, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 13:32:56.166, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 13:32:56.167, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 13:40:42.020, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 14:59:47.694, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 14:59:47.711, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 14:59:47.713, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:15:47.667, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:15:47.795, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:15:47.809, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:15:47.812, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:24:41.512, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:24:41.631, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:24:41.643, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:24:41.644, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:36:31.699, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:36:31.720, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 15:36:31.731, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 15:37:10.328, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:37:10.330, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:37:10.332, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:40:00.419, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:40:00.546, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:40:00.548, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:40:00.549, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:41:43.537, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:41:43.663, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:41:43.665, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:41:43.666, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:45:16.472, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:45:16.591, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:45:16.593, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:45:16.594, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:48:57.828, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:48:57.841, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 15:48:57.844, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 15:52:27.887, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:52:27.891, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:52:27.892, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 15:52:35.648, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 15:52:35.672, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 15:52:35.674, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 15:59:31.846, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 15:59:31.850, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 15:59:31.851, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:02:55.746, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:02:55.766, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 16:02:55.769, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 16:03:03.100, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:03:03.101, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:03:03.103, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:07:43.670, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:07:43.785, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:07:43.796, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:07:43.798, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:11:14.578, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:11:14.695, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:11:14.698, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:11:14.699, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:45:51.926, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:45:52.269, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:45:52.285, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:45:52.287, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:49:41.322, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:49:41.551, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:49:41.553, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:49:41.555, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:53:20.772, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:53:20.794, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 16:53:20.814, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 16:53:30.498, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:53:30.499, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:53:30.500, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 16:59:53.921, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 16:59:54.148, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 16:59:54.151, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 16:59:54.152, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 17:08:17.631, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 17:08:17.645, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 17:08:17.661, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 17:08:27.997, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 17:08:28.003, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 17:08:28.006, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 18:45:49.381, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 18:45:49.514, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 18:45:49.534, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 18:45:49.536, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 19:04:23.674, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 19:04:23.789, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 19:04:23.791, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 19:04:23.792, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 19:06:31.724, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 19:06:31.783, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 19:06:31.787, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 19:06:39.955, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 19:06:39.956, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 19:06:39.957, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 19:11:32.511, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 19:11:32.527, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 19:11:32.531, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 19:11:39.753, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 19:11:39.754, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 19:11:39.756, SYS,  INFO,        2, Manager Stop
+WCCILpmon    (1), 2026.01.01 19:13:26.793, SYS,  INFO,        1, Manager Start, WAIT_MODE
+WCCILpmon    (1), 2026.01.01 19:13:27.192, SYS,  INFO,       20/pmon, Erhielt START_ALL Befehl von 127.0.0.1, starte das Projekt
+WCCILpmon    (1), 2026.01.01 19:13:27.195, SYS,  INFO,        9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
+WCCILpmon    (1), 2026.01.01 19:13:35.299, SYS,  INFO,        3/pmon, Erhielt shutdown Befehl - stoppe das Projekt und beende mich
+WCCILpmon    (1), 2026.01.01 19:13:35.300, SYS,  INFO,       15/pmon, Projekt wurde komplett gestoppt - beende mich
+WCCILpmon    (1), 2026.01.01 19:13:35.301, SYS,  INFO,        2, Manager Stop
