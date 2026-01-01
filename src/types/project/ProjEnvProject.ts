@@ -185,6 +185,7 @@ export class ProjEnvProject {
             return;
         }
         this.version = version;
+        this._pmon.setVersion(this.version ?? '');
     }
 
     //------------------------------------------------------------------------------
