@@ -418,18 +418,6 @@ describe('ProjEnvProject (integration)', () => {
     describe('Project sub-projects', () => {
         it('should get sub-project', async () => {
 
-            const projectPath = getTestProjectPath('sub-proj');
-            const project = new ProjEnvProject();
-            
-            // Set project directory (this sets both install dir and project ID)
-            project.setRunnable(false);
-            project.setDir(projectPath);
-            project.setName('test-sub-project');
-            const availableVersions = getAvailableWinCCOAVersions();
-            const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
-            project.setVersion(testVersion);
-            await project.registerProj();
-
             await withRunnableTestProject(async (project) => {
                 const subProjects = project.getSubProjects();
                 assert.ok(subProjects, 'Sub-Project should be set');

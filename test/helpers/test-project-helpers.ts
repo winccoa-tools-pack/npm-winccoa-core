@@ -133,11 +133,28 @@ export async function withRunnableTestProject(
     testFn: (project: ProjEnvProject) => Promise<void>
 ): Promise<void> {
     let project: ProjEnvProject | undefined;
+    let subProject: ProjEnvProject | undefined;
 
     try {
+
+        const projectPath = getTestProjectPath('sub-proj');
+        subProject = new ProjEnvProject();
+                    
+        // Set project directory (this sets both install dir and project ID)
+        subProject.setRunnable(false);
+        subProject.setDir(projectPath);
+        subProject.setName('test-sub-project');
+        const availableVersions = getAvailableWinCCOAVersions();
+        const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+        subProject.setVersion(testVersion);
+        await subProject.registerProj();
+
         project = await registerRunnableTestProject();
         await testFn(project);
     } finally {
+        if (subProject) {
+            await unregisterTestProject(subProject);
+        }
         if (project) {
             await unregisterTestProject(project);
         }
