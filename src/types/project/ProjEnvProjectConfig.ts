@@ -49,6 +49,7 @@ export class ProjEnvProjectConfig {
         }
 
         // Normalize to native path style
+        this.loaded = false;
         this._configFilePath = path.resolve(configFilePath);
     }
 
@@ -174,9 +175,17 @@ export class ProjEnvProjectConfig {
         return undefined;
     }
 
+    private loaded: boolean = false;
+    private sections: Record<string, Record<string, string | string[]>> = {};
+
     private getSection(section: string): Record<string, string | string[]> {
-        const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
-        return this.parseConfigSections(content)[section];
+        if (!this.loaded) {
+            const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
+            this.sections = this.parseConfigSections(content);
+            this.loaded = true;
+        }
+
+        return this.sections[section];
     }
 
     /**
@@ -207,17 +216,16 @@ export class ProjEnvProjectConfig {
                 // console.log('Current section data before insertion:', sections[currentSection][trimmedKey]);
                 if (sections[currentSection][trimmedKey] !== undefined) {
                     // console.log(`Key "${trimmedKey}" already exists in section [${currentSection}]. Converting to array. Is array:`, Array.isArray(sections[currentSection][trimmedKey]));
-                    if (Array.isArray(sections[currentSection][trimmedKey])) {
-                        // already an array, do nothing
-                        const entries = sections[currentSection][trimmedKey] as string[];
-                        entries.push(value);
-                        sections[currentSection][trimmedKey] = entries;
-                    } else {
+                    if (!Array.isArray(sections[currentSection][trimmedKey])) {
                         console.log(`Converting existing entry to array for key "${trimmedKey}"`);
                         sections[currentSection][trimmedKey] = [
                             sections[currentSection][trimmedKey],
                         ];
                     }
+
+                    const entries = sections[currentSection][trimmedKey] as string[];
+                    entries.push(value);
+                    sections[currentSection][trimmedKey] = entries;
                 } else {
                     sections[currentSection][trimmedKey] = value;
                 }
@@ -238,6 +246,8 @@ export class ProjEnvProjectConfig {
             if (this.throwErrors) throw new Error('Config path is not set');
             return;
         }
+
+        this.loaded = false;
 
         // Ensure general section exists and is first
         if (!sections['general']) sections['general'] = Object.create(null);
