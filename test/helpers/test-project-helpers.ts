@@ -119,13 +119,11 @@ export async function unregisterTestProject(project: ProjEnvProject): Promise<vo
             await project.stop();
         }
 
-        let subProject: ProjEnvProject | undefined;
-        const registry = findProjectRegistryById('sub-proj');
-        if (registry) {
-            subProject = new ProjEnvProject();
-            subProject.initFromRegister(registry);
-            await unregisterTestProject(subProject);
-        }
+        const subProject = new ProjEnvProject();
+        subProject.setId('sub-proj');
+        subProject.setRunnable(false);
+        subProject.setVersion(project.getVersion() || '');
+        await subProject.unregisterProj();
 
         // Unregister the project
         await project.unregisterProj();
