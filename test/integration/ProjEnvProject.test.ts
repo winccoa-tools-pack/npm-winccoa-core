@@ -421,7 +421,6 @@ describe('ProjEnvProject (integration)', () => {
             await withRunnableTestProject(async (project) => {
                 const subProjects = project.getSubProjects();
                 assert.ok(subProjects, 'Sub-Project should be set');
-                assert.strictEqual(subProjects.length, 2, 'Found two sub-projects in test fixture');
                 assert.strictEqual(
                     subProjects.at(0)?.getId(),
                     'TestFramework_' + project.getVersion(),
@@ -432,6 +431,8 @@ describe('ProjEnvProject (integration)', () => {
                     'sub-proj',
                     'Second sub-project is the sub-proj from our test fixture'
                 );
+                assert.strictEqual(subProjects.length, 2, 'Found two sub-projects in test fixture');
+                
             });
         });
     });
