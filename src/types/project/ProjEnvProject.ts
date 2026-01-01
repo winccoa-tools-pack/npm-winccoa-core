@@ -182,7 +182,6 @@ export class ProjEnvProject {
     public setVersion(version: string): void {
         if (!version) {
             throw new Error('Project version must not be empty: ' + this.getId());
-            return;
         }
         this.version = version;
         this._pmon.setVersion(this.version ?? '');
@@ -970,8 +969,6 @@ export class ProjEnvProject {
     //@private members
     //--------------------------------------------------------------------------------
 }
-
-
 
 const sleep = async (ms: number): Promise<void> => {
     return new Promise((resolve) => setTimeout(resolve, ms));

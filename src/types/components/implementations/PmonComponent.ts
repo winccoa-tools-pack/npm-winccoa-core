@@ -328,9 +328,9 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
     }
 
     /** Converts pmon exit code to ProjEnvPmonStatus
-     * 
-     * @param code 
-     * @returns 
+     *
+     * @param code
+     * @returns
      */
     private pmonStateCodeToStatus(code: number): ProjEnvPmonStatus {
         console.log('Pmon status code:', code);

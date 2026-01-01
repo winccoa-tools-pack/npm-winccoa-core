@@ -6,9 +6,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { spawn } from 'child_process';
-import {
-    getWinCCOAInstallationPathByVersion,
-} from '../../utils/winccoa-paths.js';
+import { getWinCCOAInstallationPathByVersion } from '../../utils/winccoa-paths.js';
 import { randomUUID } from 'crypto';
 
 /*
@@ -97,17 +95,23 @@ export abstract class WinCCOAComponent {
      * @throws Error when specified version is not found on system
      */
     public getPath(version?: string): string | null {
-
         const exe = this.getExecutableName();
         const versionToUse = version ? version : this._version;
 
         if (!versionToUse) {
-            throw new Error('WinCC OA version must be specified to locate component ' + this.getName());
+            throw new Error(
+                'WinCC OA version must be specified to locate component ' + this.getName(),
+            );
         }
 
         const base = getWinCCOAInstallationPathByVersion(versionToUse);
         if (!base) {
-            throw new Error('WinCC OA version ' + versionToUse + ' not found on system to locate component ' + this.getName());
+            throw new Error(
+                'WinCC OA version ' +
+                    versionToUse +
+                    ' not found on system to locate component ' +
+                    this.getName(),
+            );
         }
 
         const candidate = path.join(base, 'bin', exe);
@@ -119,7 +123,7 @@ export abstract class WinCCOAComponent {
         if (fs.existsSync(candidate + '.exe')) {
             return candidate + '.exe';
         }
-        
+
         return null;
     }
 
