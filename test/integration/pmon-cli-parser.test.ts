@@ -4,6 +4,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { PmonComponent } from '../../src/types/components/implementations/PmonComponent';
+import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
 
 describe('Pmon CLI parser (examples)', () => {
   it('parses MGRLIST:LIST into manager options', async () => {
@@ -13,6 +14,11 @@ describe('Pmon CLI parser (examples)', () => {
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
+
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+    console.log(`Registering test project with WinCC OA version: ${testVersion}`);
+    pmon.setVersion(testVersion);
 
     const managers = await pmon.getManagerOptionsList('MyProject');
     assert(Array.isArray(managers));
@@ -32,6 +38,10 @@ describe('Pmon CLI parser (examples)', () => {
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+    console.log(`Registering test project with WinCC OA version: ${testVersion}`);
+    pmon.setVersion(testVersion);
 
     const parsed = await pmon.getProjectStatus('MyProject');
     assert(parsed);

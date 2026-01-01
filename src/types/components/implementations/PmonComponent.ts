@@ -10,10 +10,16 @@ import type { ProjEnvManagerInfo } from '../../project/ProjEnv.js';
 import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus.js';
 
 export class PmonComponent extends WinCCOAComponent {
+    /**
+     * Returns the component name
+     */
     public getName(): string {
         return 'WCCILpmon';
     }
 
+    /**
+     * Returns the component description
+     */
     public getDescription(): string {
         return 'Process Monitor';
     }
@@ -26,8 +32,6 @@ export class PmonComponent extends WinCCOAComponent {
     public async registerSubProject(projectPath: string): Promise<number> {
         const args = ['-regsubf', '-proj', projectPath, '-log', '+stderr'];
         const code = super.start(args);
-
-        sleep(2000); // wait a second to let the registry update
 
         return code;
     }
@@ -58,7 +62,8 @@ export class PmonComponent extends WinCCOAComponent {
         }
         // Use -config -autofreg -status options to register runnable project
         const args = ['-config', configPath, '-log', '+stderr', '-autofreg', '-status'];
-        const code = super.start(args, { version: projectVersion });
+        super.setVersion(projectVersion);
+        const code = super.start(args);
 
         // the pmon returns 3 if the project is not running after registrations
 
@@ -79,17 +84,6 @@ export class PmonComponent extends WinCCOAComponent {
         const code = super.start(args);
 
         return this.pmonStateCodeToStatus(await code);
-    }
-
-    private pmonStateCodeToStatus(code: number): ProjEnvPmonStatus {
-        console.log('Pmon status code:', code);
-        let status: ProjEnvPmonStatus = ProjEnvPmonStatus.Unknown;
-
-        if (code === 0) status = ProjEnvPmonStatus.Running;
-        else if (code === 3) status = ProjEnvPmonStatus.NotRunning;
-        else status = ProjEnvPmonStatus.Unknown;
-
-        return status;
     }
 
     /**
@@ -247,6 +241,11 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return super.start(args);
     }
 
+    /** Inserts a manager at a specific index into project
+     * @param options Manager options
+     * @param projectName Project name
+     * @param managerIndex Index to insert at
+     */
     public async insertManagerAt(
         options: ProjEnvManagerOptions,
         projectName: string,
@@ -268,6 +267,11 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return super.start(args);
     }
 
+    /** Sends a debug flag to a specific manager
+     * @param flag Debug flag to send (e.g., '-dbg http', '-dbg all')
+     * @param projectName Project name
+     * @param managerIndex Manager index
+     */
     public async sendDebugFlag(
         flag: string,
         projectName: string,
@@ -321,6 +325,22 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
 
         // No cached data and no project specified
         return undefined;
+    }
+
+    /** Converts pmon exit code to ProjEnvPmonStatus
+     *
+     * @param code
+     * @returns
+     */
+    private pmonStateCodeToStatus(code: number): ProjEnvPmonStatus {
+        console.log('Pmon status code:', code);
+        let status: ProjEnvPmonStatus = ProjEnvPmonStatus.Unknown;
+
+        if (code === 0) status = ProjEnvPmonStatus.Running;
+        else if (code === 3) status = ProjEnvPmonStatus.NotRunning;
+        else status = ProjEnvPmonStatus.Unknown;
+
+        return status;
     }
 
     // Private parser for manager list output
@@ -584,6 +604,3 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return state;
     }
 }
-export const sleep = async (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
