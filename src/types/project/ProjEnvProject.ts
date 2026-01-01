@@ -2,7 +2,7 @@
 
 import { PmonComponent } from '../components/implementations';
 import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
-import { OaLanguage } from '../localization/OaLanguage';
+import { OaLanguage, OaLanguageFromString } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
 import fs from 'fs';
 // import { getComponentName } from "../../utils/winccoa-components"
@@ -37,18 +37,22 @@ export class ProjEnvProject {
         // );
         this.setInstallDir(registry.installationDir);
 
-        if (!this.getId() || registry.id != this.getId()) {
+        if (registry.id) {
+            if (this.getId() && this.getId() !== registry.id) {
+                this._errorHandler.warning(
+                    `Project ID mismatch during initFromRegister: expected '${this.getId()}', got '${registry.id}'. We will use '${registry.id}'.`,
+                );
+            }
             this._id = registry.id;
-        } else {
-            throw new Error(
-                `Project ID mismatch during initFromRegister: expected ${this.getId()}, got ${registry.id}`,
-            );
         }
         this.setName(registry.name ?? registry.id);
 
         if (registry.notRunnable !== undefined) this.setRunnable(!registry.notRunnable);
 
         this.currentProject = registry.currentProject ?? false;
+
+        this._subProjects = [];
+        this._languages = [];
 
         if (this.isRunnable()) {
             if (registry.installationVersion !== undefined) {
@@ -57,12 +61,88 @@ export class ProjEnvProject {
                     this.getId() +
                         ` Setting project version from registry: ${registry.installationVersion}`,
                 );
-                this.version = registry.installationVersion;
-            } else {
-                this.version = this.getProjectVersion();
+                this.setVersion(registry.installationVersion);
             }
 
-            this._pmon.setVersion(this.version ?? '');
+            // try to get other project properties from config file
+            const configPath = this.getConfigPath();
+
+            if (configPath === '') {
+                this._errorHandler.warning(
+                    'The project config file does not exist for project ' + this.getId(),
+                );
+            } else if (!fs.existsSync(configPath)) {
+                this._errorHandler.warning(
+                    `The project config file does not exist for project ${this.getId()}: ${configPath}`,
+                );
+            } else {
+                this._projectConfigFile.setConfigPath(configPath);
+
+                const projectVersion = this.getProjectVersion();
+
+                if (projectVersion && this.getVersion() && projectVersion !== this.getVersion()) {
+                    this._errorHandler.warning(
+                        `Project version mismatch between registry and config file for project ${this.getId()}: registry=${this.getVersion()}, config=${projectVersion}`,
+                    );
+                }
+
+                // read sub-projects from config file
+                // the last one proj_path entry is the project itself
+                const subProjectsEntries =
+                    (this._projectConfigFile.getEntryValueList('proj_path') as string[]) || [];
+
+                // check for sub-project entries on windows paths may take a while
+                // the last one is always the project itself, therefoee we skip it
+                // when we have no subpojects
+                if (subProjectsEntries.length > 0) {
+                    subProjectsEntries.forEach((entry: string, _idx: number) => {
+                        console.log('Checking sub-project entry:', entry, 'at position', _idx);
+                        if (!entry || entry.trim().length === 0) return;
+
+                        const origEntry = entry;
+                        entry = entry.replace(/\\/g, '/').replace(/\/\//g, '/').toLowerCase();
+
+                        if (!entry.endsWith('/')) {
+                            entry += '/';
+                        }
+
+                        const myDir = this.getDir()
+                            .replace(/\\/g, '/')
+                            .replace(/\/\//g, '/')
+                            .toLowerCase();
+                        console.log(
+                            `[${new Date().toISOString()}]`,
+                            `Found sub-project entry in config: ${entry}, my dir is ${this.getDir()}`,
+                        );
+                        if (entry.toLowerCase() === myDir) {
+                            console.log(
+                                `[${new Date().toISOString()}]`,
+                                `Skipping sub-project entry that matches self project dir`,
+                            );
+                            return; // skip self
+                        }
+
+                        const subProj = new ProjEnvProject();
+                        subProj.setDir(origEntry);
+                        this._subProjects.push(subProj);
+                    });
+                }
+
+                // read languages from config file
+                const langEntries =
+                    (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
+                langEntries.forEach((entry: string, _idx: number) => {
+                    const oaLang = OaLanguageFromString(entry);
+                    if (oaLang === OaLanguage.undefined || oaLang === OaLanguage.auto) {
+                        console.warn(
+                            `[${new Date().toISOString()}]`,
+                            `Invalid language entry in project config: ${entry}`,
+                        );
+                    }
+                    // console.log('Checking language entry:', entry, 'at position', _idx, oaLang);
+                    this._languages.push(oaLang);
+                });
+            }
         }
     }
 
@@ -97,8 +177,6 @@ export class ProjEnvProject {
             const registry = findProjectRegistryById(id);
             if (registry) {
                 this.initFromRegister(registry);
-                // this.installPath = registry.installationDir;
-                // this.version = this.getProjectVersion();
             }
         }
     }
@@ -125,21 +203,7 @@ export class ProjEnvProject {
      * Gets the WinCC OA version from project config file
      */
     private getProjectVersion(): string | undefined {
-        const configPath = this.getConfigPath();
-
-        if (configPath === '') {
-            if (this.isRunnable()) {
-                throw new Error(
-                    'The project config file does not exist for project ' + this.getId(),
-                );
-            }
-            console.log(`[${new Date().toISOString()}]`, 'Config path is empty ' + this.getId());
-            return undefined;
-        }
-
-        const cfg = new ProjEnvProjectConfig(configPath);
-
-        return cfg.getEntryValue('proj_version');
+        return this._projectConfigFile.getEntryValue('proj_version');
     }
 
     //------------------------------------------------------------------------------
@@ -323,8 +387,27 @@ export class ProjEnvProject {
         if (!this.getName())
             return this.format('The project name is empty.\n$1', this.toString('\t'));
 
-        if (this.isRunnable() && !this.getVersion())
-            return this.format('The project version is empty.\n$1', this.toString('\t'));
+        if (this.isRunnable()) {
+            if (!this.getVersion())
+                return this.format('The project version is empty.\n$1', this.toString('\t'));
+
+            if (this.isRegistered()) {
+                if (this.getLanguages().length === 0)
+                    return this.format('The project languages are empty.\n$1', this.toString('\t'));
+
+                let langIndex = 1;
+                for (const lang of this.getLanguages()) {
+                    if (lang === OaLanguage.undefined) {
+                        return this.format(
+                            'The project has an undefined language configured at position $1.\n$2',
+                            langIndex,
+                            this.toString('\t'),
+                        );
+                    }
+                    langIndex++;
+                }
+            }
+        }
         return '';
     }
 
@@ -366,7 +449,7 @@ export class ProjEnvProject {
 
         if (!this.isValid()) this._errorHandler.exception(this.getInvalidReason());
 
-        const configFile = this.getConfigPath('config');
+        const configFile = this.isRunnable() ? this.getConfigPath('config') : this.getDir();
 
         if (!configFile) {
             this._errorHandler.severe(
@@ -379,10 +462,23 @@ export class ProjEnvProject {
 
         try {
             result = await this.tryToRegister(configFile);
-        } catch (error) {
-            console.warn(`First attempt to register project ${this.getId()} failed:`, error);
+        } catch (error: any) {
+            this._errorHandler.warning(
+                `First attempt to register project ${this.getId()} failed: ${error.toString()}`,
+            );
             // retry once if registration fails
             result = await this.tryToRegister(configFile);
+        }
+
+        if (result === 0) {
+            const registry = findProjectRegistryById(this.getId());
+            if (registry) {
+                this.initFromRegister(registry);
+            } else {
+                this._errorHandler.warning(
+                    `Project ${this.getId()} registered successfully but could not find registry entry afterwards.`,
+                );
+            }
         }
 
         return result ?? -2;
@@ -406,7 +502,9 @@ export class ProjEnvProject {
      * @returns 0 on success, -2 on timeout or failure
      */
     private async tryToRegister(configFile: string): Promise<number> {
-        const result = await this._pmon.registerProject(configFile, this.getVersion() ?? '');
+        const result = this.isRunnable()
+            ? await this._pmon.registerProject(configFile, this.getVersion() ?? '')
+            : await this._pmon.registerSubProject(configFile);
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
         let counter: number = 0;
         while (!this.isRegistered()) {
@@ -618,8 +716,8 @@ export class ProjEnvProject {
      * @brief Function stop the Pmon.
      * @return Returns 0 when successful, otherwise -1.
      */
-    public async stopPmon(): Promise<number> {
-        const result = await this._pmon.stopProjectAndPmon(this.getId());
+    public async stopPmon(timeout: number | undefined): Promise<number> {
+        const result = await this._pmon.stopProjectAndPmon(this.getId(), timeout);
         return result ?? -1;
     }
 
@@ -634,15 +732,7 @@ export class ProjEnvProject {
         const result = await this._pmon.getStatus(this.getId());
         return result === ProjEnvPmonStatus.Running;
     }
-    //------------------------------------------------------------------------------
-    /** @brief Function checks if the project has the pmon running.
-     * @details Checks if the pmon is running for this specific project.
-     * @return Returns TRUE when pmon for this project is running on the host, otherwise FALSE.
-     */
-    public async isPmonRunningForProject(): Promise<boolean> {
-        const result = await this._pmon.getStatus(this.getId());
-        return result === ProjEnvPmonStatus.Running;
-    }
+
     //------------------------------------------------------------------------------
     /** @brief Function checks if is the pmon running.
      * @return Returns TRUE when pmon with 'this' project is running on the host, otherwise FALSE.
@@ -946,6 +1036,15 @@ export class ProjEnvProject {
         return normalizedFilePath.startsWith(normalizedProjDir);
     }
 
+    //------------------------------------------------------------------------------
+    /** @brief Function returns sub-projects of this project.
+     * @details In case the project does not contains sub-projects, the function returns an empty array.
+     * @return Array of sub-projects.
+     */
+    public getSubProjects(): ProjEnvProject[] {
+        return this._subProjects;
+    }
+
     //--------------------------------------------------------------------------------
     //@protected members
     //--------------------------------------------------------------------------------
@@ -960,14 +1059,20 @@ export class ProjEnvProject {
     // Pmon object to control pmon self.
     protected _pmon: PmonComponent = new PmonComponent();
 
-    // Languages
-    protected _languages: OaLanguage[] = [];
-
     protected _errorHandler: WinCCOAErrorHandler = new WinCCOAErrorHandler();
 
     //--------------------------------------------------------------------------------
     //@private members
     //--------------------------------------------------------------------------------
+
+    // Languages
+    private _languages: OaLanguage[] = [];
+
+    // sub-projects
+    private _subProjects: ProjEnvProject[] = [];
+
+    // project config file handler
+    private _projectConfigFile: ProjEnvProjectConfig = new ProjEnvProjectConfig();
 }
 
 const sleep = async (ms: number): Promise<void> => {

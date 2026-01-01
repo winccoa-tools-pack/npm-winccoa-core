@@ -124,9 +124,12 @@ export class PmonComponent extends WinCCOAComponent {
     /**
      * Stops all managers and exits pmon
      */
-    public async stopProjectAndPmon(projectName: string): Promise<number> {
+    public async stopProjectAndPmon(
+        projectName: string,
+        timeout: number | undefined,
+    ): Promise<number> {
         const args = ['-proj', projectName, '-stopWait'];
-        return super.start(args);
+        return super.start(args, { timeout: timeout });
     }
 
     /**
