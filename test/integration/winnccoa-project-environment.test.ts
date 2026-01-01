@@ -11,6 +11,7 @@ import {
     unregisterTestProject,
 } from '../helpers/test-project-helpers';
 import { ProjEnvProject } from '../../src/types/project/ProjEnvProject';
+import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
 
 describe('winccoa-project-environment (integration)', () => {
     let testProject: ProjEnvProject | undefined;
@@ -127,6 +128,8 @@ describe('winccoa-project-environment (integration)', () => {
 
             proj = projects.find(p => p.getId().startsWith('DemoApplication_'));
             assert.ok(proj, 'DemoApplication_<version> project does shall be installed');
+            const testedVersion = getAvailableWinCCOAVersions().pop() || '';
+            assert.strictEqual(proj.getVersion(), testedVersion, 'DemoApplication project should have the expected version');
             assert.strictEqual(proj.getId(), 'DemoApplication_' + proj.getVersion(), 'Project should have an ID: runnable');
             assert.ok(proj.isRunnable(), 'The projects DemoApplication_<version> should be runnable');
             assert.ok(proj.isRegistered(), 'The projects DemoApplication_<version> should be registered');
