@@ -73,7 +73,7 @@ export abstract class WinCCOAComponent {
      * @param version - WinCC OA version string (e.g., '3.20')
      */
     public setVersion(version: string): void {
-        // Placeholder: override in derived classes if version affects behavior
+        console.log(`[${new Date().toISOString()}] Setting WinCC OA version to ${version} for component ${this.getName()}`);
         this._version = version;
     }
 

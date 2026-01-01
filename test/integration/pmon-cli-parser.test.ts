@@ -4,7 +4,6 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { PmonComponent } from '../../src/types/components/implementations/PmonComponent';
-import { get } from 'http';
 import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
 
 describe('Pmon CLI parser (examples)', () => {
