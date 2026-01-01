@@ -58,7 +58,7 @@ describe('ProjEnvProject (integration)', () => {
         it('should validate project properties', async () => {
             project = await registerRunnableTestProject();
 
-            assert.strictEqual(project.getInvalidReason(), '', 'There is no reason to be invalid be valid');
+            assert.strictEqual(project.getInvalidReason(), '', 'There is no reason to be invalid');
             assert.ok(project.isValid(), 'Project should be valid');
             assert.strictEqual(project.getInvalidReason(), '', 'Valid project should have no invalid reason');
         });
@@ -417,7 +417,7 @@ describe('ProjEnvProject (integration)', () => {
             await withRunnableTestProject(async (project) => {
                 const subProjects = project.getSubProjects();
                 assert.ok(subProjects, 'Sub-Project should be set');
-                assert.ok(subProjects.length === 2, 'Found two sub-projects in test fixture');
+                assert.strictEqual(subProjects.length, 2, 'Found two sub-projects in test fixture');
                 assert.strictEqual(
                     subProjects.at(0)?.getId(),
                     'TestFramework_' + project.getVersion(),

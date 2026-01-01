@@ -38,11 +38,10 @@ export class ProjEnvProject {
         this.setInstallDir(registry.installationDir);
 
         if (!this.getId() || registry.id != this.getId()) {
-            this._id = registry.id;
-        } else {
-            throw new Error(
-                `Project ID mismatch during initFromRegister: expected ${this.getId()}, got ${registry.id}`,
+            this._errorHandler.warning(
+                `Project ID mismatch during initFromRegister: expected '${this.getId()}', got '${registry.id}'. We will use '${registry.id}'.`,
             );
+            this._id = registry.id;
         }
         this.setName(registry.name ?? registry.id);
 
@@ -420,10 +419,21 @@ export class ProjEnvProject {
 
         try {
             result = await this.tryToRegister(configFile);
-        } catch (error) {
-            console.warn(`First attempt to register project ${this.getId()} failed:`, error);
+        } catch (error : any) {
+            this._errorHandler.warning(`First attempt to register project ${this.getId()} failed: ${error.toString()}`);
             // retry once if registration fails
             result = await this.tryToRegister(configFile);
+        }
+
+        if (result === 0) {
+            const registry = findProjectRegistryById(this.getId());
+            if (registry) {
+                this.initFromRegister(registry);
+            } else {
+                this._errorHandler.warning(
+                    `Project ${this.getId()} registered successfully but could not find registry entry afterwards.`,
+                );
+            }
         }
 
         return result ?? -2;
