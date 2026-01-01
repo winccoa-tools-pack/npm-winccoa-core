@@ -19,7 +19,6 @@ import {
 } from './ProjEnv';
 import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
 import path from 'path';
-import { sleep } from '../components/implementations/PmonComponent';
 
 /**
  * @brief WinCC OA Project class for managing project lifecycle and configuration
@@ -76,7 +75,9 @@ export class ProjEnvProject {
                 this.version = this.getProjectVersion();
             }
 
-            // read sub-projects ffrom config file
+            this._pmon.setVersion(this.version ?? '');
+
+            // read sub-projects from config file
             // the last one proj_path entry is the project itself
             const subProjectsEntries =
                 (this._projectConfigFile.getEntryValueList('proj_path') as string[]) || [];
@@ -197,9 +198,9 @@ export class ProjEnvProject {
     public setVersion(version: string): void {
         if (!version) {
             throw new Error('Project version must not be empty: ' + this.getId());
-            return;
         }
         this.version = version;
+        this._pmon.setVersion(this.version ?? '');
     }
 
     //------------------------------------------------------------------------------
@@ -1016,3 +1017,7 @@ export class ProjEnvProject {
     // project config file handler
     private _projectConfigFile: ProjEnvProjectConfig = new ProjEnvProjectConfig();
 }
+
+const sleep = async (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
