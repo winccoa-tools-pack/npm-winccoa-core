@@ -37,7 +37,7 @@ export class ProjEnvProject {
         // );
         this.setInstallDir(registry.installationDir);
 
-        if (!this.getId() || registry.id != this.getId()) {
+        if (registry.id && registry.id != this.getId()) {
             this._errorHandler.warning(
                 `Project ID mismatch during initFromRegister: expected '${this.getId()}', got '${registry.id}'. We will use '${registry.id}'.`,
             );
@@ -74,7 +74,7 @@ export class ProjEnvProject {
 
                 const projectVersion = this.getProjectVersion();
 
-                if (projectVersion && projectVersion !== this.getVersion()) {
+                if (projectVersion && this.getVersion() && projectVersion !== this.getVersion()) {
                     this._errorHandler.warning(
                         `Project version mismatch between registry and config file for project ${this.getId()}: registry=${this.getVersion()}, config=${projectVersion}`,
                     );
