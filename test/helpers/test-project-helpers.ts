@@ -3,6 +3,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { ProjEnvProject } from '../../src/types/project/ProjEnvProject';
 import { getWinCCOAInstallationPathByVersion, getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
+import { findProjectRegistryById } from '../../src/types/project/ProjEnvProjectRegistry';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,19 @@ export function getTestProjectPath(projectName: string): string {
  * ```
  */
 export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
+
+    const subProjectPath = getTestProjectPath('sub-proj');
+    const subProject = new ProjEnvProject();
+                    
+        // Set project directory (this sets both install dir and project ID)
+        subProject.setRunnable(false);
+        subProject.setDir(subProjectPath);
+        subProject.setName('test-sub-project');
+        const availableVersions = getAvailableWinCCOAVersions();
+        const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+        subProject.setVersion(testVersion);
+        await subProject.registerProj();
+
     const projectPath = getTestProjectPath('runnable');
     const project = new ProjEnvProject();
     
@@ -47,9 +61,6 @@ export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
     project.setDir(projectPath);
     project.setName('test-runnable-project');
 
-    const availableVersions = getAvailableWinCCOAVersions();
-    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
-    console.log(`Registering test project with WinCC OA version: ${testVersion}`);
     project.setVersion(testVersion);
 
 
@@ -108,6 +119,14 @@ export async function unregisterTestProject(project: ProjEnvProject): Promise<vo
             await project.stop();
         }
 
+        let subProject: ProjEnvProject | undefined;
+        const registry = findProjectRegistryById('sub-proj');
+        if (registry) {
+            subProject = new ProjEnvProject();
+            subProject.initFromRegister(registry);
+            await unregisterTestProject(subProject);
+        }
+
         // Unregister the project
         await project.unregisterProj();
     } catch (error) {
@@ -133,28 +152,12 @@ export async function withRunnableTestProject(
     testFn: (project: ProjEnvProject) => Promise<void>
 ): Promise<void> {
     let project: ProjEnvProject | undefined;
-    let subProject: ProjEnvProject | undefined;
+    
 
     try {
-
-        const projectPath = getTestProjectPath('sub-proj');
-        subProject = new ProjEnvProject();
-                    
-        // Set project directory (this sets both install dir and project ID)
-        subProject.setRunnable(false);
-        subProject.setDir(projectPath);
-        subProject.setName('test-sub-project');
-        const availableVersions = getAvailableWinCCOAVersions();
-        const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
-        subProject.setVersion(testVersion);
-        await subProject.registerProj();
-
         project = await registerRunnableTestProject();
         await testFn(project);
     } finally {
-        if (subProject) {
-            await unregisterTestProject(subProject);
-        }
         if (project) {
             await unregisterTestProject(project);
         }

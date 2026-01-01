@@ -154,9 +154,9 @@ function loadProjectRegistries(): void {
                     if (reloadTimeout) {
                         clearTimeout(reloadTimeout);
                     }
-                    console.log(
-                        `[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 100ms`,
-                    );
+                    // console.log(
+                    //     `[${new Date().toISOString()}] pvssInst.conf change detected, scheduling reload in 100ms`,
+                    // );
                     reloadTimeout = setTimeout(() => {
                         console.log(
                             `[${new Date().toISOString()}] pvssInst.conf changed, reloading project registries`,
