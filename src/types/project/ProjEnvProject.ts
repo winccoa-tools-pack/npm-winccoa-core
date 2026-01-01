@@ -37,10 +37,12 @@ export class ProjEnvProject {
         // );
         this.setInstallDir(registry.installationDir);
 
-        if (registry.id && registry.id != this.getId()) {
-            this._errorHandler.warning(
-                `Project ID mismatch during initFromRegister: expected '${this.getId()}', got '${registry.id}'. We will use '${registry.id}'.`,
-            );
+        if (registry.id) {
+            if (this.getId() && this.getId() !== registry.id) {
+                this._errorHandler.warning(
+                    `Project ID mismatch during initFromRegister: expected '${this.getId()}', got '${registry.id}'. We will use '${registry.id}'.`,
+                );
+            }
             this._id = registry.id;
         }
         this.setName(registry.name ?? registry.id);
@@ -85,13 +87,40 @@ export class ProjEnvProject {
                 const subProjectsEntries =
                     (this._projectConfigFile.getEntryValueList('proj_path') as string[]) || [];
 
-                subProjectsEntries.forEach((entry: string, _idx: number) => {
-                    if (entry === this.getDir()) return; // skip self
+                // check for sub-project entries on windows paths may take a while
+                // the last one is always the project itself, therefoee we skip it
+                // when we have no subpojects
+                if (subProjectsEntries.length > 0) {
+                    subProjectsEntries.forEach((entry: string, _idx: number) => {
+                        if (!entry || entry.trim().length === 0) return;
 
-                    const subProj = new ProjEnvProject();
-                    subProj.setDir(entry);
-                    this._subProjects.push(subProj);
-                });
+                        entry = entry.replace(/\\/g, '/').replace(/\/\//g, '/').toLowerCase();
+
+                        if (!entry.endsWith('/')) {
+                            entry += '/';
+                        }
+
+                        const myDir = this.getDir()
+                            .replace(/\\/g, '/')
+                            .replace(/\/\//g, '/')
+                            .toLowerCase();
+                        console.log(
+                            `[${new Date().toISOString()}]`,
+                            `Found sub-project entry in config: ${entry}, my dir is ${this.getDir()}`,
+                        );
+                        if (entry.toLowerCase() === myDir) {
+                            console.log(
+                                `[${new Date().toISOString()}]`,
+                                `Skipping sub-project entry that matches self project dir`,
+                            );
+                            return; // skip self
+                        }
+
+                        const subProj = new ProjEnvProject();
+                        subProj.setDir(entry);
+                        this._subProjects.push(subProj);
+                    });
+                }
 
                 // read languages from config file
                 const langEntries =
@@ -419,8 +448,10 @@ export class ProjEnvProject {
 
         try {
             result = await this.tryToRegister(configFile);
-        } catch (error : any) {
-            this._errorHandler.warning(`First attempt to register project ${this.getId()} failed: ${error.toString()}`);
+        } catch (error: any) {
+            this._errorHandler.warning(
+                `First attempt to register project ${this.getId()} failed: ${error.toString()}`,
+            );
             // retry once if registration fails
             result = await this.tryToRegister(configFile);
         }
