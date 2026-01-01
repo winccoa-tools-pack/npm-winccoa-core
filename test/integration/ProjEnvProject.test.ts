@@ -58,6 +58,7 @@ describe('ProjEnvProject (integration)', () => {
         it('should validate project properties', async () => {
             project = await registerRunnableTestProject();
 
+            assert.strictEqual(project.getInvalidReason(), '', 'There is no reason to be invalid be valid');
             assert.ok(project.isValid(), 'Project should be valid');
             assert.strictEqual(project.getInvalidReason(), '', 'Valid project should have no invalid reason');
         });

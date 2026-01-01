@@ -54,48 +54,53 @@ export class ProjEnvProject {
         this._languages = [];
 
         if (this.isRunnable()) {
-            const configPath = this.getConfigPath();
-
-            if (configPath === '') {
-                throw new Error(
-                    'The project config file does not exist for project ' + this.getId(),
-                );
-            }
-
-            this._projectConfigFile.setConfigPath(configPath);
-
             if (registry.installationVersion !== undefined) {
                 console.log(
                     `[${new Date().toISOString()}]`,
                     this.getId() +
                         ` Setting project version from registry: ${registry.installationVersion}`,
                 );
-                this.version = registry.installationVersion;
-            } else {
-                this.version = this.getProjectVersion();
+                this.setVersion(registry.installationVersion);
             }
 
-            this._pmon.setVersion(this.version ?? '');
+            // try to get other project properties from config file
+            const configPath = this.getConfigPath();
 
-            // read sub-projects from config file
-            // the last one proj_path entry is the project itself
-            const subProjectsEntries =
-                (this._projectConfigFile.getEntryValueList('proj_path') as string[]) || [];
+            if (configPath === '') {
+                this._errorHandler.warning(
+                    'The project config file does not exist for project ' + this.getId(),
+                );
+            } else {
+                this._projectConfigFile.setConfigPath(configPath);
 
-            subProjectsEntries.forEach((entry: string, _idx: number) => {
-                if (entry === this.getDir()) return; // skip self
+                const projectVersion = this.getProjectVersion();
 
-                const subProj = new ProjEnvProject();
-                subProj.setDir(entry);
-                this._subProjects.push(subProj);
-            });
+                if (projectVersion && projectVersion !== this.getVersion()) {
+                    this._errorHandler.warning(
+                        `Project version mismatch between registry and config file for project ${this.getId()}: registry=${this.getVersion()}, config=${projectVersion}`,
+                    );
+                }
 
-            // read languages from config file
-            const langEntries =
-                (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
-            langEntries.forEach((entry: string, _idx: number) => {
-                this._languages.push(OaLanguageFromString(entry));
-            });
+                // read sub-projects from config file
+                // the last one proj_path entry is the project itself
+                const subProjectsEntries =
+                    (this._projectConfigFile.getEntryValueList('proj_path') as string[]) || [];
+
+                subProjectsEntries.forEach((entry: string, _idx: number) => {
+                    if (entry === this.getDir()) return; // skip self
+
+                    const subProj = new ProjEnvProject();
+                    subProj.setDir(entry);
+                    this._subProjects.push(subProj);
+                });
+
+                // read languages from config file
+                const langEntries =
+                    (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
+                langEntries.forEach((entry: string, _idx: number) => {
+                    this._languages.push(OaLanguageFromString(entry));
+                });
+            }
         }
     }
 
