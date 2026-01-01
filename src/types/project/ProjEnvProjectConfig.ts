@@ -154,6 +154,7 @@ export class ProjEnvProjectConfig {
             if (Array.isArray(sectionData[key])) {
                 return sectionData[key] as string[];
             } else {
+                console.log('Wrapping single entry into array for key:', key);
                 return [sectionData[key] as string];
             }
         }
@@ -164,6 +165,7 @@ export class ProjEnvProjectConfig {
         const sectionData: Record<string, string | string[]> = this.getSection(_section);
         if (sectionData[key] !== undefined) {
             if (Array.isArray(sectionData[key])) {
+                console.log('Joining array entry into single string for key:', key);
                 return sectionData[key].join('\n');
             } else {
                 return sectionData[key] as string;
@@ -199,6 +201,9 @@ export class ProjEnvProjectConfig {
                 const [key, ...valueParts] = trimmedLine.split('=');
                 const value = valueParts.join('=').trim().replace(/['"]/g, '');
                 const trimmedKey = key.trim();
+                console.log(
+                    `Parsing key="${trimmedKey}" value="${value}" in section [${currentSection}]`,
+                );
                 if (sections[currentSection][trimmedKey] !== undefined) {
                     if (Array.isArray(sections[currentSection][trimmedKey])) {
                         // already an array, do nothing

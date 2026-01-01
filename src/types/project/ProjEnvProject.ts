@@ -73,7 +73,7 @@ export class ProjEnvProject {
                 );
             } else if (!fs.existsSync(configPath)) {
                 this._errorHandler.warning(
-                    `The project config file does not exist for project ${this.getId()}: ${configPath}`
+                    `The project config file does not exist for project ${this.getId()}: ${configPath}`,
                 );
             } else {
                 this._projectConfigFile.setConfigPath(configPath);
