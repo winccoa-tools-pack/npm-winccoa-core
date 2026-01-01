@@ -399,7 +399,7 @@ describe('ProjEnvProject (integration)', () => {
             await withRunnableTestProject(async (project) => {
                 const languages = project.getLanguages();
                 assert.ok(languages, 'Project languages should be set');
-                assert.ok(languages.length === 2, 'Found two languages in test fixture');
+                assert.strictEqual(languages.length, 2, 'Found two languages in test fixture');
                 assert.ok(
                     languages.includes(OaLanguage.en_US),
                     'Project languages should include en_US'
