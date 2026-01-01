@@ -99,6 +99,7 @@ export class ProjEnvProject {
                         console.log('Checking sub-project entry:', entry, 'at position', _idx);
                         if (!entry || entry.trim().length === 0) return;
 
+                        const origEntry = entry;
                         entry = entry.replace(/\\/g, '/').replace(/\/\//g, '/').toLowerCase();
 
                         if (!entry.endsWith('/')) {
@@ -122,7 +123,7 @@ export class ProjEnvProject {
                         }
 
                         const subProj = new ProjEnvProject();
-                        subProj.setDir(entry);
+                        subProj.setDir(origEntry);
                         this._subProjects.push(subProj);
                     });
                 }
@@ -131,6 +132,7 @@ export class ProjEnvProject {
                 const langEntries =
                     (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
                 langEntries.forEach((entry: string, _idx: number) => {
+                    console.log('Checking language entry:', entry, 'at position', _idx);
                     this._languages.push(OaLanguageFromString(entry));
                 });
             }
