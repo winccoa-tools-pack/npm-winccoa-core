@@ -8,7 +8,6 @@ import * as fs from 'fs';
 import { spawn } from 'child_process';
 import {
     getWinCCOAInstallationPathByVersion,
-    getAvailableWinCCOAVersions,
 } from '../../utils/winccoa-paths.js';
 import { randomUUID } from 'crypto';
 
@@ -42,6 +41,9 @@ export abstract class WinCCOAComponent {
      */
     public stdErr: string = '';
 
+    /** WinCC OA Version */
+    private _version: string = '';
+
     /**
      * Returns the canonical internal name of this component. This is the
      * identifier used to locate the executable (e.g., 'WCCILpmon').
@@ -67,6 +69,17 @@ export abstract class WinCCOAComponent {
     }
 
     /**
+     * Sets the WinCC OA version to use for locating the component executable.
+     * This may affect the path returned by `getPath()`.
+     *
+     * @param version - WinCC OA version string (e.g., '3.20')
+     */
+    public setVersion(version: string): void {
+        // Placeholder: override in derived classes if version affects behavior
+        this._version = version;
+    }
+
+    /**
      * Attempts to discover the full filesystem path to the component
      * executable by scanning known WinCC OA installation directories.
      *
@@ -81,26 +94,32 @@ export abstract class WinCCOAComponent {
      *
      * @param version - Optional WinCC OA version to search in (e.g., '3.20')
      * @returns absolute path to executable or `null`
+     * @throws Error when specified version is not found on system
      */
     public getPath(version?: string): string | null {
+
         const exe = this.getExecutableName();
-        const versions = version ? [version] : getAvailableWinCCOAVersions();
+        const versionToUse = version ? version : this._version;
 
-        for (const v of versions) {
-            const base = getWinCCOAInstallationPathByVersion(v);
-            if (!base) continue;
-
-            const candidate = path.join(base, 'bin', exe);
-            if (fs.existsSync(candidate)) {
-                return candidate;
-            }
-
-            // Windows can have .exe suffix
-            if (fs.existsSync(candidate + '.exe')) {
-                return candidate + '.exe';
-            }
+        if (!versionToUse) {
+            throw new Error('WinCC OA version must be specified to locate component ' + this.getName());
         }
 
+        const base = getWinCCOAInstallationPathByVersion(versionToUse);
+        if (!base) {
+            throw new Error('WinCC OA version ' + versionToUse + ' not found on system to locate component ' + this.getName());
+        }
+
+        const candidate = path.join(base, 'bin', exe);
+        if (fs.existsSync(candidate)) {
+            return candidate;
+        }
+
+        // Windows can have .exe suffix
+        if (fs.existsSync(candidate + '.exe')) {
+            return candidate + '.exe';
+        }
+        
         return null;
     }
 
@@ -177,10 +196,9 @@ export abstract class WinCCOAComponent {
             detached?: boolean;
             waitForLog?: string;
             timeout?: number;
-            version?: string;
         } = {},
     ): Promise<number> {
-        const p = this.getPath(options.version);
+        const p = this.getPath();
         // const histEntry = new CommandHistoryEntry(this.getName(), args);
         this.stdOut = '';
         this.stdErr = '';

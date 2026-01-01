@@ -4,6 +4,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { PmonComponent } from '../../src/types/components/implementations/PmonComponent';
+import { get } from 'http';
+import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
 
 describe('Pmon CLI parser (examples)', () => {
   it('parses MGRLIST:LIST into manager options', async () => {
@@ -13,6 +15,8 @@ describe('Pmon CLI parser (examples)', () => {
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
+
+    pmon.setVersion(getAvailableWinCCOAVersions().pop() || '');
 
     const managers = await pmon.getManagerOptionsList('MyProject');
     assert(Array.isArray(managers));
@@ -32,6 +36,7 @@ describe('Pmon CLI parser (examples)', () => {
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => sample.split('\n');
+    pmon.setVersion(getAvailableWinCCOAVersions().pop() || '');
 
     const parsed = await pmon.getProjectStatus('MyProject');
     assert(parsed);

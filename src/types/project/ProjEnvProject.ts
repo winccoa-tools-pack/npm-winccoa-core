@@ -19,7 +19,6 @@ import {
 } from './ProjEnv';
 import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
 import path from 'path';
-import { sleep } from '../components/implementations/PmonComponent';
 
 /**
  * @brief WinCC OA Project class for managing project lifecycle and configuration
@@ -62,6 +61,8 @@ export class ProjEnvProject {
             } else {
                 this.version = this.getProjectVersion();
             }
+
+            this._pmon.setVersion(this.version ?? '');
         }
     }
 
@@ -968,3 +969,9 @@ export class ProjEnvProject {
     //@private members
     //--------------------------------------------------------------------------------
 }
+
+
+
+const sleep = async (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
