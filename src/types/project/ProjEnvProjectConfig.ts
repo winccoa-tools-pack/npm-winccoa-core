@@ -148,12 +148,31 @@ export class ProjEnvProjectConfig {
         }
     }
 
-    public getEntryValue(key: string, _section = 'general'): any {
-        const sectionData: Record<string, any> = this.getSection(_section);
-        return sectionData[key];
+    public getEntryValueList(key: string, _section = 'general'): string[] | undefined {
+        const sectionData: Record<string, string | string[]> = this.getSection(_section);
+        if (sectionData[key] !== undefined) {
+            if (Array.isArray(sectionData[key])) {
+                return sectionData[key] as string[];
+            } else {
+                return [sectionData[key] as string];
+            }
+        }
+        return undefined;
     }
 
-    private getSection(section: string): Record<string, any> {
+    public getEntryValue(key: string, _section = 'general'): string | undefined {
+        const sectionData: Record<string, string | string[]> = this.getSection(_section);
+        if( sectionData[key] !== undefined ) {
+            if( Array.isArray(sectionData[key]) ) {
+                return sectionData[key].join('\n');
+            } else {
+                return sectionData[key] as string;
+            }
+        }
+        return undefined;
+    }
+
+    private getSection(section: string): Record<string, string | string[]> {
         const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
         return this.parseConfigSections(content)[section];
     }
@@ -163,7 +182,7 @@ export class ProjEnvProjectConfig {
      * @param content File content to parse
      * @returns Sections with key-value pairs
      */
-    private parseConfigSections(content: string): Record<string, Record<string, string>> {
+    private parseConfigSections(content: string): Record<string, Record<string, string | string[]>> {
         const lines = content.split('\n');
         const sections: Record<string, Record<string, any>> = Object.create(null);
         let currentSection = '';
@@ -204,7 +223,7 @@ export class ProjEnvProjectConfig {
      * Ensures `[general]` is always the first section. Other sections and keys
      * are written alphanumerically.
      */
-    private saveConfigSections(sections: Record<string, Record<string, string>>): void {
+    private saveConfigSections(sections: Record<string, Record<string, string | string[]>>): void {
         const cfgPath = this.getConfigPath();
         if (!cfgPath) {
             if (this.throwErrors) throw new Error('Config path is not set');
@@ -225,13 +244,18 @@ export class ProjEnvProjectConfig {
         for (const sec of sectionOrder) {
             outLines.push(`[${sec}]`);
             const entries = sections[sec] || Object.create(null);
-            const keys = Object.keys(entries).sort((a, b) =>
-                a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }),
-            );
+            const keys = Object.keys(entries);
             for (const key of keys) {
                 const value = entries[key] ?? '';
-                const escaped = String(value).replace(/"/g, '\\"');
-                outLines.push(`${key} = "${escaped}"`);
+                if (Array.isArray(value)) {
+                    for (const val of value) {
+                        const escaped = String(val).replace(/"/g, '\\"');
+                        outLines.push(`${key} = "${escaped}"`);
+                    }
+                } else {
+                    const escaped = String(value).replace(/"/g, '\\"');
+                    outLines.push(`${key} = "${escaped}"`);
+                }
             }
             outLines.push('');
         }

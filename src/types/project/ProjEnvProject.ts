@@ -78,7 +78,8 @@ export class ProjEnvProject {
 
             // read sub-projects ffrom config file
             // the last one proj_path entry is the project itself
-            const subProjectsEntries = this._projectConfigFile.getEntryValue('proj_path');
+            const subProjectsEntries =
+                (this._projectConfigFile.getEntryValueList('proj_path') as string[]) || [];
 
             subProjectsEntries.forEach((entry: string, _idx: number) => {
                 if (entry === this.getDir()) return; // skip self
@@ -89,7 +90,7 @@ export class ProjEnvProject {
             });
 
             // read languages from config file
-            const langEntries = this._projectConfigFile.getEntryValue('langs');
+            const langEntries = (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
             langEntries.forEach((entry: string, _idx: number) => {
                 this._languages.push(OaLanguageFromString(entry));
             });
@@ -337,8 +338,25 @@ export class ProjEnvProject {
         if (!this.getName())
             return this.format('The project name is empty.\n$1', this.toString('\t'));
 
-        if (this.isRunnable() && !this.getVersion())
-            return this.format('The project version is empty.\n$1', this.toString('\t'));
+        if (this.isRunnable()) {
+            if (!this.getVersion())
+                return this.format('The project version is empty.\n$1', this.toString('\t'));
+
+            if (this.getLanguages().length === 0)
+                return this.format('The project languages are empty.\n$1', this.toString('\t'));
+
+            let langIndex = 1;
+            for (const lang of this.getLanguages()) {
+                if (lang === OaLanguage.undefined) {
+                    return this.format(
+                        'The project has an undefined language configured at position $1.\n$2',
+                        langIndex,
+                        this.toString('\t'),
+                    );
+                }
+                langIndex++;
+            }
+        }
         return '';
     }
 
