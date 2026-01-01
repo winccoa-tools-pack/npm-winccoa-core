@@ -13,7 +13,9 @@ test('PmonComponent LIST parsing - parse MGRLIST:LIST output into managers', asy
 
     const pmon = new PmonComponent();
     (pmon as any).execAndCollectLines = async () => fixture.split('\n');
-    pmon.setVersion(getAvailableWinCCOAVersions().pop() || '');
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+    pmon.setVersion(testVersion);
 
     const managers = await pmon.getManagerOptionsList('MyProject');
 
