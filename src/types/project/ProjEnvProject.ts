@@ -91,7 +91,8 @@ export class ProjEnvProject {
             });
 
             // read languages from config file
-            const langEntries = (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
+            const langEntries =
+                (this._projectConfigFile.getEntryValueList('langs') as string[]) || [];
             langEntries.forEach((entry: string, _idx: number) => {
                 this._languages.push(OaLanguageFromString(entry));
             });

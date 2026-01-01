@@ -162,8 +162,8 @@ export class ProjEnvProjectConfig {
 
     public getEntryValue(key: string, _section = 'general'): string | undefined {
         const sectionData: Record<string, string | string[]> = this.getSection(_section);
-        if( sectionData[key] !== undefined ) {
-            if( Array.isArray(sectionData[key]) ) {
+        if (sectionData[key] !== undefined) {
+            if (Array.isArray(sectionData[key])) {
                 return sectionData[key].join('\n');
             } else {
                 return sectionData[key] as string;
@@ -182,7 +182,9 @@ export class ProjEnvProjectConfig {
      * @param content File content to parse
      * @returns Sections with key-value pairs
      */
-    private parseConfigSections(content: string): Record<string, Record<string, string | string[]>> {
+    private parseConfigSections(
+        content: string,
+    ): Record<string, Record<string, string | string[]>> {
         const lines = content.split('\n');
         const sections: Record<string, Record<string, any>> = Object.create(null);
         let currentSection = '';
