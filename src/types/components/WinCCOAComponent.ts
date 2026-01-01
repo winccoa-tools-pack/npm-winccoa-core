@@ -71,16 +71,18 @@ export abstract class WinCCOAComponent {
      * This may affect the path returned by `getPath()`.
      *
      * @param version - WinCC OA version string (e.g., '3.20')
+     * @throws Error when version is empty
      */
     public setVersion(version: string): void {
         console.log(
             `[${new Date().toISOString()}] Setting WinCC OA version to ${version} for component ${this.getName()}`,
         );
-        this._version = version;
 
-        if (!version) {
+        if (version === undefined || version === '') {
             throw new Error('WinCC OA version must not be empty: ' + this.getName());
         }
+
+        this._version = version;
     }
 
     /**
