@@ -204,7 +204,9 @@ export class ProjEnvProjectConfig {
                 console.log(
                     `Parsing key="${trimmedKey}" value="${value}" in section [${currentSection}]`,
                 );
+                console.log('Current section data before insertion:', sections[currentSection][trimmedKey]);
                 if (sections[currentSection][trimmedKey] !== undefined) {
+                    console.log(`Key "${trimmedKey}" already exists in section [${currentSection}]. Converting to array. Is array:`, Array.isArray(sections[currentSection][trimmedKey]));
                     if (Array.isArray(sections[currentSection][trimmedKey])) {
                         // already an array, do nothing
                         const entries = sections[currentSection][trimmedKey] as string[];
@@ -217,7 +219,6 @@ export class ProjEnvProjectConfig {
                     }
                 } else {
                     sections[currentSection][trimmedKey] = value;
-                    sections[currentSection][key.trim()] = value;
                 }
             }
         }
