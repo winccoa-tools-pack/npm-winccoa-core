@@ -449,7 +449,7 @@ export class ProjEnvProject {
 
         if (!this.isValid()) this._errorHandler.exception(this.getInvalidReason());
 
-        const configFile = this.getConfigPath('config');
+        const configFile = this.isRunnable() ? this.getConfigPath('config') : this.getDir();
 
         if (!configFile) {
             this._errorHandler.severe(
@@ -502,7 +502,9 @@ export class ProjEnvProject {
      * @returns 0 on success, -2 on timeout or failure
      */
     private async tryToRegister(configFile: string): Promise<number> {
-        const result = await this._pmon.registerProject(configFile, this.getVersion() ?? '');
+        const result = this.isRunnable()
+            ? await this._pmon.registerProject(configFile, this.getVersion() ?? '')
+            : await this._pmon.registerSubProject(configFile);
         console.log(`[${new Date().toISOString()}]`, 'Register project result:', result);
         let counter: number = 0;
         while (!this.isRegistered()) {
