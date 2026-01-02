@@ -141,7 +141,7 @@
 3. **Important**: Create back-merge PR from `main` to `develop` to sync changes
 4. Delete hotfix branch after both merges complete
 
-**📖 For complete Git Flow documentation, see: [docs/GITFLOW_WORKFLOW.md](docs/GITFLOW_WORKFLOW.md)**
+**📖 For complete Git Flow documentation, see: [docs/automation/GITFLOW_WORKFLOW.md](docs/automation/GITFLOW_WORKFLOW.md)**
 
 ---
 
