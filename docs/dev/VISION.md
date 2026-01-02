@@ -441,7 +441,7 @@ function getInstallPath(): string | null {
 - Complete API coverage
 - Full documentation
 - Performance optimized
-- Used in production (vs-code-projects-viewer)
+- Used in production (vs-code extensions)
 
 ### v1.x - Enhancements
 
