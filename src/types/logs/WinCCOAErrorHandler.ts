@@ -57,7 +57,7 @@ export class WinCCOAErrorHandler {
     public verbose(msg: string): void {
         if (this.verboseEnabled || (this.debugFlag && this.debugFlag.length > 0)) {
             const out = this.formatMessage('verbose', msg);
-            // eslint-disable-next-line no-console
+             
             console.error(out);
             this.sendToOutput(out);
         }
@@ -65,7 +65,7 @@ export class WinCCOAErrorHandler {
 
     public info(msg: string): void {
         const out = this.formatMessage('info', msg);
-        // eslint-disable-next-line no-console
+         
         console.warn(out);
         this.sendToOutput(out);
     }
@@ -73,7 +73,7 @@ export class WinCCOAErrorHandler {
     public warning(msg: string, code = 54): Error {
         const body = `${msg} (code=${code})`;
         const out = this.formatMessage('warning', body);
-        // eslint-disable-next-line no-console
+         
         console.warn(out);
         this.sendToOutput(out);
         return new Error(body);
@@ -82,10 +82,10 @@ export class WinCCOAErrorHandler {
     public severe(msg: string, code = 54): never | void {
         const body = `${msg} (code=${code})`;
         const out = this.formatMessage('severe', body);
-        // eslint-disable-next-line no-console
+         
         console.error(out);
         // include stack trace
-        // eslint-disable-next-line no-console
+         
         console.error(new Error(body).stack);
         this.sendToOutput(out + '\n' + (new Error(body).stack ?? ''));
         if (this.throwOnSevere) {
@@ -96,7 +96,7 @@ export class WinCCOAErrorHandler {
     public exception(msg: string, code = 54): never {
         const body = `${msg} (code=${code})`;
         const out = this.formatMessage('exception', body);
-        // eslint-disable-next-line no-console
+         
         console.error(out);
         this.sendToOutput(out);
         throw new Error(body);
@@ -117,7 +117,7 @@ export class WinCCOAErrorHandler {
             case 'exception':
                 return this.exception(msg, code);
             default:
-                // eslint-disable-next-line no-console
+                 
                 console.log(this.formatMessage('info', msg));
                 this.sendToOutput(this.formatMessage('info', msg));
                 return;
