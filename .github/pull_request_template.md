@@ -58,8 +58,6 @@
 
 ### Test Environment
 
-- VS Code Version:
-- Extension Version:
 - WinCC OA Version:
 - Operating System:
 
@@ -83,10 +81,6 @@
 2. and that
 3. and it works as proposed
 
-## 📸 **Screenshots (if applicable)**
-
-<!-- Add screenshots to help explain your changes -->
-
 ## 📝 **Checklist**
 
 ### Code Quality
@@ -101,7 +95,6 @@
 ### Documentation
 
 - [ ] I have updated the documentation accordingly
-- [ ] I have updated the CHANGELOG.md file (if applicable)
 - [ ] Any new configuration options are documented
 
 ### Dependencies
