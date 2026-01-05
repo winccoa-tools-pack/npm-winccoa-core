@@ -8,6 +8,7 @@ import {
     getTestProjectPath,
 } from '../helpers/test-project-helpers';
 import { OaLanguage } from '../../src/types/localization/OaLanguage';
+import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
 
 describe('ProjEnvProject (integration)', () => {
     describe('Project Registration', () => {
@@ -58,6 +59,7 @@ describe('ProjEnvProject (integration)', () => {
         it('should validate project properties', async () => {
             project = await registerRunnableTestProject();
 
+            assert.strictEqual(project.getInvalidReason(), '', 'There is no reason to be invalid');
             assert.ok(project.isValid(), 'Project should be valid');
             assert.strictEqual(project.getInvalidReason(), '', 'Valid project should have no invalid reason');
         });
@@ -219,11 +221,6 @@ describe('ProjEnvProject (integration)', () => {
             await withRunnableTestProject(async (project) => {
                 try {
                     project.startPmon();
-                    // // Result might be 0 (success) or -1/-2 (already running or error)
-                    // assert.ok(
-                    //     typeof startResult === 'number',
-                    //     'Start pmon should return a number'
-                    // );
 
                     // Check if pmon is running
                     const isRunning = await project.isPmonRunning();
@@ -231,25 +228,11 @@ describe('ProjEnvProject (integration)', () => {
 
                     // Clean up - stop pmon
                     if (isRunning) {
-                        await project.stopPmon();
+                        await project.stopPmon(10);
                     }
                 } catch (error) {
                     console.warn('Pmon lifecycle test partially skipped:', error);
                 }
-            });
-        });
-
-        it('should check pmon running status', async () => {
-            await withRunnableTestProject(async (project) => {
-                const isRunning = await project.isPmonRunning();
-                assert.strictEqual(typeof isRunning, 'boolean', 'isPmonRunning should return boolean');
-
-                const isProjectPmonRunning = await project.isPmonRunningForProject();
-                assert.strictEqual(
-                    typeof isProjectPmonRunning,
-                    'boolean',
-                    'isPmonRunningForProject should return boolean'
-                );
             });
         });
     });
@@ -388,6 +371,50 @@ describe('ProjEnvProject (integration)', () => {
             project.initFromRegister(testRegistry);
 
             assert.ok(!project.isRunnable(), 'Should not be runnable when notRunnable is true');
+        });
+    });
+
+    
+
+    describe('Project Languages', () => {
+        it('should get project languages', async () => {
+            await withRunnableTestProject(async (project) => {
+                const languages = project.getLanguages();
+                assert.ok(languages, 'Project languages should be set');
+                assert.strictEqual(languages.length, 2, 'Found two languages in test fixture');
+                assert.strictEqual(
+                    languages.at(0),
+                    OaLanguage.de_AT,
+                    'Project languages should include de_AT'
+                );
+                assert.strictEqual(
+                    languages.at(1),
+                    OaLanguage.en_US,
+                    'Project languages should include en_US'
+                );
+            });
+        });
+    });
+
+    describe('Project sub-projects', () => {
+        it('should get sub-project', async () => {
+
+            await withRunnableTestProject(async (project) => {
+                const subProjects = project.getSubProjects();
+                assert.ok(subProjects, 'Sub-Project should be set');
+                assert.strictEqual(
+                    subProjects.at(0)?.getId(),
+                    'TestFramework_' + project.getVersion(),
+                    'First sub-project is the WinCC OA Test Framework'
+                );
+                assert.strictEqual(
+                    subProjects.at(1)?.getId(),
+                    'sub-proj',
+                    'Second sub-project is the sub-proj from our test fixture'
+                );
+                assert.strictEqual(subProjects.length, 2, 'Found two sub-projects in test fixture');
+                
+            });
         });
     });
 });

@@ -49,6 +49,7 @@ export class ProjEnvProjectConfig {
         }
 
         // Normalize to native path style
+        this.loaded = false;
         this._configFilePath = path.resolve(configFilePath);
     }
 
@@ -148,14 +149,57 @@ export class ProjEnvProjectConfig {
         }
     }
 
-    public getEntryValue(key: string, _section = 'general'): string {
-        const sectionData: Record<string, string> = this.getSection(_section);
-        return sectionData[key];
+    public getEntryValueList(key: string, _section = 'general'): string[] | undefined {
+        const sectionData: Record<string, string | string[]> = this.getSection(_section);
+        if (sectionData[key] !== undefined) {
+            if (Array.isArray(sectionData[key])) {
+                console.log('Entry-list found for key:', sectionData[key], key, _section);
+                return sectionData[key] as string[];
+            } else {
+                console.log(
+                    'Wrapping single entry into array for key:',
+                    sectionData[key],
+                    key,
+                    _section,
+                );
+                return [sectionData[key] as string];
+            }
+        }
+        console.log('Entry-list not found for key:', key, _section);
+        return undefined;
     }
 
-    private getSection(section: string): Record<string, string> {
-        const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
-        return this.parseConfigSections(content)[section];
+    public getEntryValue(key: string, _section = 'general'): string | undefined {
+        const sectionData: Record<string, string | string[]> = this.getSection(_section);
+        if (sectionData[key] !== undefined) {
+            if (Array.isArray(sectionData[key])) {
+                console.log(
+                    'Joining array entry into single string for key:',
+                    sectionData[key],
+                    key,
+                    _section,
+                );
+                return sectionData[key].join('\n');
+            } else {
+                console.log('Entry found for key:', sectionData[key], key, _section);
+                return sectionData[key] as string;
+            }
+        }
+        console.log('Entry not found for key:', key, _section);
+        return undefined;
+    }
+
+    private loaded: boolean = false;
+    private sections: Record<string, Record<string, string | string[]>> = {};
+
+    private getSection(section: string): Record<string, string | string[]> {
+        if (!this.loaded) {
+            const content = fs.readFileSync(this.getConfigPath(), 'utf-8');
+            this.sections = this.parseConfigSections(content);
+            this.loaded = true;
+        }
+
+        return this.sections[section];
     }
 
     /**
@@ -163,9 +207,11 @@ export class ProjEnvProjectConfig {
      * @param content File content to parse
      * @returns Sections with key-value pairs
      */
-    private parseConfigSections(content: string): Record<string, Record<string, string>> {
+    private parseConfigSections(
+        content: string,
+    ): Record<string, Record<string, string | string[]>> {
         const lines = content.split('\n');
-        const sections: Record<string, Record<string, string>> = Object.create(null);
+        const sections: Record<string, Record<string, any>> = Object.create(null);
         let currentSection = '';
 
         for (const line of lines) {
@@ -177,7 +223,26 @@ export class ProjEnvProjectConfig {
             } else if (currentSection && trimmedLine.includes('=')) {
                 const [key, ...valueParts] = trimmedLine.split('=');
                 const value = valueParts.join('=').trim().replace(/['"]/g, '');
-                sections[currentSection][key.trim()] = value;
+                const trimmedKey = key.trim();
+                // console.log(
+                //     `Parsing key="${trimmedKey}" value="${value}" in section [${currentSection}]`,
+                // );
+                // console.log('Current section data before insertion:', sections[currentSection][trimmedKey]);
+                if (sections[currentSection][trimmedKey] !== undefined) {
+                    // console.log(`Key "${trimmedKey}" already exists in section [${currentSection}]. Converting to array. Is array:`, Array.isArray(sections[currentSection][trimmedKey]));
+                    if (!Array.isArray(sections[currentSection][trimmedKey])) {
+                        console.log(`Converting existing entry to array for key "${trimmedKey}"`);
+                        sections[currentSection][trimmedKey] = [
+                            sections[currentSection][trimmedKey],
+                        ];
+                    }
+
+                    const entries = sections[currentSection][trimmedKey] as string[];
+                    entries.push(value);
+                    sections[currentSection][trimmedKey] = entries;
+                } else {
+                    sections[currentSection][trimmedKey] = value;
+                }
             }
         }
 
@@ -189,12 +254,14 @@ export class ProjEnvProjectConfig {
      * Ensures `[general]` is always the first section. Other sections and keys
      * are written alphanumerically.
      */
-    private saveConfigSections(sections: Record<string, Record<string, string>>): void {
+    private saveConfigSections(sections: Record<string, Record<string, string | string[]>>): void {
         const cfgPath = this.getConfigPath();
         if (!cfgPath) {
             if (this.throwErrors) throw new Error('Config path is not set');
             return;
         }
+
+        this.loaded = false;
 
         // Ensure general section exists and is first
         if (!sections['general']) sections['general'] = Object.create(null);
@@ -210,13 +277,18 @@ export class ProjEnvProjectConfig {
         for (const sec of sectionOrder) {
             outLines.push(`[${sec}]`);
             const entries = sections[sec] || Object.create(null);
-            const keys = Object.keys(entries).sort((a, b) =>
-                a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }),
-            );
+            const keys = Object.keys(entries);
             for (const key of keys) {
                 const value = entries[key] ?? '';
-                const escaped = String(value).replace(/"/g, '\\"');
-                outLines.push(`${key} = "${escaped}"`);
+                if (Array.isArray(value)) {
+                    for (const val of value) {
+                        const escaped = String(val).replace(/"/g, '\\"');
+                        outLines.push(`${key} = "${escaped}"`);
+                    }
+                } else {
+                    const escaped = String(value).replace(/"/g, '\\"');
+                    outLines.push(`${key} = "${escaped}"`);
+                }
             }
             outLines.push('');
         }
