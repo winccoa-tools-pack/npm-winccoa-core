@@ -760,7 +760,7 @@ export class ProjEnvProject {
 
     //------------------------------------------------------------------------------
     /** Function checks if the project is in emergency mode.
-     * 
+     *
      * @returns true if emergency mode is active, false otherwise
      */
     public isEmergencyMode(): boolean | undefined {
@@ -769,7 +769,7 @@ export class ProjEnvProject {
 
     //------------------------------------------------------------------------------
     /** Function checks if the project use demo license.
-     * 
+     *
      * @returns true if demo mode-license is active, false otherwise
      */
     public isDemoMode(): boolean | undefined {
