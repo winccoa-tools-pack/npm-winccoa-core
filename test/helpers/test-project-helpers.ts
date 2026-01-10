@@ -2,8 +2,10 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { ProjEnvProject } from '../../src/types/project/ProjEnvProject';
-import { getWinCCOAInstallationPathByVersion, getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
-import { findProjectRegistryById } from '../../src/types/project/ProjEnvProjectRegistry';
+import {
+    getWinCCOAInstallationPathByVersion,
+    getAvailableWinCCOAVersions,
+} from '../../src/utils/winccoa-paths';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,7 +29,7 @@ export function getTestProjectPath(projectName: string): string {
  * Creates and registers a runnable WinCC OA test project
  * @returns ProjEnvProject instance for the registered test project
  * @throws Error if registration fails
- * 
+ *
  * @example
  * ```typescript
  * const project = await registerRunnableTestProject();
@@ -40,22 +42,21 @@ export function getTestProjectPath(projectName: string): string {
  * ```
  */
 export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
-
     const subProjectPath = getTestProjectPath('sub-proj');
     const subProject = new ProjEnvProject();
-                    
-        // Set project directory (this sets both install dir and project ID)
-        subProject.setRunnable(false);
-        subProject.setDir(subProjectPath);
-        subProject.setName('test-sub-project');
-        const availableVersions = getAvailableWinCCOAVersions();
-        const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
-        subProject.setVersion(testVersion);
-        await subProject.registerProj();
+
+    // Set project directory (this sets both install dir and project ID)
+    subProject.setRunnable(false);
+    subProject.setDir(subProjectPath);
+    subProject.setName('test-sub-project');
+    const availableVersions = getAvailableWinCCOAVersions();
+    const testVersion = availableVersions.length > 0 ? availableVersions[0] : '';
+    subProject.setVersion(testVersion);
+    await subProject.registerProj();
 
     const projectPath = getTestProjectPath('runnable');
     const project = new ProjEnvProject();
-    
+
     // Set project directory (this sets both install dir and project ID)
     project.setRunnable(true);
     project.setDir(projectPath);
@@ -63,27 +64,32 @@ export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
 
     project.setVersion(testVersion);
 
+    cleanUpProgs(project);
+
+    if (project.isRegistered()) {
+        // Ensure pmon is stopped before registration
+        await project.stopPmon(10);
+    }
 
     // Update config file with actual WinCC OA path and version
     const configPath = path.join(projectPath, 'config', 'config');
     if (fs.existsSync(configPath)) {
         try {
             // Get the first available WinCC OA version for testing
-            
-                const testPath = getWinCCOAInstallationPathByVersion(testVersion);
-                
-                if (testPath) {
-                    // Read the config file
-                    let configContent = fs.readFileSync(configPath, 'utf-8');
-                    
-                    // Replace placeholders with actual values
-                    configContent = configContent.replace(/<WinCC_OA_PATH>/g, testPath);
-                    configContent = configContent.replace(/<WinCC_OA_VERSION>/g, testVersion);
-                    
-                    // Write back the updated config
-                    fs.writeFileSync(configPath, configContent, 'utf-8');
-                }
-            
+
+            const testPath = getWinCCOAInstallationPathByVersion(testVersion);
+
+            if (testPath) {
+                // Read the config file
+                let configContent = fs.readFileSync(configPath, 'utf-8');
+
+                // Replace placeholders with actual values
+                configContent = configContent.replace(/<WinCC_OA_PATH>/g, testPath);
+                configContent = configContent.replace(/<WinCC_OA_VERSION>/g, testVersion);
+
+                // Write back the updated config
+                fs.writeFileSync(configPath, configContent, 'utf-8');
+            }
         } catch (error) {
             console.warn('Warning: Could not update test project config file:', error);
         }
@@ -94,7 +100,9 @@ export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
     try {
         const result = await project.registerProj();
         if (result !== 0) {
-            console.warn(`Warning: Could not register test project (pmon may not be available): error code ${result}`);
+            console.warn(
+                `Warning: Could not register test project (pmon may not be available): error code ${result}`,
+            );
         }
     } catch (error) {
         console.warn(`Warning: Project registration failed (pmon may not be available):`, error);
@@ -117,6 +125,7 @@ export async function unregisterTestProject(project: ProjEnvProject): Promise<vo
         // Stop the project if it's running
         if (project.isRunning()) {
             await project.stop();
+            await project.stopPmon(10);
         }
 
         const subProject = new ProjEnvProject();
@@ -126,7 +135,9 @@ export async function unregisterTestProject(project: ProjEnvProject): Promise<vo
         await subProject.unregisterProj();
 
         // Unregister the project
+
         await project.unregisterProj();
+        cleanUpProgs(project);
     } catch (error) {
         console.warn(`Warning: Failed to clean up test project ${project.getId()}:`, error);
     }
@@ -135,7 +146,7 @@ export async function unregisterTestProject(project: ProjEnvProject): Promise<vo
 /**
  * Helper to run a test with a registered project that gets automatically cleaned up
  * @param testFn Test function that receives the registered project
- * 
+ *
  * @example
  * ```typescript
  * it('should test project functionality', async () => {
@@ -147,10 +158,9 @@ export async function unregisterTestProject(project: ProjEnvProject): Promise<vo
  * ```
  */
 export async function withRunnableTestProject(
-    testFn: (project: ProjEnvProject) => Promise<void>
+    testFn: (project: ProjEnvProject) => Promise<void>,
 ): Promise<void> {
     let project: ProjEnvProject | undefined;
-    
 
     try {
         project = await registerRunnableTestProject();
@@ -159,5 +169,16 @@ export async function withRunnableTestProject(
         if (project) {
             await unregisterTestProject(project);
         }
+    }
+}
+
+export function cleanUpProgs(project: ProjEnvProject): void {
+    const progsPath = project.getConfigPath('progs');
+    const progsBackupPath = progsPath + '.bak';
+
+    if (fs.existsSync(progsBackupPath)) {
+        fs.unlinkSync(progsPath);
+        fs.copyFileSync(progsBackupPath, progsPath);
+        fs.unlinkSync(progsBackupPath);
     }
 }
