@@ -1,0 +1,32 @@
+# Repository settings applied via GitHub REST API by .github/workflows/apply-settings-and-rulesets.yml
+# This repo uses GitFlow: develop is default, main is stable release.
+
+description: "Core utilities and type definitions for WinCC OA development. This library provides essential functionality for managing WinCC OA projects, components, and system interactions. It includes type definitions, project scaffolding tools, and utility functions to streamline the development process in WinCC OA environments."
+homepage: "https://github.com/winccoa-tools-pack"
+default_branch: "develop"
+
+has_issues: true
+has_wiki: false
+
+allow_squash_merge: true
+allow_merge_commit: false
+allow_rebase_merge: false
+
+delete_branch_on_merge: true
+
+topics:
+  - winccoa
+  - wincc-oa
+  - automation
+  - scada
+  - hmi
+  - industrial-automation
+  - Siemens
+  - ETM
+  - NPM
+  - winccoa-NPM
+  - winccoa-NPM-core
+
+security:
+  enable_vulnerability_alerts: true
+  enable_automated_security_fixes: true
