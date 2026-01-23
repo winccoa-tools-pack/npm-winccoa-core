@@ -44,7 +44,8 @@ jobs:
     with:
       target_branch: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
       validate_release_branch: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/v') }}
-    secrets: inherit
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   cleanup-old-prereleases:
     needs: [pre-release]

@@ -24,7 +24,8 @@ jobs:
     with:
       target_branch: ${{ github.event.workflow_run.head_branch || github.ref_name }}
       validate_release_branch: false
-    secrets: inherit
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   notify-success:
     runs-on: ubuntu-latest
