@@ -124,7 +124,7 @@ jobs:
           if [ -z "$IMAGE" ]; then
             echo "No WinCC OA image configured (package.json config.winccoaImage or repo var WINCCOA_IMAGE)."
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
+            exit 1
           fi
 
           echo "Using WinCC OA image: $IMAGE"
