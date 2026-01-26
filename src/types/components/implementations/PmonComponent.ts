@@ -5,6 +5,7 @@ import {
     ProjEnvManagerStartMode,
     ProjEnvManagerState,
     ProjEnvProjectState,
+    startModeToString,
 } from '../../project/ProjEnv.js';
 import type { ProjEnvManagerInfo } from '../../project/ProjEnv.js';
 import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus.js';
@@ -48,9 +49,7 @@ export class PmonComponent extends WinCCOAComponent {
      */
     public async registerSubProject(projectPath: string): Promise<number> {
         const args = ['-regsubf', '-proj', projectPath, '-log', '+stderr'];
-        const code = super.start(args);
-
-        return code;
+        return this.startAndValidateOutput(args, { checkStdout: false });
     }
 
     //-------------------------------------------------------------------------
@@ -63,9 +62,7 @@ export class PmonComponent extends WinCCOAComponent {
     public async unregisterProject(projectName: string): Promise<number> {
         // Use -unreg option to unregister project
         const args = ['-unreg', projectName, '-log', '+stderr'];
-        const code = super.start(args);
-
-        return code;
+        return this.startAndValidateOutput(args, { checkStdout: false });
     }
 
     //-------------------------------------------------------------------------
@@ -82,7 +79,7 @@ export class PmonComponent extends WinCCOAComponent {
         // Use -config -autofreg -status options to register runnable project
         const args = ['-config', configPath, '-log', '+stderr', '-autofreg', '-status'];
         super.setVersion(projectVersion);
-        const code = super.start(args);
+        const code = this.startAndValidateOutput(args, { checkStdout: false });
 
         // the pmon returns 3 if the project is not running after registrations
 
@@ -101,7 +98,7 @@ export class PmonComponent extends WinCCOAComponent {
           0=pmon is running, 3=pmon is stopped, 4=unknown
         */
         const args = ['-status', '-proj', projectName, '-log', '+stdout'];
-        const code = super.start(args);
+        const code = this.startAndValidateOutput(args, { checkStdout: () => {} });
 
         return this.pmonStateCodeToStatus(await code);
     }
@@ -113,7 +110,7 @@ export class PmonComponent extends WinCCOAComponent {
     public async startPmonOnly(projectName: string): Promise<number> {
         const args = ['-proj', projectName, '-noAutostart'];
 
-        return super.start(args, { detached: true, waitForLog: 'WAIT_MODE' });
+        return this.startAndValidateOutput(args, { detached: true, waitForLog: 'WAIT_MODE' });
     }
 
     //-------------------------------------------------------------------------
@@ -126,11 +123,11 @@ export class PmonComponent extends WinCCOAComponent {
         if (startAll) {
             args = args.concat(['-command', this.makeCliCredentials() + 'START_ALL:']);
             // INFO, 9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
-            return super.start(args, { waitForLog: '9/pmon' });
+            return this.startAndValidateOutput(args, { waitForLog: '9/pmon' });
         } else {
             // starting pmon only without extra arguments means, it will start the project too.
             // that means the pmon process will never end (hopefully, otherwise it crashed), so we need to detach
-            return super.start(args, { detached: true, waitForLog: 'WAIT_MODE' });
+            return this.startAndValidateOutput(args, { detached: true, waitForLog: 'WAIT_MODE' });
         }
     }
 
@@ -139,9 +136,16 @@ export class PmonComponent extends WinCCOAComponent {
      * Stops all managers in a project
      */
     public async stopProject(projectName: string): Promise<number> {
-        const args = ['-proj', projectName, '-command', this.makeCliCredentials() + 'STOP_ALL:'];
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'STOP_ALL:',
+            '-log',
+            '+stderr',
+        ];
         // INFO, 13/pmon, Projekt wurde komplett gestoppt - warte auf Befehle
-        return super.start(args, { waitForLog: '13/pmon' });
+        return this.startAndValidateOutput(args, { waitForLog: '13/pmon' });
     }
 
     //-------------------------------------------------------------------------
@@ -152,8 +156,8 @@ export class PmonComponent extends WinCCOAComponent {
         projectName: string,
         timeout: number | undefined,
     ): Promise<number> {
-        const args = ['-proj', projectName, '-stopWait'];
-        return super.start(args, { timeout: timeout });
+        const args = ['-proj', projectName, '-stopWait', '-log', '+stderr'];
+        return this.startAndValidateOutput(args, { timeout: timeout, checkStdout: false });
     }
 
     //-------------------------------------------------------------------------
@@ -161,8 +165,15 @@ export class PmonComponent extends WinCCOAComponent {
      * Restarts all managers in a project
      */
     public async restartProject(projectName: string): Promise<number> {
-        const args = ['-proj', projectName, '-command', this.makeCliCredentials() + 'RESTART_ALL:'];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'RESTART_ALL:',
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -170,8 +181,15 @@ export class PmonComponent extends WinCCOAComponent {
      * Sets pmon wait mode
      */
     public async setWaitMode(projectName: string): Promise<number> {
-        const args = ['-proj', projectName, '-command', this.makeCliCredentials() + 'WAIT_MODE:'];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'WAIT_MODE:',
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -185,8 +203,10 @@ export class PmonComponent extends WinCCOAComponent {
             '-command',
             this.makeCliCredentials() + 'SINGLE_MGR:START',
             managerIndex.toString(),
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -200,8 +220,10 @@ export class PmonComponent extends WinCCOAComponent {
             '-command',
             this.makeCliCredentials() + 'SINGLE_MGR:STOP',
             managerIndex.toString(),
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -215,8 +237,10 @@ export class PmonComponent extends WinCCOAComponent {
             '-command',
             this.makeCliCredentials() + 'SINGLE_MGR:KILL',
             managerIndex.toString(),
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -230,8 +254,10 @@ export class PmonComponent extends WinCCOAComponent {
             '-command',
             this.makeCliCredentials() + 'SINGLE_MGR:DEL',
             managerIndex.toString(),
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -300,13 +326,15 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             '-command',
             this.makeCliCredentials() + 'SINGLE_MGR:PROP_PUT',
             managerIndex.toString(),
-            options.startMode.toString(),
+            startModeToString(options.startMode),
             options.secondToKill.toString(),
             options.resetStartCounter.toString(),
-            options.restart.toString(),
+            options.resetMin.toString(),
             options.startOptions,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -318,8 +346,13 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
     public async insertManagerAt(
         options: ProjEnvManagerOptions,
         projectName: string,
-        managerIndex: number,
+        managerIndex: number | undefined,
     ): Promise<number> {
+        if (managerIndex === undefined) {
+            managerIndex =
+                (await this.getManagerOptionsList(projectName).then((list) => list.length)) + 1;
+        }
+        // SINGLE_MGR:INS <idx> <manager> <startmode> <seckill> <restartcount> <resetmin> <args>
         const args = [
             '-proj',
             projectName,
@@ -327,13 +360,15 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             this.makeCliCredentials() + 'SINGLE_MGR:INS',
             managerIndex.toString(),
             options.component,
-            options.startMode.toString(),
+            startModeToString(options.startMode),
             options.secondToKill.toString(),
             options.resetStartCounter.toString(),
-            options.restart.toString(),
+            options.resetMin.toString(),
             options.startOptions,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -354,8 +389,10 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             this.makeCliCredentials() + 'SINGLE_MGR:DEBUG',
             managerIndex.toString(),
             flag,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
     //-------------------------------------------------------------------------
@@ -513,8 +550,39 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             oldCredentials.password,
             newCredentials.username,
             newCredentials.password,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
+    }
+
+    private startAndValidateOutput(
+        args: string[] = [],
+        options: {
+            detached?: boolean;
+            waitForLog?: string;
+            timeout?: number;
+            checkStdout?: false | ((stdout: string) => void);
+        } = {},
+    ): Promise<number> {
+        if (options.checkStdout === undefined) {
+            options.checkStdout = (stdout: string) => {
+                if (!stdout) {
+                    console.warn(
+                        'WARNING: Pmon command returned empty output. Do you means stdErr: ' +
+                            this.stdErr,
+                    );
+                    return;
+                }
+                stdout = stdout.trim();
+                if (stdout != 'OK') {
+                    console.error('ERROR: Pmon command failed with output:', stdout);
+                } else if (stdout.startsWith('ERROR')) {
+                    throw new Error(`Pmon command failed with error: ${stdout}`);
+                }
+            };
+        }
+        return super.start(args, options);
     }
 
     //-------------------------------------------------------------------------
@@ -581,8 +649,8 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
                 component: name,
                 startMode: startModeEnum,
                 secondToKill: seckill,
-                restart: restartCount,
-                resetStartCounter: resetMin,
+                resetMin: resetMin,
+                resetStartCounter: restartCount,
                 startOptions: args,
             });
         }

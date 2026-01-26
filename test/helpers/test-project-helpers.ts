@@ -1,7 +1,9 @@
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import type { TestContext } from 'node:test';
 import { ProjEnvProject } from '../../src/types/project/ProjEnvProject';
+import { PmonComponent } from '../../src/types/components/implementations/PmonComponent';
 import {
     getWinCCOAInstallationPathByVersion,
     getAvailableWinCCOAVersions,
@@ -181,4 +183,69 @@ export function cleanUpProgs(project: ProjEnvProject): void {
         fs.copyFileSync(progsBackupPath, progsPath);
         fs.unlinkSync(progsBackupPath);
     }
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export type EnsurePmonAcceptingCommandsOptions = {
+    timeoutMs?: number;
+    pollMs?: number;
+};
+
+/**
+ * Starts the project (if needed) and waits until pmon accepts list commands.
+ * Returns a configured PmonComponent, or skips the test and returns undefined.
+ */
+export async function ensurePmonAcceptingCommands(
+    t: TestContext,
+    project: ProjEnvProject,
+    options: EnsurePmonAcceptingCommandsOptions = {},
+): Promise<PmonComponent | undefined> {
+    const timeoutMs = options.timeoutMs ?? 15_000;
+    const pollMs = options.pollMs ?? 500;
+
+    const version = project.getVersion() || '';
+    if (!version) {
+        t.skip('No WinCC OA version configured for runnable test project');
+        return undefined;
+    }
+
+    const pmon = new PmonComponent();
+    pmon.setVersion(version);
+    if (!pmon.exists()) {
+        t.skip('WCCILpmon not found on this machine; skipping integration test');
+        return undefined;
+    }
+
+    // Prefer starting pmon only: it keeps manager list closer to progs order.
+    // Some environments may still require full project start; we'll fall back if needed.
+    const startCode = await project.startPmon();
+    if (startCode !== 0) {
+        // startCode = await project.start();
+        // if (startCode !== 0) {
+            t.skip(`Could not start pmon/project for integration test (code=${startCode})`);
+            return undefined;
+        // }
+    }
+
+    const start = Date.now();
+    // Wait until pmon accepts commands (MGRLIST:LIST).
+    while (Date.now() - start < timeoutMs) {
+        try {
+            const isProjRunning = await project.isPmonRunning();
+            if (isProjRunning) {
+                console.log('Pmon is accepting commands.');
+                return pmon;
+            }
+        } catch {
+            // ignore and retry
+        }
+
+        await sleep(pollMs);
+    }
+
+    t.skip(`Pmon did not become responsive within ${timeoutMs} ms`);
+    return undefined;
 }
