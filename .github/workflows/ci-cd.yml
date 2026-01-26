@@ -142,22 +142,14 @@ jobs:
             -v "$GITHUB_WORKSPACE":$WORKDIR:rw \
             -e CI=true \
             -w $WORKDIR \
-            "${{ steps.image.outputs.image }}" tail -f /dev/null
+            "${{ steps.image.outputs.image }}" bash -lc 'chmod +x .github/scripts/wait-for-winccoa.sh; .github/scripts/wait-for-winccoa.sh'
 
       - name: Wait for WinCC OA readiness
         shell: bash
         run: |
           set -euo pipefail
-          echo "Waiting for WinCC OA inside container..."
-          for i in {1..60}; do
-            if docker exec winccoa-ci sh -c '[ -x /opt/WinCC_OA/bin/winccoa ]'; then
-              echo "Container ready (attempt $i)";
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "::error::WinCC OA did not become ready in time"
-          exit 1
+          chmod +x ./scripts/wait-for-winccoa.sh
+          ./scripts/wait-for-winccoa.sh winccoa-ci 60
 
       - name: Run integration tests inside container
         shell: bash
