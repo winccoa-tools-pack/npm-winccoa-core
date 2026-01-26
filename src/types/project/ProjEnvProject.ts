@@ -699,8 +699,6 @@ export class ProjEnvProject {
     //------------------------------------------------------------------------------
     /** @brief Function start pmon for this project.
      *  @details Pmon can be started locally only.
-     * @param autoStart Enable to start project self by pmon. You can deactivate it,
-     *                 so is started pmon only.
      * @return Error code.
      * value | description
      * ------|------------
@@ -835,7 +833,10 @@ export class ProjEnvProject {
      *               Index begin with 1. Pmon has idx 0 in progs file.
      * @return Error code. Returns -1 when failed, -2 when pmon is not reachable, otherwise returns the index of the inserted manager.
      */
-    public async insertManager(opts: ProjEnvManagerOptions, manIdx = -1): Promise<number> {
+    public async insertManager(
+        opts: ProjEnvManagerOptions,
+        manIdx: number | undefined = undefined,
+    ): Promise<number> {
         const result = await this._pmon.insertManagerAt(opts, this.getId(), manIdx);
         return result ?? -1;
     }
