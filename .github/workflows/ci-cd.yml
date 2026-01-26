@@ -144,12 +144,12 @@ jobs:
             -w $WORKDIR \
             "${{ steps.image.outputs.image }}" bash -lc 'chmod +x .github/scripts/wait-for-winccoa.sh; .github/scripts/wait-for-winccoa.sh'
 
-      - name: Wait for WinCC OA readiness
-        shell: bash
-        run: |
-          set -euo pipefail
-          chmod +x ./scripts/wait-for-winccoa.sh
-          ./scripts/wait-for-winccoa.sh winccoa-ci 60
+      # - name: Wait for WinCC OA readiness
+      #   shell: bash
+      #   run: |
+      #     set -euo pipefail
+      #     chmod +x ./scripts/wait-for-winccoa.sh
+      #     ./scripts/wait-for-winccoa.sh winccoa-ci 60
 
       - name: Run integration tests inside container
         shell: bash
