@@ -107,19 +107,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          IMAGE_FROM_PKG=$(node -p "(require('./package.json').config && require('./package.json').config.winccoaImage) || ''" 2>/dev/null || true)
-          IMAGE_FROM_PKG="${IMAGE_FROM_PKG//\r/}"
-          IMAGE_FROM_PKG="${IMAGE_FROM_PKG//\n/}"
-
-          # Optional override via repository variable WINCCOA_IMAGE
-          IMAGE_OVERRIDE="${{ vars.WINCCOA_IMAGE || '' }}"
-          IMAGE_OVERRIDE="${IMAGE_OVERRIDE//\r/}"
-          IMAGE_OVERRIDE="${IMAGE_OVERRIDE//\n/}"
-
-          IMAGE="$IMAGE_FROM_PKG"
-          if [ -n "$IMAGE_OVERRIDE" ]; then
-            IMAGE="$IMAGE_OVERRIDE"
-          fi
+          IMAGE="mpokornyetm/winccoa-tools-pack-npm-winccoa-core"
 
           if [ -z "$IMAGE" ]; then
             echo "No WinCC OA image configured (package.json config.winccoaImage or repo var WINCCOA_IMAGE)."
