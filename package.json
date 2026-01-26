@@ -61,6 +61,9 @@
     "typescript": "^5.2.0",
     "typescript-eslint": "^8.53.0"
   },
+  "config": {
+    "winccoaImage": "mpokornyetm/winccoa-tools-pack-npm-winccoa-core"
+  },
   "overrides": {
     "glob": "^9.0.0"
   },
