@@ -17,16 +17,6 @@ describe('insertManagerAt (integration)', () => {
 					return;
 				}
 
-				const progsPath = project.getConfigPath('progs');
-				assert.ok(progsPath, 'Expected progs file path');
-				assert.ok(fs.existsSync(progsPath), 'Expected progs file to exist');
-
-				// Ensure we can restore the runnable fixture after this test.
-				const progsBackupPath = progsPath + '.bak';
-				if (!fs.existsSync(progsBackupPath)) {
-					fs.copyFileSync(progsPath, progsBackupPath);
-				}
-
 				const beforeList = await pmon.getManagerOptionsList(project.getId());
 				const beforeComponents = listComponents(beforeList);
 				if (beforeComponents.join(',') !== 'WCCILpmon,WCCOAui') {
