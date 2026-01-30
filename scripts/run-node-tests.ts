@@ -47,13 +47,14 @@ if (files.length === 0) {
     process.exit(1);
 }
 
-
-    let failed = false;
-    for (const file of files) {
-        const args = ['--import', 'tsx', '--test', '--test-force-exit', file];
-        const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
-        if (result.status !== 0) {
-            failed = true;
-        }
+// Run tests one by one to better isolate failures
+// Integration tests may leave resources hanging that interfere with subsequent tests
+let failed = false;
+for (const file of files) {
+    const args = ['--import', 'tsx', '--test', '--test-force-exit', file];
+    const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
+    if (result.status !== 0) {
+        failed = true;
     }
-    process.exit(failed ? 1 : 0);
+}
+process.exit(failed ? 1 : 0);
