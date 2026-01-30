@@ -142,7 +142,7 @@ jobs:
           set -euo pipefail
           # --shm-size=2g is critical for VS Code/Electron in Docker
           docker run -d --name winccoa-ci \
-            --shm-size=2g \
+            --shm-size=4g \
             --memory=6g \
             -v "$GITHUB_WORKSPACE":$WORKDIR:rw \
             -e CI=true \
