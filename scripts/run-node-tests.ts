@@ -47,6 +47,6 @@ if (files.length === 0) {
     process.exit(1);
 }
 
-const args = ['--import', 'tsx', '--test', '--test-force-exit', ...files];
+const args = ['--import', 'tsx', '--test', '--test-force-exit', '--test-threads=1', ...files];
 const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
 process.exit(result.status ?? 1);
