@@ -84,7 +84,7 @@ jobs:
 
   integration-winccoa:
     name: Integration Tests - WinCC OA
-  #  needs: [test]
+    needs: [test]
     if: ${{ needs.test.result == 'success' }}
     runs-on: ubuntu-latest
     env:
