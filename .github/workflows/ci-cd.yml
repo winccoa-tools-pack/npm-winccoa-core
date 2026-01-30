@@ -84,7 +84,7 @@ jobs:
 
   integration-winccoa:
     name: Integration Tests - WinCC OA
-    needs: [test]
+  #  needs: [test]
     if: ${{ needs.test.result == 'success' }}
     runs-on: ubuntu-latest
     env:
@@ -132,6 +132,10 @@ jobs:
           set -euo pipefail
           test -f "./test/fixtures/projects/runnable/config/config"
 
+
+      - name: Build package (host)
+        run: npm run build
+
       - name: Run WinCC OA container
         shell: bash
         run: |
@@ -161,8 +165,6 @@ jobs:
           docker exec --user root winccoa-ci sh -c '
             set -e
             echo "Node version: $(node -v)"
-            echo "building package"
-            npm run build
             echo "Starting integration tests under Xvfb"
             xvfb-run -s "-screen 0 1280x1024x24" npm run test:integration -- --no-sandbox --disable-gpu
           '
