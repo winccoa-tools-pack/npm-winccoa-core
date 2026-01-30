@@ -47,6 +47,13 @@ if (files.length === 0) {
     process.exit(1);
 }
 
-const args = ['--import', 'tsx', '--test', '--test-force-exit', '--test-threads=1', ...files];
-const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
-process.exit(result.status ?? 1);
+
+    let failed = false;
+    for (const file of files) {
+        const args = ['--import', 'tsx', '--test', '--test-force-exit', file];
+        const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
+        if (result.status !== 0) {
+            failed = true;
+        }
+    }
+    process.exit(failed ? 1 : 0);
