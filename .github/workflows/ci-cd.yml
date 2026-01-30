@@ -159,7 +159,7 @@ jobs:
             set -e
             echo "Node version: $(node -v)"
             echo "Starting integration tests under Xvfb"
-            xvfb-run -s "-screen 0 1280x1024x24" npm run ci:integration
+            xvfb-run -s "-screen 0 1280x1024x24" npm run ci:integration -- --no-sandbox --disable-gpu
           '
 
       - name: Collect logs on failure
