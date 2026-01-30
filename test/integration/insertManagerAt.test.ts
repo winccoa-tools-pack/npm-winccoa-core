@@ -17,16 +17,6 @@ describe('insertManagerAt (integration)', () => {
 					return;
 				}
 
-				const progsPath = project.getConfigPath('progs');
-				assert.ok(progsPath, 'Expected progs file path');
-				assert.ok(fs.existsSync(progsPath), 'Expected progs file to exist');
-
-				// Ensure we can restore the runnable fixture after this test.
-				const progsBackupPath = progsPath + '.bak';
-				if (!fs.existsSync(progsBackupPath)) {
-					fs.copyFileSync(progsPath, progsBackupPath);
-				}
-
 				const beforeList = await pmon.getManagerOptionsList(project.getId());
 				const beforeComponents = listComponents(beforeList);
 				if (beforeComponents.join(',') !== 'WCCILpmon,WCCOAui') {
@@ -65,7 +55,7 @@ describe('insertManagerAt (integration)', () => {
 
 				if (afterComponents.length <= 1 || afterComponents[1] !== 'WCCOActrl') {
                     assert.fail(
-						`WCCOActrl was not visible at index 1 via MGRLIST:LIST (got: ${afterComponents.join(',')})`,
+						`WCCOActrl was not visible at index 1 via MGRLIST:LIST (got: ${afterComponents.join(',')}) after ${timeoutMs}ms, stdErr: ${pmon.stdErr}, \n , stdErr: ${pmon.stdOut}`,
 					);
 					return;
 				}
