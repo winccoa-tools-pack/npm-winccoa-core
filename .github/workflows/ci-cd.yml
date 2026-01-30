@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKDIR: /workspace
-      IMAGE_NAME: mpokornyetm/winccoa-tools-pack-npm-winccoa-core
+      IMAGE_NAME: mpokornyetm/winccoa-tools-pack-npm-winccoa-core:npm-winccoa-core
 
     steps:
       - name: Checkout repository
