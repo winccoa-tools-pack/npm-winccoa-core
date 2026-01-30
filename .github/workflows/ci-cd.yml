@@ -89,31 +89,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKDIR: /workspace
+      IMAGE_NAME: mpokornyetm/winccoa-tools-pack-npm-winccoa-core
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Erhöht den verfügbaren RAM durch Swap auf der SSD (verhindert Host-OOM)
+      - name: Set up Swap Space
+        uses: [pierotofy/set-swap-space](https://github.com)@master
+        with:
+          swap-size-gb: 4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Determine WinCC OA image
-        id: image
-        shell: bash
-        env:
-          WINCCOA_IMAGE: ${{ vars.WINCCOA_IMAGE }}
-        run: |
-          set -euo pipefail
-
-          PKG_IMAGE="$(node -p "require('./package.json').config?.winccoaImage || ''")"
-
-          IMAGE="${WINCCOA_IMAGE:-$PKG_IMAGE}"
-          if [ -z "$IMAGE" ]; then
-            IMAGE="mpokornyetm/winccoa-tools-pack-npm-winccoa-core"
-          fi
-
-          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-          echo "Using WinCC OA image: $IMAGE"
 
       - name: Login to Docker Hub (optional)
         shell: bash
@@ -132,7 +121,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker pull "${{ steps.image.outputs.image }}"
+          docker pull "$IMAGE_NAME"
 
       - name: Verify runnable fixture config exists
         shell: bash
@@ -144,13 +133,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # --shm-size=2g is critical for VS Code/Electron in Docker
           docker run -d --name winccoa-ci \
+            --shm-size=2g \
+            --memory=4g \
             -v "$GITHUB_WORKSPACE":$WORKDIR:rw \
             -e CI=true \
             -e OAINST=/opt/WinCC_OA \
             -e OAPROJ=$WORKDIR/test/fixtures/projects/runnable \
             -w $WORKDIR \
-            "${{ steps.image.outputs.image }}" bash -lc 'sleep 2'
+            "$IMAGE_NAME" bash -lc 'sleep 2'
 
       - name: Verify Xvfb available
         shell: bash
@@ -162,6 +154,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # xvfb-run simulates the display for the VS Code Extension Tests
           docker exec --user root winccoa-ci sh -c '
             set -e
             echo "Node version: $(node -v)"
@@ -175,6 +168,8 @@ jobs:
         run: |
           echo "==== docker logs ===="
           docker logs winccoa-ci || true
+          echo "==== dmesg (check for OOM Killer) ===="
+          dmesg | tail -n 50 || true
 
       - name: Stop and remove container
         if: ${{ always() }}
