@@ -134,6 +134,12 @@ jobs:
           set -euo pipefail
           docker pull "${{ steps.image.outputs.image }}"
 
+      - name: Verify runnable fixture config exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "./test/fixtures/projects/runnable/config/config"
+
       - name: Run WinCC OA container
         shell: bash
         run: |
@@ -141,15 +147,16 @@ jobs:
           docker run -d --name winccoa-ci \
             -v "$GITHUB_WORKSPACE":$WORKDIR:rw \
             -e CI=true \
+            -e OAINST=/opt/WinCC_OA \
+            -e OAPROJ=$WORKDIR/test/fixtures/projects/runnable \
             -w $WORKDIR \
-            "${{ steps.image.outputs.image }}" bash -lc 'chmod +x .github/scripts/wait-for-winccoa.sh; .github/scripts/wait-for-winccoa.sh'
+            "${{ steps.image.outputs.image }}" bash -lc 'sleep 2'
 
-      # - name: Wait for WinCC OA readiness
-      #   shell: bash
-      #   run: |
-      #     set -euo pipefail
-      #     chmod +x ./scripts/wait-for-winccoa.sh
-      #     ./scripts/wait-for-winccoa.sh winccoa-ci 60
+      - name: Verify Xvfb available
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec --user root winccoa-ci sh -c 'command -v xvfb-run >/dev/null 2>&1 || (echo "::error::xvfb-run not found in container"; exit 1)'
 
       - name: Run integration tests inside container
         shell: bash

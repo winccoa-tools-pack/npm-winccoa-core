@@ -55,7 +55,7 @@ describe('insertManagerAt (integration)', () => {
 
 				if (afterComponents.length <= 1 || afterComponents[1] !== 'WCCOActrl') {
                     assert.fail(
-						`WCCOActrl was not visible at index 1 via MGRLIST:LIST (got: ${afterComponents.join(',')})`,
+						`WCCOActrl was not visible at index 1 via MGRLIST:LIST (got: ${afterComponents.join(',')}) after ${timeoutMs}ms, stdErr: ${pmon.stdErr}, \n , stdErr: ${pmon.stdOut}`,
 					);
 					return;
 				}
