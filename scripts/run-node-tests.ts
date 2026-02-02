@@ -31,19 +31,33 @@ function collectTestFiles(rootDir: string): string[] {
     return out.sort();
 }
 
-const dirs = process.argv.slice(2);
-if (dirs.length === 0) {
-    console.error('Usage: node --import tsx scripts/run-node-tests.ts <dir> [dir...]');
+// Collect CLI args but ignore option-like args (starting with '-')
+const rawArgs = process.argv.slice(2);
+const targets = rawArgs.filter((a) => !a.startsWith('-'));
+if (targets.length === 0) {
+    console.error('Usage: node --import tsx scripts/run-node-tests.ts <file|dir> [file|dir...]');
     process.exit(2);
 }
 
 const cwd = process.cwd();
-const files = dirs
-    .map((d) => path.resolve(cwd, d))
-    .flatMap((d) => collectTestFiles(d));
+const files = targets.flatMap((t) => {
+    const resolved = path.resolve(cwd, t);
+    try {
+        const stat = fs.statSync(resolved);
+        if (stat.isFile() && resolved.endsWith('.test.ts')) {
+            return [resolved];
+        }
+        if (stat.isDirectory()) {
+            return collectTestFiles(resolved);
+        }
+    } catch {
+        // ignore missing targets
+    }
+    return [] as string[];
+});
 
 if (files.length === 0) {
-    console.error(`No '*.test.ts' files found under: ${dirs.join(', ')}`);
+    console.error(`No '*.test.ts' files found under: ${targets.join(', ')}`);
     process.exit(1);
 }
 
