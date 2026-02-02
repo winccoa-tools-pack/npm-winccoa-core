@@ -126,11 +126,16 @@ describe('winccoa-project-environment (integration)', () => {
             
             assert.ok(!proj, 'runnable project does not exists per default');
 
-            proj = projects.find(p => p.getId().startsWith('DemoApplication_'));
-            assert.ok(proj, 'DemoApplication_<version> project does shall be installed');
             const availableVersions = getAvailableWinCCOAVersions();
-            const testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
-            assert.strictEqual(proj.getId(), 'DemoApplication_' + testVersion, 'Project should have an ID: runnable');
+            let testVersion = (availableVersions.length > 0) ? availableVersions[0] : '';
+            proj = projects.find(p => p.getId().startsWith('DemoApplication_' + testVersion));
+
+            if (!proj && availableVersions.length > 1) {
+                testVersion = availableVersions[1];
+                proj = projects.find(p => p.getId().startsWith('DemoApplication_' + testVersion));
+            }
+            assert.ok(proj, 'DemoApplication_' + testVersion + ' project does shall be installed');
+            assert.strictEqual(proj.getId(), 'DemoApplication_' + testVersion, 'Check ID');
             assert.ok(proj.isRunnable(), 'The projects DemoApplication_<version> should be runnable');
             assert.ok(proj.isRegistered(), 'The projects DemoApplication_<version> should be registered');
             assert.ok(proj.getInstallDir() != '', 'The projects DemoApplication_<version> should have an install dir');

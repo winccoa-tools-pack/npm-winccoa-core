@@ -109,6 +109,15 @@ export async function registerRunnableTestProject(): Promise<ProjEnvProject> {
     } catch (error) {
         console.warn(`Warning: Project registration failed (pmon may not be available):`, error);
     }
+        
+    // make a backup of progs file
+    const progsPath = project.getConfigPath('progs');
+	
+				// Ensure we can restore the runnable fixture after this test.
+				const progsBackupPath = progsPath + '.bak';
+				if (!fs.existsSync(progsBackupPath)) {
+					fs.copyFileSync(progsPath, progsBackupPath);
+				}
 
     return project;
 }
@@ -166,6 +175,7 @@ export async function withRunnableTestProject(
 
     try {
         project = await registerRunnableTestProject();
+                
         await testFn(project);
     } finally {
         if (project) {

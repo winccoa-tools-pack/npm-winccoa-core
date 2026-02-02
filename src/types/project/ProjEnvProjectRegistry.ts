@@ -32,6 +32,8 @@ export interface ProjEnvProjectRegistry {
     currentProject?: boolean;
 
     installationVersion?: string;
+
+    invalidReason?: string;
 }
 
 export interface ProductRegistry extends ProjEnvProjectRegistry {
@@ -295,9 +297,8 @@ function parseProjRegistryFile(configPath: string): void {
                         const idFromPath = path.basename(entryValue);
 
                         if (idFromPath && idFromPath !== currentProjectSection.id) {
-                            throw new Error(
-                                `Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`,
-                            );
+                            currentProjectSection.invalidReason = `Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`;
+                            break;
                         }
 
                         currentProjectSection.installationDir = path.dirname(entryValue);
