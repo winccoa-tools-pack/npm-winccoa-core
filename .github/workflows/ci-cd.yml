@@ -120,6 +120,8 @@ jobs:
         run: |
           set -euo pipefail
           test -f "./test/fixtures/projects/runnable/config/config"
+      - name: Install dependencies (host)
+        run: npm ci
       - name: Build package (host)
         run: npm run build
       - name: Run WinCC OA container
