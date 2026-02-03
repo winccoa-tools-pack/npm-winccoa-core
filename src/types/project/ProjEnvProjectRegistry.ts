@@ -167,7 +167,7 @@ function loadProjectRegistries(): void {
                         console.log(
                             `[${new Date().toISOString()}] Reloading project registries. Current cache size: ${registeredProjectsCache.length}`,
                         );
-                        
+
                         try {
                             parseProjRegistryFile(configPath);
                             console.log(
@@ -188,7 +188,7 @@ function loadProjectRegistries(): void {
                     }, 100);
                 }
             });
-            
+
             // Handle watcher errors to prevent crashes
             fileWatcher.on('error', (error) => {
                 console.error(
@@ -345,14 +345,16 @@ function parseProjRegistryFile(configPath: string): void {
 
     registeredProjectsCache = projects;
     registeredProducts = products;
-    
+
     // Debug logging
     console.log(`[PVSS REGISTRY] Parsed pvssInst.conf:`);
     console.log(`[PVSS REGISTRY]   Total projects: ${projects.length}`);
     console.log(`[PVSS REGISTRY]   Total products: ${products.length}`);
-    
-    projects.forEach(p => {
-        console.log(`[PVSS REGISTRY]   Project: ${p.id} - notRunnable=${p.notRunnable} (${p.notRunnable ? 'FILTERED OUT' : 'WILL SHOW'})`);
+
+    projects.forEach((p) => {
+        console.log(
+            `[PVSS REGISTRY]   Project: ${p.id} - notRunnable=${p.notRunnable} (${p.notRunnable ? 'FILTERED OUT' : 'WILL SHOW'})`,
+        );
     });
 }
 
