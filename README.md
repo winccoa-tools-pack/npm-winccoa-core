@@ -225,7 +225,7 @@ We're excited to be part of your development journey.
 
 ## Quick Links
 
-• [📦 VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mPokornyETM.wincc-oa-projects)
+• [📦 npm package](https://www.npmjs.com/package/@winccoa-tools-pack/npm-winccoa-core)
 • [📚 Documentation](docs/dev/README.md)
 • [🐛 Report Issues](https://github.com/winccoa-tools-pack/npm-winccoa-core/issues)
 

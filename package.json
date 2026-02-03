@@ -1,6 +1,6 @@
 {
   "name": "@winccoa-tools-pack/npm-winccoa-core",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "author": "winccoa-tools-pack",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -42,27 +42,27 @@
     "style-check": "npm run lint && npm run format:check && npm run lint:md",
     "style-fix": "npm run lint:fix && npm run format && npm run lint:md:fix",
     "test": "npm run style-check && npm run build && npm run test:unit",
-    "test:unit": "node --import tsx --test --test-force-exit test/unit/*.test.ts test/unit/types/**/*.test.ts test/unit/utils/*.test.ts",
-    "test:integration": "node --import tsx --test --test-force-exit test/integration/*.test.ts",
+    "test:unit": "node --import tsx scripts/run-node-tests.ts test/unit",
+    "test:integration": "node --import tsx scripts/run-node-tests.ts test/integration",
     "ci:integration": "npm ci && npm run build && npm run test:integration"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@types/node": "^25.0.3",
+    "@types/node": "^25.2.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
-    "globals": "^17.0.0",
+    "globals": "^17.3.0",
     "markdownlint": "^0.40.0",
     "markdownlint-cli": "^0.47.0",
-    "prettier": "^3.0.0",
+    "prettier": "^3.8.1",
     "ts-node": "^10.9.1",
     "tsx": "^4.21.0",
     "typescript": "^5.2.0",
-    "typescript-eslint": "^8.51.0"
+    "typescript-eslint": "^8.54.0"
   },
-  "overrides": {
-    "glob": "^9.0.0"
+  "config": {
+    "winccoaImage": "mpokornyetm/winccoa-tools-pack-npm-winccoa-core:npm-winccoa-core"
   },
   "engines": {
     "node": ">=20"

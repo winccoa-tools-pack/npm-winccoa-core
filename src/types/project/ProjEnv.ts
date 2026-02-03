@@ -74,7 +74,7 @@ export interface ProjEnvManagerOptions {
     component: string;
     startMode: ProjEnvManagerStartMode;
     secondToKill: number;
-    restart: number;
+    resetMin: number;
     resetStartCounter: number;
     startOptions: string;
 }

@@ -8,7 +8,7 @@ import {
     getTestProjectPath,
 } from '../helpers/test-project-helpers';
 import { OaLanguage } from '../../src/types/localization/OaLanguage';
-import { getAvailableWinCCOAVersions } from '../../src/utils/winccoa-paths';
+import fs from 'fs';
 
 describe('ProjEnvProject (integration)', () => {
     describe('Project Registration', () => {
@@ -414,6 +414,35 @@ describe('ProjEnvProject (integration)', () => {
                 );
                 assert.strictEqual(subProjects.length, 2, 'Found two sub-projects in test fixture');
                 
+            });
+        });
+    });
+
+    describe('Project pmon credentials', () => {
+        it('should get pmon credentials', async () => {
+            await withRunnableTestProject(async (project) => {
+                assert.strictEqual(project.isProtected(), false);
+
+                // the project is not protected, so you can not login
+                assert.rejects(async () => {
+                        await project.loginPmon('admin', 'some-pw');
+                    }, /Failed to login to project/);
+
+                // make a backup of progs file
+                const progsPath = project.getConfigPath('progs');
+                const progsBackupPath = progsPath + '.bak';
+                fs.copyFileSync(progsPath, progsBackupPath);
+                assert.strictEqual(await project.setPmonCredentials('admin', 'some-pw'), 0, 'Setting empty credentials should succeed');
+                
+
+                assert.strictEqual(project.isProtected(), true);
+
+                project.startPmon();
+                const isRunning = await project.isPmonRunning();
+                assert.strictEqual(isRunning, true, 'Pmon should be running');
+                await project.stopPmon(10);
+
+                fs.copyFileSync(progsBackupPath, progsPath);
             });
         });
     });

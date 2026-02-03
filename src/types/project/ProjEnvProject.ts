@@ -19,6 +19,7 @@ import {
 } from './ProjEnv';
 import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
 import path from 'path';
+import { PmonComponentCredential } from '../..';
 
 /**
  * @brief WinCC OA Project class for managing project lifecycle and configuration
@@ -56,11 +57,11 @@ export class ProjEnvProject {
 
         if (this.isRunnable()) {
             if (registry.installationVersion !== undefined) {
-                console.log(
-                    `[${new Date().toISOString()}]`,
-                    this.getId() +
-                        ` Setting project version from registry: ${registry.installationVersion}`,
-                );
+                // console.log(
+                //     `[${new Date().toISOString()}]`,
+                //     this.getId() +
+                //         ` Setting project version from registry: ${registry.installationVersion}`,
+                // );
                 this.setVersion(registry.installationVersion);
             }
 
@@ -96,7 +97,7 @@ export class ProjEnvProject {
                 // when we have no subpojects
                 if (subProjectsEntries.length > 0) {
                     subProjectsEntries.forEach((entry: string, _idx: number) => {
-                        console.log('Checking sub-project entry:', entry, 'at position', _idx);
+                        // console.log('Checking sub-project entry:', entry, 'at position', _idx);
                         if (!entry || entry.trim().length === 0) return;
 
                         const origEntry = entry;
@@ -110,15 +111,15 @@ export class ProjEnvProject {
                             .replace(/\\/g, '/')
                             .replace(/\/\//g, '/')
                             .toLowerCase();
-                        console.log(
-                            `[${new Date().toISOString()}]`,
-                            `Found sub-project entry in config: ${entry}, my dir is ${this.getDir()}`,
-                        );
+                        // console.log(
+                        //     `[${new Date().toISOString()}]`,
+                        //     `Found sub-project entry in config: ${entry}, my dir is ${this.getDir()}`,
+                        // );
                         if (entry.toLowerCase() === myDir) {
-                            console.log(
-                                `[${new Date().toISOString()}]`,
-                                `Skipping sub-project entry that matches self project dir`,
-                            );
+                            // console.log(
+                            //     `[${new Date().toISOString()}]`,
+                            //     `Skipping sub-project entry that matches self project dir`,
+                            // );
                             return; // skip self
                         }
 
@@ -698,8 +699,6 @@ export class ProjEnvProject {
     //------------------------------------------------------------------------------
     /** @brief Function start pmon for this project.
      *  @details Pmon can be started locally only.
-     * @param autoStart Enable to start project self by pmon. You can deactivate it,
-     *                 so is started pmon only.
      * @return Error code.
      * value | description
      * ------|------------
@@ -714,9 +713,15 @@ export class ProjEnvProject {
     //------------------------------------------------------------------------------
     /**
      * @brief Function stop the Pmon.
+     *
+     * @details The function stops also the project with it.
+     * @param timeout Time in s.ms to wait for pmon stop
      * @return Returns 0 when successful, otherwise -1.
      */
     public async stopPmon(timeout: number | undefined): Promise<number> {
+        if (timeout !== undefined) {
+            timeout = timeout * 1000;
+        }
         const result = await this._pmon.stopProjectAndPmon(this.getId(), timeout);
         return result ?? -1;
     }
@@ -752,11 +757,19 @@ export class ProjEnvProject {
     }
 
     //------------------------------------------------------------------------------
+    /** Function checks if the project is in emergency mode.
+     *
+     * @returns true if emergency mode is active, false otherwise
+     */
     public isEmergencyMode(): boolean | undefined {
         return this.getProjectStatus()?.project?.emergency;
     }
 
     //------------------------------------------------------------------------------
+    /** Function checks if the project use demo license.
+     *
+     * @returns true if demo mode-license is active, false otherwise
+     */
     public isDemoMode(): boolean | undefined {
         return this.getProjectStatus()?.project?.demo;
     }
@@ -820,7 +833,10 @@ export class ProjEnvProject {
      *               Index begin with 1. Pmon has idx 0 in progs file.
      * @return Error code. Returns -1 when failed, -2 when pmon is not reachable, otherwise returns the index of the inserted manager.
      */
-    public async insertManager(opts: ProjEnvManagerOptions, manIdx = -1): Promise<number> {
+    public async insertManager(
+        opts: ProjEnvManagerOptions,
+        manIdx: number | undefined = undefined,
+    ): Promise<number> {
         const result = await this._pmon.insertManagerAt(opts, this.getId(), manIdx);
         return result ?? -1;
     }
@@ -895,6 +911,12 @@ export class ProjEnvProject {
         return [];
     }
 
+    //------------------------------------------------------------------------------
+    /** @brief Function returns project status.
+     * @details The function returns the project status.
+     *          The status is stored in the pmon table.
+     * @return Project status ProjEnvPmonProjectStatus. In case of error returns undefined.
+     */
     public getProjectStatus(): ProjEnvPmonProjectStatus | undefined {
         return undefined;
     }
@@ -1043,6 +1065,76 @@ export class ProjEnvProject {
      */
     public getSubProjects(): ProjEnvProject[] {
         return this._subProjects;
+    }
+
+    //------------------------------------------------------------------------------
+    /** @brief Function checks if the project is protected.
+     * @details A project is considered protected if it has a password set in the progs file.
+     * @returns true if the project is protected, false otherwise.
+     */
+    public isProtected(): boolean {
+        if (!this.isRunnable()) {
+            return false; // sub-projects are not protected
+        }
+
+        if (this._pmon.getCredentials() != null) return true; // user name or pw has been set
+
+        const progsPath = this.getConfigPath('progs');
+
+        if (!progsPath || fs.existsSync(progsPath)) {
+            return false; // progs file does not exist
+        }
+
+        const content = fs.readFileSync(progsPath, 'utf-8');
+
+        if (content.indexOf('auth "" ""') !== -1)
+            return false; // user name or pw has not been set in progs file
+        else return true; // user name or pw has been set in progs file
+    }
+
+    //------------------------------------------------------------------------------
+    /** @brief Function logs into the project using the provided credentials.
+     * @details This function logs into the project using the provided username and password.
+     *          It verifies the credentials against the project's pmon component.
+     * @param username The username to use for login.
+     * @param password The password to use for login.
+     */
+    public async loginPmon(username: string, password: string): Promise<void> {
+        if (!this.isRunnable()) {
+            this._errorHandler.exception(
+                `Project ${this.getId()} is not runnable and cannot be logged into.`,
+            );
+        }
+        const cred = new PmonComponentCredential(username, password);
+        const rc = this._pmon.verifyCredentials(this.getId(), cred);
+        if ((await rc) === false) {
+            this._errorHandler.exception(
+                `Failed to login to project ${this.getId()}: Invalid credentials`,
+            );
+        }
+    }
+
+    //------------------------------------------------------------------------------
+    /** @brief Function sets the credentials for the project.
+     * @details This function sets the credentials for the project in the pmon component.
+     * @param username The username to set.
+     * @param password The password to set.
+     * @return Error code:
+     *         0  = Success
+     *         -1 = Failed to set credentials
+     */
+    public async setPmonCredentials(username: string, password: string): Promise<number> {
+        if (!this.isRunnable()) {
+            this._errorHandler.exception(
+                `Project ${this.getId()} is not runnable and cannot used credentials.`,
+            );
+        }
+        const cred = new PmonComponentCredential(username, password);
+        const code = this._pmon.saveCredentials(this.getId(), cred);
+        if ((await code) !== 0) {
+            this._errorHandler.exception(`Failed to set credentials for project ${this.getId()}`);
+        }
+        return 0;
     }
 
     //--------------------------------------------------------------------------------

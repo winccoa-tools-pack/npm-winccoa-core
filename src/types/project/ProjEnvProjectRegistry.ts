@@ -32,6 +32,8 @@ export interface ProjEnvProjectRegistry {
     currentProject?: boolean;
 
     installationVersion?: string;
+
+    invalidReason?: string;
 }
 
 export interface ProductRegistry extends ProjEnvProjectRegistry {
@@ -165,12 +167,42 @@ function loadProjectRegistries(): void {
                         console.log(
                             `[${new Date().toISOString()}] Reloading project registries. Current cache size: ${registeredProjectsCache.length}`,
                         );
-                        parseProjRegistryFile(configPath);
-                        console.log(
-                            `[${new Date().toISOString()}] Project registries reloaded. Current cache size: ${registeredProjectsCache.length}`,
-                        );
+
+                        try {
+                            parseProjRegistryFile(configPath);
+                            console.log(
+                                `[${new Date().toISOString()}] Project registries reloaded. Current cache size: ${registeredProjectsCache.length}`,
+                            );
+                        } catch (error) {
+                            console.error(
+                                `[${new Date().toISOString()}] Failed to parse pvssInst.conf:`,
+                                error instanceof Error ? error.message : String(error),
+                            );
+                            // Clear cache on parse error to prevent corrupt state
+                            registeredProjectsCache = [];
+                            registeredProducts = [];
+                            console.warn(
+                                `[${new Date().toISOString()}] Cleared project registry cache due to parse error`,
+                            );
+                        }
                     }, 100);
                 }
+            });
+
+            // Handle watcher errors to prevent crashes
+            fileWatcher.on('error', (error) => {
+                console.error(
+                    `[${new Date().toISOString()}] File watcher error for pvssInst.conf:`,
+                    error,
+                );
+                // Close watcher on error to prevent infinite loop
+                if (fileWatcher) {
+                    fileWatcher.close();
+                    fileWatcher = undefined;
+                }
+                console.warn(
+                    `[${new Date().toISOString()}] File watcher closed due to error. Manual refresh required.`,
+                );
             });
         } catch (error) {
             // Silently fail if file watching is not supported
@@ -265,9 +297,8 @@ function parseProjRegistryFile(configPath: string): void {
                         const idFromPath = path.basename(entryValue);
 
                         if (idFromPath && idFromPath !== currentProjectSection.id) {
-                            throw new Error(
-                                `Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`,
-                            );
+                            currentProjectSection.invalidReason = `Project ID mismatch in registry entry. Expected: ${currentProjectSection.id}, Found in path: ${idFromPath}`;
+                            break;
                         }
 
                         currentProjectSection.installationDir = path.dirname(entryValue);
@@ -314,6 +345,17 @@ function parseProjRegistryFile(configPath: string): void {
 
     registeredProjectsCache = projects;
     registeredProducts = products;
+
+    // Debug logging
+    console.log(`[PVSS REGISTRY] Parsed pvssInst.conf:`);
+    console.log(`[PVSS REGISTRY]   Total projects: ${projects.length}`);
+    console.log(`[PVSS REGISTRY]   Total products: ${products.length}`);
+
+    projects.forEach((p) => {
+        console.log(
+            `[PVSS REGISTRY]   Project: ${p.id} - notRunnable=${p.notRunnable} (${p.notRunnable ? 'FILTERED OUT' : 'WILL SHOW'})`,
+        );
+    });
 }
 
 /**

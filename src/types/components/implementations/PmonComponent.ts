@@ -5,11 +5,27 @@ import {
     ProjEnvManagerStartMode,
     ProjEnvManagerState,
     ProjEnvProjectState,
+    startModeToString,
 } from '../../project/ProjEnv.js';
 import type { ProjEnvManagerInfo } from '../../project/ProjEnv.js';
 import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus.js';
 
+export class PmonComponentCredential {
+    public username: string;
+    public password: string;
+
+    constructor(username: string, password: string) {
+        this.username = username;
+        this.password = password;
+    }
+}
+
 export class PmonComponent extends WinCCOAComponent {
+    //-------------------------------------------------------------------------
+    //@public members
+    //-------------------------------------------------------------------------
+
+    //-------------------------------------------------------------------------
     /**
      * Returns the component name
      */
@@ -17,6 +33,7 @@ export class PmonComponent extends WinCCOAComponent {
         return 'WCCILpmon';
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Returns the component description
      */
@@ -24,6 +41,7 @@ export class PmonComponent extends WinCCOAComponent {
         return 'Process Monitor';
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Registers a sub-project using pmon's -regsubf option
      * @param projectPath - Path to the sub-project directory
@@ -31,11 +49,10 @@ export class PmonComponent extends WinCCOAComponent {
      */
     public async registerSubProject(projectPath: string): Promise<number> {
         const args = ['-regsubf', '-proj', projectPath, '-log', '+stderr'];
-        const code = super.start(args);
-
-        return code;
+        return this.startAndValidateOutput(args, { checkStdout: false });
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Unregisters a project using pmon's -unreg option
      * @param projectName - Name of the project to unregister
@@ -45,11 +62,10 @@ export class PmonComponent extends WinCCOAComponent {
     public async unregisterProject(projectName: string): Promise<number> {
         // Use -unreg option to unregister project
         const args = ['-unreg', projectName, '-log', '+stderr'];
-        const code = super.start(args);
-
-        return code;
+        return this.startAndValidateOutput(args, { checkStdout: false });
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Registers a runnable project using pmon's -config -autofreg -status options
      * @param configPath - Path to the project config file
@@ -63,7 +79,7 @@ export class PmonComponent extends WinCCOAComponent {
         // Use -config -autofreg -status options to register runnable project
         const args = ['-config', configPath, '-log', '+stderr', '-autofreg', '-status'];
         super.setVersion(projectVersion);
-        const code = super.start(args);
+        const code = this.startAndValidateOutput(args, { checkStdout: false });
 
         // the pmon returns 3 if the project is not running after registrations
 
@@ -72,6 +88,7 @@ export class PmonComponent extends WinCCOAComponent {
         return state !== ProjEnvPmonStatus.Unknown ? 0 : -1;
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Get pmon status. It check if the pmon is running or not
      */
@@ -81,20 +98,22 @@ export class PmonComponent extends WinCCOAComponent {
           0=pmon is running, 3=pmon is stopped, 4=unknown
         */
         const args = ['-status', '-proj', projectName, '-log', '+stdout'];
-        const code = super.start(args);
+        const code = this.startAndValidateOutput(args, { checkStdout: () => {} });
 
         return this.pmonStateCodeToStatus(await code);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Starts pmon only (without auto-starting managers)
      */
     public async startPmonOnly(projectName: string): Promise<number> {
         const args = ['-proj', projectName, '-noAutostart'];
 
-        return super.start(args, { detached: true, waitForLog: 'WAIT_MODE' });
+        return this.startAndValidateOutput(args, { detached: true, waitForLog: 'WAIT_MODE' });
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Starts a project with all managers
      */
@@ -102,25 +121,34 @@ export class PmonComponent extends WinCCOAComponent {
         let args: string[] = ['-proj', projectName];
 
         if (startAll) {
-            args = args.concat(['-command', 'START_ALL:']);
+            args = args.concat(['-command', this.makeCliCredentials() + 'START_ALL:']);
             // INFO, 9/pmon, Das Projekt wurde gestartet und läuft. Gehe in den Überwachungsmodus
-            return super.start(args, { waitForLog: '9/pmon' });
+            return this.startAndValidateOutput(args, { waitForLog: '9/pmon' });
         } else {
             // starting pmon only without extra arguments means, it will start the project too.
             // that means the pmon process will never end (hopefully, otherwise it crashed), so we need to detach
-            return super.start(args, { detached: true, waitForLog: 'WAIT_MODE' });
+            return this.startAndValidateOutput(args, { detached: true, waitForLog: 'WAIT_MODE' });
         }
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Stops all managers in a project
      */
     public async stopProject(projectName: string): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'STOP_ALL:'];
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'STOP_ALL:',
+            '-log',
+            '+stderr',
+        ];
         // INFO, 13/pmon, Projekt wurde komplett gestoppt - warte auf Befehle
-        return super.start(args, { waitForLog: '13/pmon' });
+        return this.startAndValidateOutput(args, { waitForLog: '13/pmon' });
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Stops all managers and exits pmon
      */
@@ -128,26 +156,43 @@ export class PmonComponent extends WinCCOAComponent {
         projectName: string,
         timeout: number | undefined,
     ): Promise<number> {
-        const args = ['-proj', projectName, '-stopWait'];
-        return super.start(args, { timeout: timeout });
+        const args = ['-proj', projectName, '-stopWait', '-log', '+stderr'];
+        return this.startAndValidateOutput(args, { timeout: timeout, checkStdout: false });
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Restarts all managers in a project
      */
     public async restartProject(projectName: string): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'RESTART_ALL:'];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'RESTART_ALL:',
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Sets pmon wait mode
      */
     public async setWaitMode(projectName: string): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'WAIT_MODE:'];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'WAIT_MODE:',
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Starts a specific manager by index
      */
@@ -156,36 +201,66 @@ export class PmonComponent extends WinCCOAComponent {
             '-proj',
             projectName,
             '-command',
-            'SINGLE_MGR:START',
+            this.makeCliCredentials() + 'SINGLE_MGR:START',
             managerIndex.toString(),
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Stops a specific manager by index
      */
     public async stopManager(projectName: string, managerIndex: number): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'SINGLE_MGR:STOP', managerIndex.toString()];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'SINGLE_MGR:STOP',
+            managerIndex.toString(),
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Kills a specific manager by index
      */
     public async killManager(projectName: string, managerIndex: number): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'SINGLE_MGR:KILL', managerIndex.toString()];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'SINGLE_MGR:KILL',
+            managerIndex.toString(),
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Removes a specific manager by index
      */
     public async removeManager(projectName: string, managerIndex: number): Promise<number> {
-        const args = ['-proj', projectName, '-command', 'SINGLE_MGR:DEL', managerIndex.toString()];
-        return super.start(args);
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'SINGLE_MGR:DEL',
+            managerIndex.toString(),
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Gets the list of managers in a project
      */
@@ -195,13 +270,21 @@ export class PmonComponent extends WinCCOAComponent {
             throw new Error('WCCILpmon executable not found');
         }
 
-        const args = ['-proj', projectName, '-command', 'MGRLIST:LIST', '-log', '+stdout'];
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'MGRLIST:LIST',
+            '-log',
+            '+stdout',
+        ];
         const callPath = pmonPath ?? '';
         const lines = await (this as any).execAndCollectLines(callPath, args);
         const parsed = this.parseManagerList(lines.join('\n'));
         return parsed;
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Convenience accessor for manager option (from MGRLIST:LIST) by index.
      * If `projectName` is provided, it will refresh the options list first.
@@ -224,6 +307,14 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return undefined;
     }
 
+    //-------------------------------------------------------------------------
+    /** Sets manager options at a specific index in project
+     *
+     * @param options
+     * @param projectName
+     * @param managerIndex
+     * @returns
+     */
     public async setManagerOptionsAt(
         options: ProjEnvManagerOptions,
         projectName: string,
@@ -233,17 +324,20 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             '-proj',
             projectName,
             '-command',
-            'SINGLE_MGR:PROP_PUT',
+            this.makeCliCredentials() + 'SINGLE_MGR:PROP_PUT',
             managerIndex.toString(),
-            options.startMode.toString(),
+            startModeToString(options.startMode),
             options.secondToKill.toString(),
             options.resetStartCounter.toString(),
-            options.restart.toString(),
+            options.resetMin.toString(),
             options.startOptions,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /** Inserts a manager at a specific index into project
      * @param options Manager options
      * @param projectName Project name
@@ -252,24 +346,32 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
     public async insertManagerAt(
         options: ProjEnvManagerOptions,
         projectName: string,
-        managerIndex: number,
+        managerIndex: number | undefined,
     ): Promise<number> {
+        if (managerIndex === undefined) {
+            managerIndex =
+                (await this.getManagerOptionsList(projectName).then((list) => list.length)) + 1;
+        }
+        // SINGLE_MGR:INS <idx> <manager> <startmode> <seckill> <restartcount> <resetmin> <args>
         const args = [
             '-proj',
             projectName,
             '-command',
-            'SINGLE_MGR:INS',
+            this.makeCliCredentials() + 'SINGLE_MGR:INS',
             managerIndex.toString(),
             options.component,
-            options.startMode.toString(),
+            startModeToString(options.startMode),
             options.secondToKill.toString(),
             options.resetStartCounter.toString(),
-            options.restart.toString(),
+            options.resetMin.toString(),
             options.startOptions,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
+    //-------------------------------------------------------------------------
     /** Sends a debug flag to a specific manager
      * @param flag Debug flag to send (e.g., '-dbg http', '-dbg all')
      * @param projectName Project name
@@ -284,15 +386,20 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             '-proj',
             projectName,
             '-command',
-            'SINGLE_MGR:DEBUG',
+            this.makeCliCredentials() + 'SINGLE_MGR:DEBUG',
             managerIndex.toString(),
             flag,
+            '-log',
+            '+stderr',
         ];
-        return super.start(args);
+        return this.startAndValidateOutput(args);
     }
 
-    /**
-     * Gets detailed project and manager status (MGRLIST:STATI) and returns typed managers and optional project state
+    //-------------------------------------------------------------------------
+    /** Gets detailed project and manager status (MGRLIST:STATI) and returns typed
+     *  managers and optional project state
+     * @param projectName Project name
+     * @returns Parsed project status
      */
 
     public async getProjectStatus(projectName: string): Promise<ProjEnvPmonProjectStatus> {
@@ -302,7 +409,14 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             throw new Error(errorMsg);
         }
 
-        const args = ['-proj', projectName, '-command', 'MGRLIST:STATI', '-log', '+stdout'];
+        const args = [
+            '-proj',
+            projectName,
+            '-command',
+            this.makeCliCredentials() + 'MGRLIST:STATI',
+            '-log',
+            '+stdout',
+        ];
         const callPath = pmonPath ?? '';
         const lines = await (this as any).execAndCollectLines(callPath, args);
         const raw = lines.join('\n');
@@ -310,6 +424,7 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return parsed;
     }
 
+    //-------------------------------------------------------------------------
     /**
      * Convenience method to get a single manager status by index.
      * If `projectName` is provided, it will refresh the list first.
@@ -330,6 +445,147 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return undefined;
     }
 
+    //-------------------------------------------------------------------------
+    /** Saves credentials for pmon authentication
+     *
+     * @param projectName Project name
+     * @param credentials Credentials to save
+     * @returns
+     */
+    public async saveCredentials(
+        projectName: string,
+        credentials: PmonComponentCredential,
+    ): Promise<number> {
+        if (!this.currentCredentials) {
+            this.currentCredentials = { username: '', password: '' };
+        }
+
+        this.validateCredentials(credentials);
+
+        const code = this._storeCredentials(projectName, this.currentCredentials, credentials);
+
+        if ((await code) === 0) {
+            this.currentCredentials = credentials;
+            console.log('Saved credentials for project', projectName);
+        } else {
+            console.log('Failed to save credentials for project', projectName);
+        }
+
+        return code;
+    }
+
+    //-------------------------------------------------------------------------
+    /** Validates pmon credentials
+     *
+     * @param credentials
+     * throws Error if credentials are invalid
+     */
+    public validateCredentials(credentials: PmonComponentCredential): void {
+        if (!credentials.username || credentials.username.trim() === '') {
+            throw new Error('Username cannot be empty');
+        }
+        if (!credentials.password || credentials.password.trim() === '') {
+            throw new Error('Password cannot be empty');
+        }
+
+        if (credentials.username.indexOf('#') !== -1) {
+            throw new Error('Username cannot contains the character "#"');
+        }
+        if (credentials.password.indexOf('#') !== -1) {
+            throw new Error('Password cannot contains the character "#"');
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    /** Gets the currently used credentials
+     *
+     * @returns
+     */
+    public getCredentials(): PmonComponentCredential | null {
+        return this.currentCredentials;
+    }
+
+    //-------------------------------------------------------------------------
+    /** Verifies pmon credentials
+     *
+     * @param projectName Project name
+     * @param credentials Credentials to verify
+     * @returns
+     */
+    public verifyCredentials(
+        projectName: string,
+        credentials: PmonComponentCredential,
+    ): Promise<boolean> {
+        const oldCredentials = credentials;
+        // just try to store the same credentials again
+        return this._storeCredentials(projectName, oldCredentials, credentials).then(
+            (code) => code === 0,
+        );
+    }
+
+    //-------------------------------------------------------------------------
+    //@private members
+    //-------------------------------------------------------------------------
+
+    private currentCredentials: PmonComponentCredential | null = null;
+
+    private makeCliCredentials(): string {
+        if (!this.currentCredentials) {
+            return '';
+        }
+        return `${this.currentCredentials.username}#${this.currentCredentials.password}`;
+    }
+
+    //-------------------------------------------------------------------------
+    private _storeCredentials(
+        projectName: string,
+        oldCredentials: PmonComponentCredential,
+        newCredentials: PmonComponentCredential,
+    ): Promise<number> {
+        const args = [
+            '-proj',
+            projectName,
+            '-auth',
+            oldCredentials.username,
+            oldCredentials.password,
+            newCredentials.username,
+            newCredentials.password,
+            '-log',
+            '+stderr',
+        ];
+        return this.startAndValidateOutput(args);
+    }
+
+    private startAndValidateOutput(
+        args: string[] = [],
+        options: {
+            detached?: boolean;
+            waitForLog?: string;
+            timeout?: number;
+            checkStdout?: false | ((stdout: string) => void);
+        } = {},
+    ): Promise<number> {
+        if (options.checkStdout === undefined) {
+            options.checkStdout = (stdout: string) => {
+                if (!stdout) {
+                    console.warn(
+                        'WARNING: Pmon command returned empty output. Do you means stdErr: ' +
+                            this.stdErr,
+                    );
+                    return;
+                }
+                stdout = stdout.trim();
+                if (stdout != 'OK') {
+                    console.error('ERROR: Pmon command failed with output:', stdout);
+                } else if (stdout.startsWith('ERROR')) {
+                    throw new Error(`Pmon command failed with error: ${stdout}`);
+                }
+            };
+        }
+        return super.start(args, options);
+    }
+
+    //-------------------------------------------------------------------------
     /** Converts pmon exit code to ProjEnvPmonStatus
      *
      * @param code
@@ -346,6 +602,7 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return status;
     }
 
+    //-------------------------------------------------------------------------
     // Private parser for manager list output
     private parseManagerList(output: string): ProjEnvManagerOptions[] {
         const lines = output
@@ -392,14 +649,15 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
                 component: name,
                 startMode: startModeEnum,
                 secondToKill: seckill,
-                restart: restartCount,
-                resetStartCounter: resetMin,
+                resetMin: resetMin,
+                resetStartCounter: restartCount,
                 startOptions: args,
             });
         }
         return result;
     }
 
+    //-------------------------------------------------------------------------
     // Parse project state line from STATI output
     private parseProjectState(line: string): {
         status: ProjEnvProjectState;
@@ -446,6 +704,7 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
         return null;
     }
 
+    //-------------------------------------------------------------------------
     // Parse STATI output into typed managers and project state
     private parseManagerStatus(output: string): ProjEnvPmonProjectStatus {
         const managers: ProjEnvManagerInfo[] = [];

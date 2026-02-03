@@ -208,6 +208,7 @@ export abstract class WinCCOAComponent {
             detached?: boolean;
             waitForLog?: string;
             timeout?: number;
+            checkStdout?: false | ((stdout: string) => void);
         } = {},
     ): Promise<number> {
         const p = this.getPath();
@@ -261,26 +262,34 @@ export abstract class WinCCOAComponent {
                 proc.stdout?.on('data', (d) => {
                     const str = d.toString();
                     this.stdOut += str;
-                    console.log(
-                        `[${new Date().toISOString()}]`,
-                        cmdId,
-                        'STDOUT:',
-                        str,
-                    ); /* histEntry.stdOut += str; */
+                    // console.log(
+                    //     `[${new Date().toISOString()}]`,
+                    //     cmdId,
+                    //     'STDOUT:',
+                    //     str,
+                    // ); /* histEntry.stdOut += str; */
                 });
                 proc.stderr?.on('data', (d) => {
                     const str = d.toString();
                     this.stdErr += str;
-                    console.log(
-                        `[${new Date().toISOString()}]`,
-                        cmdId,
-                        'STDERR:',
-                        str,
-                    ); /* histEntry.stdErr += str; */
+                    // console.log(
+                    //     `[${new Date().toISOString()}]`,
+                    //     cmdId,
+                    //     'STDERR:',
+                    //     str,
+                    // ); /* histEntry.stdErr += str; */
                 });
 
                 proc.on('close', (code) => {
                     if (timeoutHandle) clearTimeout(timeoutHandle);
+                    if (options.checkStdout) {
+                        options.checkStdout(this.stdOut);
+                        console.log(
+                            `[${new Date().toISOString()}]`,
+                            cmdId,
+                            'stderr: ' + this.stdErr,
+                        );
+                    }
                     resolve(code ?? 0);
                 });
                 proc.on('error', (err) => {
@@ -313,6 +322,12 @@ export abstract class WinCCOAComponent {
         args: string[],
         timeout?: number,
     ): Promise<string[]> {
+        console.log(
+            `[${new Date().toISOString()}] Executing command for component ${this.getName()}:`,
+            cmdPath,
+            args,
+            timeout ? `(timeout: ${timeout}ms)` : '',
+        );
         return new Promise((resolve, reject) => {
             const proc = spawn(cmdPath, args, { shell: false });
             let stdout = '';
@@ -338,6 +353,7 @@ export abstract class WinCCOAComponent {
 
             proc.on('close', (_code) => {
                 if (timeoutHandle) clearTimeout(timeoutHandle);
+
                 const lines = stdout
                     .split(/\r?\n/)
                     .map((l) => l.trim())
