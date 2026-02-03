@@ -4,15 +4,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [0.2.0](https://github.com/winccoa-tools-pack/npm-winccoa-core/compare/v0.1.1-rc.202512302248.5b48184.0...v0.2.0) (2025-12-31)
 
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
 ### Added
 
 - **WinCCOAComponent**: Added `timeout` option to `start()` method for process execution time limits
