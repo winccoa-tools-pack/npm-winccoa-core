@@ -166,7 +166,7 @@ import {
 ### Core Technologies
 
 - **Language**: TypeScript 5.x
-- **Runtime**: Node.js 18+ (LTS)
+- **Runtime**: Node.js 20+ (LTS)
 - **Package Manager**: npm
 - **Build Tool**: TypeScript Compiler (tsc)
 
@@ -174,7 +174,6 @@ import {
 
 - **Framework**: node:test (native Node.js)
 - **Assertion**: node:assert
-- **Coverage**: c8 or nyc
 - **Mocking**: Manual mocks / test doubles
 
 ### Code Quality
@@ -317,8 +316,6 @@ class WinCCOANotFoundError extends Error {
 
 ### Code Quality
 
-- **Test Coverage**: ≥80% lines, branches, functions
-- **Type Coverage**: 100% (no implicit `any`)
 - **Linting**: Zero errors, minimal warnings
 - **Complexity**: Keep cyclomatic complexity <10
 
@@ -441,7 +438,7 @@ function getInstallPath(): string | null {
 - Complete API coverage
 - Full documentation
 - Performance optimized
-- Used in production (vs-code-projects-viewer)
+- Used in production (vs-code extensions)
 
 ### v1.x - Enhancements
 
