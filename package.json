@@ -64,9 +64,6 @@
   "config": {
     "winccoaImage": "mpokornyetm/winccoa-tools-pack-npm-winccoa-core:npm-winccoa-core"
   },
-  "overrides": {
-    "glob": "^9.0.0"
-  },
   "engines": {
     "node": ">=20"
   }
