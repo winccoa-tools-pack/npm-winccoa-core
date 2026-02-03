@@ -110,6 +110,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Publish to npm (dist-tag: latest)"
+        # Skip NPM publish on forked repositories (no NPM_TOKEN available)
+        if: github.repository == 'winccoa-tools-pack/npm-winccoa-core'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         shell: bash
