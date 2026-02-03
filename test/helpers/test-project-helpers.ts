@@ -172,6 +172,7 @@ export async function withRunnableTestProject(
     testFn: (project: ProjEnvProject) => Promise<void>,
 ): Promise<void> {
     let project: ProjEnvProject | undefined;
+    
 
     try {
         project = await registerRunnableTestProject();
