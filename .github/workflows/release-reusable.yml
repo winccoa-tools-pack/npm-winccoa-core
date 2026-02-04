@@ -136,7 +136,7 @@ jobs:
 
           # Verify the new tarball
           echo "📋 Contents of new tarball:"
-          tar -tzf "dist/$CLEAN_NAME" | head -20
+          tar -tzf "dist/$CLEAN_NAME" | head -20 || true
 
           # Cleanup staging
           rm -rf staging
