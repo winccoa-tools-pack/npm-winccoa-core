@@ -24,6 +24,7 @@ jobs:
     with:
       target_branch: ${{ github.event.workflow_run.head_branch || github.ref_name }}
       validate_release_branch: false
+      publish_to_npm: false
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -37,7 +38,6 @@ jobs:
         run: |
           echo "🧪 Dev pre-release ${{ needs.pre-release.outputs.tag }} created successfully!"
           echo "📦 npm tarball (*.tgz) attached to the GitHub pre-release"
-          echo "🏪 Package published to npm with dist-tag: next"
-          echo "📝 Auto-generated from develop"
+          echo "📝 Auto-generated from develop (not published to npm)"
           echo ""
           echo "🔗 Pre-release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.pre-release.outputs.tag }}"
