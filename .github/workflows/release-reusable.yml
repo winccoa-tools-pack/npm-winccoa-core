@@ -90,23 +90,56 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           scope: "@winccoa-tools-pack"
 
-      - name: Download tested npm tarball from prerelease
+      - name: Download and repack tarball with release version
         shell: bash
         run: |
-          mkdir -p dist
+          mkdir -p dist staging
           PRERELEASE_TAG="${{ needs.precheck.outputs.prerelease_tag }}"
           REPO="${GITHUB_REPOSITORY}"
+          VERSION="${{ needs.versioning.outputs.version }}"
 
-          gh release download --repo "$REPO" "$PRERELEASE_TAG" --pattern "*.tgz" --dir dist
+          echo "📥 Downloading tarball from prerelease: $PRERELEASE_TAG"
+          gh release download --repo "$REPO" "$PRERELEASE_TAG" --pattern "*.tgz" --dir staging
 
-          TARBALL_PATH=$(ls -1 dist/*.tgz 2>/dev/null | head -n 1)
+          TARBALL_PATH=$(ls -1 staging/*.tgz 2>/dev/null | head -n 1)
           if [ -z "$TARBALL_PATH" ]; then
             echo "❌ ERROR: No .tgz found in prerelease assets for $PRERELEASE_TAG"
-            ls -la dist || true
+            ls -la staging || true
             exit 1
           fi
 
           echo "📦 Downloaded tarball: $TARBALL_PATH"
+
+          # Extract, update version, and repack
+          # npm tarballs have a "package" folder inside
+          echo "📂 Extracting tarball..."
+          tar -xzf "$TARBALL_PATH" -C staging
+
+          echo "🔧 Updating version in package.json to: $VERSION"
+          # Use jq to update the version field
+          jq --arg version "$VERSION" '.version = $version' staging/package/package.json > staging/package/package.json.tmp
+          mv staging/package/package.json.tmp staging/package/package.json
+
+          # Verify the version was updated
+          UPDATED_VERSION=$(jq -r '.version' staging/package/package.json)
+          echo "✅ Version in package.json is now: $UPDATED_VERSION"
+
+          if [ "$UPDATED_VERSION" != "$VERSION" ]; then
+            echo "❌ ERROR: Version update failed"
+            exit 1
+          fi
+
+          # Repack with clean version name
+          CLEAN_NAME="winccoa-tools-pack-npm-winccoa-core-${VERSION}.tgz"
+          echo "📦 Repacking as: dist/$CLEAN_NAME"
+          tar -czf "dist/$CLEAN_NAME" -C staging package
+
+          # Verify the new tarball
+          echo "📋 Contents of new tarball:"
+          tar -tzf "dist/$CLEAN_NAME" | head -20
+
+          # Cleanup staging
+          rm -rf staging
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
