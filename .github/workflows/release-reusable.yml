@@ -75,7 +75,8 @@ jobs:
       target_branch: ${{ inputs.target_branch }}
       create_tag: true
       push_tag: true
-      force_push_tag: false
+      # This allows the release workflow to overwrite an existing tag if a previous release attempt failed partway through.
+      force_push_tag: true
     secrets: inherit
 
   release:
