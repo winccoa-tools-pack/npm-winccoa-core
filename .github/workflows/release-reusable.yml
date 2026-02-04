@@ -96,6 +96,7 @@ jobs:
           mkdir -p dist
           PRERELEASE_TAG="${{ needs.precheck.outputs.prerelease_tag }}"
           REPO="${GITHUB_REPOSITORY}"
+          VERSION="${{ needs.versioning.outputs.version }}"
 
           gh release download --repo "$REPO" "$PRERELEASE_TAG" --pattern "*.tgz" --dir dist
 
@@ -107,6 +108,13 @@ jobs:
           fi
 
           echo "📦 Downloaded tarball: $TARBALL_PATH"
+
+          # Rename tarball to clean version (remove SHA suffix)
+          CLEAN_NAME="dist/winccoa-tools-pack-npm-winccoa-core-${VERSION}.tgz"
+          if [ "$TARBALL_PATH" != "$CLEAN_NAME" ]; then
+            mv "$TARBALL_PATH" "$CLEAN_NAME"
+            echo "📦 Renamed to: $CLEAN_NAME"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
