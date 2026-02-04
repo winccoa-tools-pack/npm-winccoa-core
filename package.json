@@ -1,6 +1,6 @@
 {
   "name": "@winccoa-tools-pack/npm-winccoa-core",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "winccoa-tools-pack",
   "license": "MIT",
   "main": "dist/cjs/index.js",
