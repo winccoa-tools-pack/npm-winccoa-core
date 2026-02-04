@@ -123,7 +123,8 @@ jobs:
           fi
 
           echo "🚀 Publishing $TARBALL_PATH to npm..."
-          npm publish "$TARBALL_PATH" --access public --ignore-scripts
+          # Use ./ prefix to ensure npm treats this as a local file path, not a git URL
+          npm publish "./$TARBALL_PATH" --access public --ignore-scripts
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -144,20 +145,48 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cleanup prereleases for this version
+      - name: Deprecate pre-release npm versions
+        if: github.repository == 'winccoa-tools-pack/npm-winccoa-core'
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="${{ needs.versioning.outputs.version }}"
+          PACKAGE="@winccoa-tools-pack/npm-winccoa-core"
+
+          echo "🧹 Deprecating pre-release npm versions for $VERSION..."
+
+          # Get all versions from npm that match the pre-release pattern (e.g., 0.2.1-abc1234)
+          PRERELEASE_VERSIONS=$(npm view "$PACKAGE" versions --json 2>/dev/null | \
+            jq -r ".[] | select(startswith(\"$VERSION-\"))" 2>/dev/null || echo "")
+
+          if [ -z "$PRERELEASE_VERSIONS" ]; then
+            echo "✅ No pre-release npm versions found for $VERSION"
+            exit 0
+          fi
+
+          for PRERELEASE_VERSION in $PRERELEASE_VERSIONS; do
+            echo "  - Deprecating $PACKAGE@$PRERELEASE_VERSION"
+            npm deprecate "$PACKAGE@$PRERELEASE_VERSION" "Superseded by stable release $VERSION" || \
+              echo "⚠️ Failed to deprecate $PRERELEASE_VERSION"
+          done
+
+          echo "✅ Pre-release npm versions deprecated"
+
+      - name: Cleanup GitHub prereleases for this version
         shell: bash
         run: |
           VERSION="${{ needs.versioning.outputs.version }}"
           PREFIX="v$VERSION-"
           REPO="${GITHUB_REPOSITORY}"
 
-          echo "🧹 Deleting prereleases with tag prefix: $PREFIX"
+          echo "🧹 Deleting GitHub prereleases with tag prefix: $PREFIX"
 
           TAGS=$(gh release list --repo "$REPO" --limit 200 --json tagName,isPrerelease \
             --jq "[.[] | select(.isPrerelease == true and (.tagName | startswith(\"$PREFIX\"))) ] | .[].tagName")
 
           if [ -z "$TAGS" ]; then
-            echo "✅ No prereleases to delete"
+            echo "✅ No GitHub prereleases to delete"
             exit 0
           fi
 
