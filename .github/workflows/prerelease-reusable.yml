@@ -12,10 +12,15 @@ on:
         required: false
         default: true
         type: boolean
+      publish_to_npm:
+        description: "If true: publish to npm with 'next' tag. If false: only create GitHub prerelease with artifact"
+        required: false
+        default: false
+        type: boolean
     secrets:
       NPM_TOKEN:
-        description: "npm token used to publish to the npm registry"
-        required: true
+        description: "npm token used to publish to the npm registry (required only if publish_to_npm is true)"
+        required: false
     outputs:
       version:
         description: "Computed prerelease version (x.y.z-<shortsha>)"
@@ -104,8 +109,8 @@ jobs:
         run: npm pack
 
       - name: "Publish to npm (dist-tag: next)"
-        # Skip NPM publish on forked repositories (no NPM_TOKEN available)
-        if: github.repository == 'winccoa-tools-pack/npm-winccoa-core'
+        # Only publish if publish_to_npm is true and not a fork
+        if: inputs.publish_to_npm && github.repository == 'winccoa-tools-pack/npm-winccoa-core'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --tag next --access public --ignore-scripts
