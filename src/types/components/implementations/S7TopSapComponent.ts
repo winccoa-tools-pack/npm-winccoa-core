@@ -2,7 +2,7 @@
  * S7 Top SAP Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class S7TopSapComponent extends WinCCOAComponent {
     public getName(): string {

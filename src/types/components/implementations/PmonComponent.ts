@@ -1,14 +1,14 @@
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
-import { ProjEnvPmonStatus } from '../../project/ProjEnvPmonStatus.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
+import { ProjEnvPmonStatus } from '../../project/ProjEnvPmonStatus';
 import {
     ProjEnvManagerOptions,
     ProjEnvManagerStartMode,
     ProjEnvManagerState,
     ProjEnvProjectState,
     startModeToString,
-} from '../../project/ProjEnv.js';
-import type { ProjEnvManagerInfo } from '../../project/ProjEnv.js';
-import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus.js';
+} from '../../project/ProjEnv';
+import type { ProjEnvManagerInfo } from '../../project/ProjEnv';
+import { ProjEnvPmonProjectStatus } from '../../project/ProjEnvPmonStatus';
 
 export class PmonComponentCredential {
     public username: string;

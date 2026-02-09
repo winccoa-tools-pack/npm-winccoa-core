@@ -2,7 +2,7 @@
  * Java Manager Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class JavaComponent extends WinCCOAComponent {
     public getName(): string {

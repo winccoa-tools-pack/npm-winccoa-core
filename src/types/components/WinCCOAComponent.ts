@@ -6,7 +6,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { spawn } from 'child_process';
-import { getWinCCOAInstallationPathByVersion } from '../../utils/winccoa-paths.js';
+import { getWinCCOAInstallationPathByVersion } from '../../utils/winccoa-paths';
 import { randomUUID } from 'crypto';
 
 /*

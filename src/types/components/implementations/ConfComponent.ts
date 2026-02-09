@@ -2,7 +2,7 @@
  * Configuration Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class ConfComponent extends WinCCOAComponent {
     public getName(): string {

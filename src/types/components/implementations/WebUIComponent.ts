@@ -2,7 +2,7 @@
  * WebUI Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class WebUIComponent extends WinCCOAComponent {
     public getName(): string {

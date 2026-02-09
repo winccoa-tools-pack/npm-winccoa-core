@@ -2,7 +2,7 @@
  * S7 Driver Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class S7Component extends WinCCOAComponent {
     public getName(): string {
