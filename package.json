@@ -29,7 +29,7 @@
   "scripts": {
     "build:types": "tsc -p tsconfig.build.types.json",
     "build:cjs": "tsc -p tsconfig.build.cjs.json",
-    "build:esm": "tsc -p tsconfig.build.esm.json",
+    "build:esm": "tsc -p tsconfig.build.esm.json && node scripts/fix-esm-imports.mjs",
     "build": "npm run build:types && npm run build:cjs && npm run build:esm",
     "compile": "tsc --build",
     "prepublishOnly": "npm run build",

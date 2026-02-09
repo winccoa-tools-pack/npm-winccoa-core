@@ -2,7 +2,7 @@
  * DNP3 Driver Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class DNP3Component extends WinCCOAComponent {
     public getName(): string {

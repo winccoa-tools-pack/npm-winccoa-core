@@ -2,7 +2,7 @@
  * IEC 60870 Driver Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class IEC60870Component extends WinCCOAComponent {
     public getName(): string {

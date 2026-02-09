@@ -1,4 +1,4 @@
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class DriverComponent extends WinCCOAComponent {
     public getName(): string {

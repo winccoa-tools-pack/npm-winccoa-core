@@ -2,7 +2,7 @@
  * Simulation Driver Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class SimComponent extends WinCCOAComponent {
     public getName(): string {
