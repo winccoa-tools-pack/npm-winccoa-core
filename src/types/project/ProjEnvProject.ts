@@ -1,6 +1,9 @@
 //--------------------------------------------------------------------------------
 
-import { PmonComponent, PmonComponentCredential } from '../components/implementations/PmonComponent';
+import {
+    PmonComponent,
+    PmonComponentCredential,
+} from '../components/implementations/PmonComponent';
 import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
 import { OaLanguage, OaLanguageFromString } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
