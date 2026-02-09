@@ -1,6 +1,9 @@
 //--------------------------------------------------------------------------------
 
-import { PmonComponent } from '../components/implementations';
+import {
+    PmonComponent,
+    PmonComponentCredential,
+} from '../components/implementations/PmonComponent';
 import { findProjectRegistryById, ProjEnvProjectRegistry } from '../project/ProjEnvProjectRegistry';
 import { OaLanguage, OaLanguageFromString } from '../localization/OaLanguage';
 import { tr } from '../../utils/winccoa-localization';
@@ -19,7 +22,6 @@ import {
 } from './ProjEnv';
 import { WinCCOAErrorHandler } from '../logs/WinCCOAErrorHandler';
 import path from 'path';
-import { PmonComponentCredential } from '../..';
 
 /**
  * @brief WinCC OA Project class for managing project lifecycle and configuration

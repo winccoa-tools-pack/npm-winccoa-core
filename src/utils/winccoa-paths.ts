@@ -24,7 +24,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import { execSync, execFileSync } from 'child_process';
-import { parseVersionString } from './winccoa-version-info.js';
+import { parseVersionString } from './winccoa-version-info';
 
 /**
  * Cache for WinCC OA installation paths indexed by version

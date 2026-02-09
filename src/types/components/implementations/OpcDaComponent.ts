@@ -2,7 +2,7 @@
  * OPC DA Client Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class OpcDaComponent extends WinCCOAComponent {
     public getName(): string {
