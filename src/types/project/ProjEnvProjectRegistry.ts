@@ -99,11 +99,23 @@ export function findProjectRegistryById(id: string): ProjEnvProjectRegistry | un
     return getRegisteredProjects().find((projRegistry) => projRegistry.id === id);
 }
 
+/**
+ * Finds a registered product (WinCC OA version) by its unique identifier.
+ *
+ * @param version - The product version to search for
+ * @returns Product registry entry if found, undefined otherwise
+ */
 export function getProductByVersion(version: string): ProductRegistry | undefined {
     loadProjectRegistries();
     return registeredProducts.find((product) => product.id === version);
 }
 
+/**
+ * Retrieves the last used project directory for a given WinCC OA version.
+ *
+ * @param version - The WinCC OA version to look up
+ * @returns The last used project directory if found, undefined otherwise
+ */
 export function getLastUsedProjectDir(version: string): string | undefined {
     loadProjectRegistries();
     return getProductByVersion(version)?.lastUsedProjectDir;
@@ -117,6 +129,19 @@ export function getLastUsedProjectDir(version: string): string | undefined {
  */
 export function reloadProjectRegistries(): void {
     loadProjectRegistries();
+}
+
+/**
+ * Stops watching the pvssInst.conf file for changes. After calling this, the project registry cache will no longer automatically refresh.
+ * Use with caution, as this may lead to stale data if the configuration changes.
+ * This functiuon is primarily intended for testing purposes to prevent interference from file watching during controlled test scenarios.
+ */
+export function stopWatchingProjectRegistries(): void {
+    if (fileWatcher) {
+        fileWatcher.close();
+        fileWatcher = undefined;
+        console.log(`[${new Date().toISOString()}] Stopped watching pvssInst.conf for changes.`);
+    }
 }
 
 /**
@@ -214,6 +239,10 @@ function loadProjectRegistries(): void {
     }
 }
 
+/** Parses the pvssInst.conf file to extract project and product registry information, and updates the caches accordingly.
+ *
+ * @param configPath - The path to the pvssInst.conf file
+ */
 function parseProjRegistryFile(configPath: string): void {
     console.log(`[${new Date().toISOString()}] Loading project registries from ${configPath}`);
 

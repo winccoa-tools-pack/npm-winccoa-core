@@ -92,6 +92,20 @@ if (path) {
 // subsequent lookups return cached value immediately
 ```
 
+### Working with WinCC OA Components
+
+```typescript
+import { getAllWinCCOAComponents } from '@winccoa-tools-pack/npm-winccoa-core';
+
+// Returns only components whose executable exists for the given version.
+// Throws if the version is not installed on this host.
+const components = getAllWinCCOAComponents('3.20');
+
+for (const c of components) {
+  console.log(`${c.getName()}: ${c.getDescription()}`);
+}
+```
+
 ## ✨ Features
 
 ### Component Management
@@ -107,6 +121,7 @@ if (path) {
 
 - **ProjEnvProject**: Complete project lifecycle management
   - Project registration and unregistration
+  - Project version fallback: reads `proj_version` from config if the registry does not provide a version
   - Async operations with automatic retry logic
   - Status polling with proper async/await
   - Configuration file handling
