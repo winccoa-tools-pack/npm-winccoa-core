@@ -1,11 +1,7 @@
 import { strict as assert } from 'node:assert';
 
 import {
-    AndroidComponent,
     ApiComponent,
-    AsciiManagerComponent,
-    AlertManagerComponent,
-    ConfComponent,
     CtrlComponent,
     DataComponent,
     DbManagerComponent,
@@ -16,8 +12,6 @@ import {
     HttpComponent,
     IEC60870Component,
     IEC61850Component,
-    IosComponent,
-    JavaComponent,
     JavaScriptComponent,
     ModbusComponent,
     OpcComponent,
@@ -33,17 +27,11 @@ import {
     SplitComponent,
     UIComponent,
     ValueArchManagerComponent,
-    VideoDriverComponent,
-    VisionComponent,
-    WebUIComponent
+    VideoDriverComponent
 } from '../../src/types/components/implementations/index';
 
 const classes = [
-    AndroidComponent,
     ApiComponent,
-    AsciiManagerComponent,
-    AlertManagerComponent,
-    ConfComponent,
     CtrlComponent,
     DataComponent,
     DbManagerComponent,
@@ -54,8 +42,6 @@ const classes = [
     HttpComponent,
     IEC60870Component,
     IEC61850Component,
-    IosComponent,
-    JavaComponent,
     JavaScriptComponent,
     ModbusComponent,
     OpcComponent,
@@ -72,8 +58,6 @@ const classes = [
     UIComponent,
     ValueArchManagerComponent,
     VideoDriverComponent,
-    VisionComponent,
-    WebUIComponent
 ];
 
 for (const C of classes) {
