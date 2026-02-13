@@ -75,7 +75,7 @@ export class ProjEnvProject {
                     'The project config file does not exist for project ' + this.getId(),
                 );
             } else if (!fs.existsSync(configPath)) {
-                this._errorHandler.warning(
+                this._errorHandler.severe(
                     `The project config file does not exist for project ${this.getId()}: ${configPath}`,
                 );
             } else {
@@ -83,9 +83,17 @@ export class ProjEnvProject {
 
                 const projectVersion = this.getProjectVersion();
 
-                if (projectVersion && this.getVersion() && projectVersion !== this.getVersion()) {
-                    this._errorHandler.warning(
-                        `Project version mismatch between registry and config file for project ${this.getId()}: registry=${this.getVersion()}, config=${projectVersion}`,
+                if (!projectVersion) {
+                    this._errorHandler.severe(
+                        `Unable to determine project version for project ${this.getId()}. Project version is required for proper project management. Please ensure that 'proj_version' is set in the project config file ${configPath}.`,
+                    );
+                }
+
+                if (!this.getVersion()) {
+                    this.setVersion(projectVersion ?? '');
+                } else if (projectVersion !== this.getVersion()) {
+                    this._errorHandler.severe(
+                        `Project version mismatch between registry and config file for project ${this.getId()}: registry=${this.getVersion()}, config=${projectVersion}. Please ensure that the project version is consistent across the registry and config file to avoid potential issues with project management.`,
                     );
                 }
 

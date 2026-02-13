@@ -121,6 +121,7 @@ for (const c of components) {
 
 - **ProjEnvProject**: Complete project lifecycle management
   - Project registration and unregistration
+  - Project version fallback: reads `proj_version` from config if the registry does not provide a version
   - Async operations with automatic retry logic
   - Status polling with proper async/await
   - Configuration file handling
