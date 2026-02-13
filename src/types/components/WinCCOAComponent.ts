@@ -74,7 +74,6 @@ export abstract class WinCCOAComponent {
      * @throws Error when version is empty
      */
     public setVersion(version: string): void {
-
         if (version === undefined || version === '') {
             throw new Error('WinCC OA version must not be empty: ' + this.getName());
         }

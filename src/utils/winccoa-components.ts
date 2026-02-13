@@ -40,7 +40,7 @@ export function getAllWinCCOAComponents(oaVersion: string): WinCCOAComponent[] {
 
     const components: WinCCOAComponent[] = [];
 
-    allPossibleComponents.forEach(component => {
+    allPossibleComponents.forEach((component) => {
         component.setVersion(oaVersion);
         if (component.exists()) {
             components.push(component);

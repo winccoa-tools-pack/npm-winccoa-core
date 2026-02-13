@@ -1,9 +1,6 @@
 import { WinCCOAComponent } from '../WinCCOAComponent';
-import { AlertManagerComponent } from './AlertManagerComponent';
-import { AndroidComponent } from './AndroidComponent';
 import { ApiComponent } from './ApiComponent';
 import { AsciiManagerComponent } from './AsciiManagerComponent';
-import { ConfComponent } from './ConfComponent';
 import { CtrlComponent } from './CtrlComponent';
 import { DataComponent } from './DataComponent';
 import { DbManagerComponent } from './DbManagerComponent';
@@ -14,8 +11,6 @@ import { EventComponent } from './EventComponent';
 import { HttpComponent } from './HttpComponent';
 import { IEC60870Component } from './IEC60870Component';
 import { IEC61850Component } from './IEC61850Component';
-import { IosComponent } from './IosComponent';
-import { JavaComponent } from './JavaComponent';
 import { JavaScriptComponent } from './JavaScriptComponent';
 import { ModbusComponent } from './ModbusComponent';
 import { OpcComponent } from './OpcComponent';
@@ -32,14 +27,8 @@ import { SplitComponent } from './SplitComponent';
 import { UIComponent } from './UIComponent';
 import { ValueArchManagerComponent } from './ValueArchManagerComponent';
 import { VideoDriverComponent } from './VideoDriverComponent';
-import { VisionComponent } from './VisionComponent';
-import { WebUIComponent } from './WebUIComponent';
 
-export { AndroidComponent } from './AndroidComponent';
 export { ApiComponent } from './ApiComponent';
-export { AsciiManagerComponent } from './AsciiManagerComponent';
-export { AlertManagerComponent } from './AlertManagerComponent';
-export { ConfComponent } from './ConfComponent';
 export { CtrlComponent } from './CtrlComponent';
 export { DataComponent } from './DataComponent';
 export { DbManagerComponent } from './DbManagerComponent';
@@ -50,8 +39,6 @@ export { EventComponent } from './EventComponent';
 export { HttpComponent } from './HttpComponent';
 export { IEC60870Component } from './IEC60870Component';
 export { IEC61850Component } from './IEC61850Component';
-export { IosComponent } from './IosComponent';
-export { JavaComponent } from './JavaComponent';
 export { JavaScriptComponent } from './JavaScriptComponent';
 export { ModbusComponent } from './ModbusComponent';
 export { OpcComponent } from './OpcComponent';
@@ -68,18 +55,16 @@ export { SplitComponent } from './SplitComponent';
 export { UIComponent } from './UIComponent';
 export { ValueArchManagerComponent } from './ValueArchManagerComponent';
 export { VideoDriverComponent } from './VideoDriverComponent';
-export { VisionComponent } from './VisionComponent';
-export { WebUIComponent } from './WebUIComponent';
 
-
-
-export function getAllComponents() : WinCCOAComponent[] {
+/**
+ * Get all available WinCC OA components. This list contains all possible components independent of the actual WinCC OA version.
+ * The caller can then set the version and check existence on each component.
+ * @returns Array of WinCCOAComponent instances for all available components
+ */
+export function getAllComponents(): WinCCOAComponent[] {
     return [
-        new AndroidComponent(),
         new ApiComponent(),
         new AsciiManagerComponent(),
-        new AlertManagerComponent(),
-        new ConfComponent(),
         new CtrlComponent(),
         new DataComponent(),
         new DbManagerComponent(),
@@ -90,8 +75,6 @@ export function getAllComponents() : WinCCOAComponent[] {
         new HttpComponent(),
         new IEC60870Component(),
         new IEC61850Component(),
-        new IosComponent(),
-        new JavaComponent(),
         new JavaScriptComponent(),
         new ModbusComponent(),
         new OpcComponent(),
@@ -108,7 +91,5 @@ export function getAllComponents() : WinCCOAComponent[] {
         new UIComponent(),
         new ValueArchManagerComponent(),
         new VideoDriverComponent(),
-        new VisionComponent(),
-        new WebUIComponent(),
     ];
-}   
+}
