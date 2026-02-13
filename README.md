@@ -92,6 +92,20 @@ if (path) {
 // subsequent lookups return cached value immediately
 ```
 
+### Working with WinCC OA Components
+
+```typescript
+import { getAllWinCCOAComponents } from '@winccoa-tools-pack/npm-winccoa-core';
+
+// Returns only components whose executable exists for the given version.
+// Throws if the version is not installed on this host.
+const components = getAllWinCCOAComponents('3.20');
+
+for (const c of components) {
+  console.log(`${c.getName()}: ${c.getDescription()}`);
+}
+```
+
 ## ✨ Features
 
 ### Component Management

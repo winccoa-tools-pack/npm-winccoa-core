@@ -40,6 +40,7 @@ This directory contains the core WinCC OA functionality and utilities.
 ### Utilities (`utils/`)
 
 - Path resolution for WinCC OA installations
+- Component discovery helpers (e.g. `getAllWinCCOAComponents`)
 - Version detection and comparison
 - Localization helpers
 - Log parsing utilities
