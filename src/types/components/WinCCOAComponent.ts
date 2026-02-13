@@ -74,10 +74,6 @@ export abstract class WinCCOAComponent {
      * @throws Error when version is empty
      */
     public setVersion(version: string): void {
-        console.log(
-            `[${new Date().toISOString()}] Setting WinCC OA version to ${version} for component ${this.getName()}`,
-        );
-
         if (version === undefined || version === '') {
             throw new Error('WinCC OA version must not be empty: ' + this.getName());
         }
