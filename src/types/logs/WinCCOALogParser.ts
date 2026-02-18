@@ -13,7 +13,9 @@ export class WinCCOALogParser {
             const content = await fs.promises.readFile(filePath, 'utf-8');
             return this.parseLogContent(content);
         } catch (error) {
-            throw new Error(`Failed to read log file: ${error}`);
+            const wrapped = new Error(`Failed to read log file: ${error}`);
+            (wrapped as any).cause = error;
+            throw wrapped;
         }
     }
 
