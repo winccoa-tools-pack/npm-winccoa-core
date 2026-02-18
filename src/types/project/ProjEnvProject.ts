@@ -615,8 +615,7 @@ export class ProjEnvProject {
      * @return Object formatted in string variable.
      */
     public toString(prefix = ''): string {
-        let ret = '';
-        ret = prefix + this.format('Project ID: $1\n', this.getId());
+        let ret = prefix + this.format('Project ID: $1\n', this.getId());
         ret += prefix + this.format('Name: $1\n', this.getName());
 
         const instDir = this.getInstallDir();

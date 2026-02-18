@@ -593,13 +593,10 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
      */
     private pmonStateCodeToStatus(code: number): ProjEnvPmonStatus {
         console.log('Pmon status code:', code);
-        let status: ProjEnvPmonStatus = ProjEnvPmonStatus.Unknown;
 
-        if (code === 0) status = ProjEnvPmonStatus.Running;
-        else if (code === 3) status = ProjEnvPmonStatus.NotRunning;
-        else status = ProjEnvPmonStatus.Unknown;
-
-        return status;
+        if (code === 0) return ProjEnvPmonStatus.Running;
+        if (code === 3) return ProjEnvPmonStatus.NotRunning;
+        return ProjEnvPmonStatus.Unknown;
     }
 
     //-------------------------------------------------------------------------
@@ -673,7 +670,7 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             const emergency = parseInt(parts[2], 10) === 1;
             const demo = parseInt(parts[3], 10) === 1;
 
-            let status: ProjEnvProjectState = ProjEnvProjectState.Unknown;
+            let status: ProjEnvProjectState;
             switch (statusCode) {
                 case -1:
                     status = ProjEnvProjectState.Unknown;
