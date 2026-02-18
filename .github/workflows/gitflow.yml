@@ -133,18 +133,25 @@ jobs:
               });
               core.notice(`Updated PR #${pr.number} (${pr.html_url}).`);
 
-              // Auto-merge if no conflicts and PR is not draft
+              // Enable auto-merge so the PR merges once required status checks pass.
               if (!hadConflicts && !pr.draft) {
                 try {
-                  await github.rest.pulls.merge({
-                    owner,
-                    repo,
-                    pull_number: pr.number,
-                    merge_method: 'merge',
-                  });
-                  core.notice(`Auto-merged PR #${pr.number}`);
+                  // GitHub GraphQL is required to enable auto-merge.
+                  const { repository } = await github.graphql(`
+                    query($owner: String!, $repo: String!, $number: Int!) {
+                      repository(owner: $owner, name: $repo) {
+                        pullRequest(number: $number) { id }
+                      }
+                    }`, { owner, repo, number: pr.number });
+                  await github.graphql(`
+                    mutation($prId: ID!, $method: PullRequestMergeMethod!) {
+                      enablePullRequestAutoMerge(input: { pullRequestId: $prId, mergeMethod: $method }) {
+                        clientMutationId
+                      }
+                    }`, { prId: repository.pullRequest.id, method: 'SQUASH' });
+                  core.notice(`Enabled auto-merge (squash) on PR #${pr.number}`);
                 } catch (e) {
-                  core.warning(`Could not auto-merge PR #${pr.number}: ${e.message}`);
+                  core.warning(`Could not enable auto-merge on PR #${pr.number}: ${e.message}`);
                 }
               }
               return;
@@ -161,17 +168,23 @@ jobs:
             });
             core.notice(`Created PR #${created.data.number} (${created.data.html_url}).`);
 
-            // Auto-merge if no conflicts
+            // Enable auto-merge so the PR merges once required status checks pass.
             if (!hadConflicts) {
               try {
-                await github.rest.pulls.merge({
-                  owner,
-                  repo,
-                  pull_number: created.data.number,
-                  merge_method: 'merge',
-                });
-                core.notice(`Auto-merged PR #${created.data.number}`);
+                const { repository } = await github.graphql(`
+                  query($owner: String!, $repo: String!, $number: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $number) { id }
+                    }
+                  }`, { owner, repo, number: created.data.number });
+                await github.graphql(`
+                  mutation($prId: ID!, $method: PullRequestMergeMethod!) {
+                    enablePullRequestAutoMerge(input: { pullRequestId: $prId, mergeMethod: $method }) {
+                      clientMutationId
+                    }
+                  }`, { prId: repository.pullRequest.id, method: 'SQUASH' });
+                core.notice(`Enabled auto-merge (squash) on PR #${created.data.number}`);
               } catch (e) {
-                core.warning(`Could not auto-merge PR #${created.data.number}: ${e.message}`);
+                core.warning(`Could not enable auto-merge on PR #${created.data.number}: ${e.message}`);
               }
             }
