@@ -36,10 +36,12 @@ This directory contains the core WinCC OA functionality and utilities.
   - Async project registration with retry logic
   - Polling-based status verification with proper async/await
   - Automatic registry reload between status checks
+  - Version resolution fallback to `proj_version` in project config when missing in registry
 
 ### Utilities (`utils/`)
 
 - Path resolution for WinCC OA installations
+- Component discovery helpers (e.g. `getAllWinCCOAComponents`)
 - Version detection and comparison
 - Localization helpers
 - Log parsing utilities

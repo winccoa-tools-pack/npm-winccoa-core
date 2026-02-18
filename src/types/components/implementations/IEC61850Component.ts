@@ -2,7 +2,7 @@
  * IEC 61850 Client Component
  */
 
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class IEC61850Component extends WinCCOAComponent {
     public getName(): string {

@@ -1,4 +1,4 @@
-import { WinCCOAComponent } from '../WinCCOAComponent.js';
+import { WinCCOAComponent } from '../WinCCOAComponent';
 
 export class UIComponent extends WinCCOAComponent {
     public getName(): string {
