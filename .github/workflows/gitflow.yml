@@ -55,22 +55,44 @@ jobs:
             git checkout -B "$UP_BRANCH" "origin/$BASE_BRANCH"
           fi
 
-          # Merge main into upmerge branch
-          if git merge --no-ff --no-edit "origin/main"; then
+          # Check if there is anything new on main that develop doesn't have
+          if git diff --quiet "HEAD..origin/main" 2>/dev/null; then
+            echo "Nothing to upmerge – develop already contains everything from main."
+            echo "skip=true"  >> "$GITHUB_OUTPUT"
+            echo "had_conflicts=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+          # Merge main into upmerge branch.
+          # -X theirs: on any conflict accept the content from main (the
+          # release commit is authoritative for files it touched).
+          # This resolves the conflicts caused by squash-merged release PRs
+          # where git cannot trace common ancestry.
+          if git merge --no-ff --no-edit -X theirs "origin/main"; then
             echo "had_conflicts=false" >> "$GITHUB_OUTPUT"
           else
-            echo "had_conflicts=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::Merge conflicts detected. Resolve conflicts in PR." 
-            # Keep the conflicted index for PR review
+            # -X theirs handles content conflicts automatically.
+            # If we still fail here it is a tree conflict (e.g. modify vs
+            # delete).  Stage everything, preferring main's version, and
+            # commit.
+            echo "::warning::Merge had structural conflicts – auto-resolving in favour of main."
+            git checkout --theirs . 2>/dev/null || true
+            git add -A
+            git -c core.editor=true merge --continue || \
+              git commit --no-edit -m "chore: upmerge main to develop (auto-resolved)"
+            echo "had_conflicts=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Push upmerge branch
+        if: steps.prep.outputs.skip != 'true'
         shell: bash
         run: |
           set -euo pipefail
           git push --force-with-lease origin "${{ steps.prep.outputs.up_branch }}"
 
       - name: Create or update PR (draft if conflicts)
+        if: steps.prep.outputs.skip != 'true'
         uses: actions/github-script@v7
         with:
           script: |
