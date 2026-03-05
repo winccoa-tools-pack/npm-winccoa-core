@@ -77,4 +77,27 @@ describe('ProjEnvProjectConfig', () => {
     const content = fs.readFileSync(cfgPath, 'utf-8');
     assert.doesNotMatch(content, /rem =/);
   });
+
+  it('merges keys from duplicate sections', () => {
+    const content = [
+      '[general]',
+      'proj_version = "3.20"',
+      'pvss_path = "/opt/WinCC_OA/3.20"',
+      '',
+      '[event]',
+      'fwdDpType = "SubSystem.Actual.State_1"',
+      '',
+      '[general]',
+      'ctrlMaxPendings = 2000',
+      '',
+    ].join('\n');
+    writeFile(cfgPath, content);
+
+    // proj_version from first [general] must survive
+    assert.equal(cfg.getEntryValue('proj_version', 'general'), '3.20');
+    // key from second [general] must also be present
+    assert.equal(cfg.getEntryValue('ctrlMaxPendings', 'general'), '2000');
+    // key from first [general] also preserved
+    assert.equal(cfg.getEntryValue('pvss_path', 'general'), '/opt/WinCC_OA/3.20');
+  });
 });

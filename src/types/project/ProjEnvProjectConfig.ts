@@ -219,7 +219,11 @@ export class ProjEnvProjectConfig {
 
             if (trimmedLine.startsWith('[') && trimmedLine.endsWith(']')) {
                 currentSection = trimmedLine.slice(1, -1);
-                sections[currentSection] = Object.create(null);
+                // Reuse existing section object to merge keys from duplicate sections
+                // (WinCC OA config files legitimately contain multiple sections with the same name)
+                if (!sections[currentSection]) {
+                    sections[currentSection] = Object.create(null);
+                }
             } else if (currentSection && trimmedLine.includes('=')) {
                 const [key, ...valueParts] = trimmedLine.split('=');
                 const value = valueParts.join('=').trim().replace(/['"]/g, '');
