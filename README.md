@@ -152,7 +152,7 @@ npm run build
 # Run all tests
 npm test
 
-# Run only unit tests. Without WinCC OA instalation
+# Run only unit tests. Without WinCC OA installation
 npm run test:unit
 
 # Run only integration tests. WinCC OA must be installed.
@@ -180,14 +180,14 @@ This project uses [Git Flow](https://www.atlassian.com/git/tutorials/comparing-w
 - **`release/*`** - Release preparation
 - **`hotfix/*`** - Emergency fixes for production
 
-For detailed workflow information, see [docs/GITFLOW_WORKFLOW.md](docs/GITFLOW_WORKFLOW.md).
+For detailed workflow information, see [docs/automation/GITFLOW_WORKFLOW.md](docs/automation/GITFLOW_WORKFLOW.md).
 
 ## 📖 Documentation
 
 - [Source Code Overview](src/README.md) - Detailed module documentation
 - [Changelog](CHANGELOG.md) - Version history and updates
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
-- [Development Docs](docs/dev/README.md) - Development guidelines
+- [Development Vision](docs/dev/VISION.md) - Development guidelines
 
 ## 🔧 Configuration
 
