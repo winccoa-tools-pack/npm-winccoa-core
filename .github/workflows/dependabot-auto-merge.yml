@@ -9,9 +9,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    # Temporary: points to the reusable workflow PR branch for validation.
-    # After winccoa-tools-pack/.github#85 is merged, switch back to @main.
-    uses: winccoa-tools-pack/.github/.github/workflows/reusable-dependabot-auto-merge.yml@feature/reusable-dependabot-auto-merge
+    uses: winccoa-tools-pack/.github/.github/workflows/reusable-dependabot-auto-merge.yml@main
     with:
       pr_url: ${{ github.event.pull_request.html_url }}
       merge_method: squash
