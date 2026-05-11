@@ -15,6 +15,7 @@ jobs:
     uses: winccoa-tools-pack/.github/.github/workflows/reusable-dependabot-auto-merge.yml@main
     with:
       pr_url: ${{ github.event.pull_request.html_url }}
+      approve_pr: true
       merge_method: squash
       update_branch: true
 
@@ -28,4 +29,5 @@ jobs:
       base_branch: develop
       merge_method: squash
       update_branch: true
+      approve_prs: true
       enable_auto_merge: true
