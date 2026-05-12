@@ -1,0 +1,61 @@
+name: Auto-merge countdown label
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  add-countdown-label:
+    # Avoid trying to label PRs from forks (no permission to write labels)
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add 3-day countdown label
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const labelName = 'merge-in-3-days-without-review';
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            async function ensureLabelExists() {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name: labelName });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner,
+                  repo,
+                  name: labelName,
+                  color: '0e8a16',
+                  description: 'Auto-merge after 3 days if CI is green and no reviews were given.',
+                });
+              }
+            }
+
+            await ensureLabelExists();
+
+            // Add label idempotently
+            const existing = (context.payload.pull_request.labels || []).map(l => l.name);
+            if (existing.includes(labelName)) {
+              core.info(`Label already present: ${labelName}`);
+              return;
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number,
+              labels: [labelName],
+            });
+
+            core.info(`Applied label: ${labelName}`);
