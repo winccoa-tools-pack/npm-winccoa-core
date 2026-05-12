@@ -1,0 +1,22 @@
+name: Auto-approve stale PRs
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # Daily at 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-approve and auto-merge after countdown
+        uses: mPokornyETM/auto-approve-stale-prs@v1
+        with:
+          days-until-approve: '3'
+          merge-method: 'merge'
+          require-green-ci: 'true'
+          author-associations: 'OWNER,MEMBER,COLLABORATOR'
