@@ -22,27 +22,3 @@ jobs:
           release-type: node
           target-branch: develop
           skip-github-release: true
-name: release-please
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-
-jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Release Please
-        uses: googleapis/release-please-action@v4
-        with:
-          token: ${{ secrets.REPO_ADMIN_TOKEN != '' && secrets.REPO_ADMIN_TOKEN || github.token }}
-          release-type: node
-          target-branch: main
-          skip-github-release: true
