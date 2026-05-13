@@ -1,0 +1,15 @@
+name: Rebase open PRs
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  rebase-prs:
+    # Requires GH_TOKEN_PAT secret (PAT) in this repo or org
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: winccoa-tools-pack/.github/.github/workflows/reusable-rebase-open-prs.yml@main
+    secrets: inherit
