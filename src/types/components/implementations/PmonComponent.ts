@@ -615,7 +615,8 @@ once 30 3 1 -m gedi -n -num 5` to get the properties. It shall be mu more faster
             if (parts.length < 1) continue;
 
             if (parts.length < 6) {
-                throw new Error(`The line '${line}' has incorrect format`);
+                // Skip PMON log/warning lines that appear in stdout output
+                continue;
             }
 
             const name = parts[0];

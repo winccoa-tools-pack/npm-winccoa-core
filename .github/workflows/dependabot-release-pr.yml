@@ -1,0 +1,21 @@
+name: Dependabot (create release PR)
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-release-pr:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    uses: winccoa-tools-pack/.github/.github/workflows/reusable-dependabot-release-pr.yml@main
+    secrets: inherit
+    with:
+      base_branch: develop
+      target_branch: main
+      enable_auto_merge: false
+      project_type: npm
+      auto_release: true

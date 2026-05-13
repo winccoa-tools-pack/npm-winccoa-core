@@ -1,6 +1,7 @@
 {
   "name": "@winccoa-tools-pack/npm-winccoa-core",
-  "version": "0.2.6",
+  "version": "2.0.8",
+  "description": "Core utilities and type definitions for WinCC OA development (process control, paths, logs, and shared helpers)",
   "author": "winccoa-tools-pack",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -48,17 +49,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.2.3",
+    "@types/node": "^25.6.2",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.3.0",
+    "globals": "^17.6.0",
     "markdownlint": "^0.40.0",
-    "markdownlint-cli": "^0.47.0",
+    "markdownlint-cli": "^0.48.0",
     "prettier": "^3.8.1",
     "ts-node": "^10.9.1",
     "tsx": "^4.21.0",
     "typescript": "^5.2.0",
-    "typescript-eslint": "^8.55.0"
+    "typescript-eslint": "^8.59.3"
   },
   "config": {
     "winccoaImage": "mpokornyetm/winccoa-tools-pack-npm-winccoa-core:npm-winccoa-core"

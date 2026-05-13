@@ -1,26 +1,37 @@
-# Auto-enable squash merge for Dependabot PRs
-# GitHub will automatically merge once all required checks pass
 name: Dependabot Auto-merge
 
-on: pull_request
-
-permissions:
-  contents: write
-  pull-requests: write
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
 
 jobs:
-  auto-merge:
-    runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
-    steps:
-      - name: Update branch if behind
-        run: gh pr update-branch --rebase "$PR_URL" || true
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  dependabot-auto-merge:
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    uses: winccoa-tools-pack/.github/.github/workflows/reusable-dependabot-auto-merge.yml@main
+    secrets: inherit
+    with:
+      pr_url: ${{ github.event.pull_request.html_url }}
+      approve_pr: true
+      merge_method: squash
+      update_branch: true
 
-      - name: Enable auto-merge
-        run: gh pr merge --auto --squash "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  dependabot-refresh:
+    if: github.event_name == 'push' && github.ref_name == 'develop'
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    uses: winccoa-tools-pack/.github/.github/workflows/reusable-dependabot-refresh.yml@main
+    secrets: inherit
+    with:
+      base_branch: develop
+      merge_method: squash
+      update_branch: true
+      approve_prs: true
+      enable_auto_merge: true
