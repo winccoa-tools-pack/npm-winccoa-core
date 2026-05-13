@@ -1,6 +1,6 @@
 {
   "name": "@winccoa-tools-pack/npm-winccoa-core",
-  "version": "0.2.6",
+  "version": "2.0.8",
   "description": "Core utilities and type definitions for WinCC OA development (process control, paths, logs, and shared helpers)",
   "author": "winccoa-tools-pack",
   "license": "MIT",
