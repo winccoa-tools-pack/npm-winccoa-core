@@ -41,10 +41,6 @@ on:
         default: false
         type: boolean
 
-concurrency:
-  group: create-release-branch-${{ github.repository }}-${{ inputs.version }}
-  cancel-in-progress: false
-
 permissions:
   contents: write
   pull-requests: write
