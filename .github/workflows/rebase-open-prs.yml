@@ -4,12 +4,21 @@ on:
   push:
     branches:
       - develop
+  workflow_dispatch: {}
 
+permissions:
+  contents: write
+  pull-requests: write
+
+  # allow commenting on PRs and updating workflow files when needed
+  issues: write
+  
 jobs:
-  rebase-prs:
-    # Requires GH_TOKEN_PAT secret (PAT) in this repo or org
-    permissions:
-      contents: write
-      pull-requests: write
-    uses: winccoa-tools-pack/.github/.github/workflows/reusable-rebase-open-prs.yml@main
-    secrets: inherit
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mPokornyETM/rebase-open-prs-action@v1.2.4
+        with:
+          github-token: ${{ secrets.REPO_ADMIN_TOKEN  }}
+          skip-drafts: 'true'                    # Skip draft PRs (default: true)
+          skip-dependabot-rebase: 'true'         # Use @dependabot rebase comment (default: true)
