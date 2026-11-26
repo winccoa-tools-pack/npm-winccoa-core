@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.9] - 2026-11-26
+
+### Fixed
+
+- resolve katex and js-yaml security alerts in dev dependencies (#202)
+- use client-id instead of the deprecated app-id for the bot token (#198)
+- ignore TypeScript 7 and ESLint 10 updates until the lint tooling supports them (#196)
+
+### Changed
+
+- deps-dev(deps-dev): bump @types/node from 25.6.2 to 26.6.6 (#185)
+- align .github files and scripts with the template (#201)
+- prefer REPO_ADMIN_TOKEN over the bot app token for merges and branch updates (#199)
+- use the winccoa-tools-pack-bot app token for automated PR actions (#197)
+- bump actions/checkout from 6 to 7 (#167)
+- run integration tests manually and warn on limited test coverage (#194)
+- add apply-settings helper scripts and actions policy (#193)
+- auto-release patch and minor releases (#192)
+- deps-dev(deps-dev): bump the dev-tools group across 1 directory with 2 updates (#163)
+- bump actions/setup-node from 6 to 7 (#174)
+- bump smol-toml and markdownlint-cli (#191)
+- deps-dev(deps-dev): bump typescript-eslint from 8.59.3 to 8.73.0 (#186)
+- deps-dev(deps-dev): bump globals from 17.6.0 to 17.14.0 (#187)
+- deps-dev(deps-dev): bump markdownlint from 0.40.0 to 0.42.2 (#184)
+- deps-dev(deps-dev): bump @humanfs/node from 0.16.7 to 0.16.8 (#189)
+- deps-dev(deps-dev): bump tsx from 4.21.0 to 4.23.15 (#182)
+- align .github with template-npm-shared-library (#181)
+- use org reusable rebase-open-prs (#153)
+
 ## [Unreleased]
 
 ### Added
